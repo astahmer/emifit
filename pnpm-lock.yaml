@@ -29,6 +29,7 @@ specifiers:
   react-router-dom: ^6.2.1
   react-virtual: ^2.10.4
   redaxios: ^0.4.1
+  ts-toolbelt: ^9.6.0
   typescript: ^4.5.5
   valtio: ^1.3.0
   vite: ^2.8.4
@@ -68,6 +69,7 @@ devDependencies:
   '@vitejs/plugin-react': 1.2.0
   prettier: 2.5.1
   prettier-plugin-sorted: 2.0.0_prettier@2.5.1
+  ts-toolbelt: 9.6.0
   typescript: 4.5.5
   vite: 2.8.4
   vite-plugin-pwa: 0.11.13_vite@2.8.4
@@ -4442,6 +4444,10 @@ packages:
     resolution: {integrity: sha1-qLE/1r/SSJUZZ0zN5VujaTtwbQk=}
     dependencies:
       punycode: 2.1.1
+    dev: true
+
+  /ts-toolbelt/9.6.0:
+    resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
     dev: true
 
   /tsconfig-resolver/2.2.0:
