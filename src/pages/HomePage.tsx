@@ -1,39 +1,121 @@
 import { CalendarButton } from "@/components/CalendarButton";
+import { MultiSelect } from "@/components/MultiSelect";
+import { Categories } from "@/constants";
+import { currentDateAtom } from "@/store";
 import { ChevronLeftIcon, ChevronRightIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Button, Divider, Flex, Heading, HStack, IconButton, ListItem, OrderedList, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Divider,
+    Flex,
+    Heading,
+    HStack,
+    IconButton,
+    ListItem,
+    OrderedList,
+    Popover,
+    PopoverAnchor,
+    PopoverArrow,
+    PopoverBody,
+    PopoverCloseButton,
+    PopoverContent,
+    Text,
+    useDisclosure,
+} from "@chakra-ui/react";
+import { addDays, isFuture } from "date-fns";
+import { useAtom } from "jotai";
 import { Fragment } from "react";
 
 export const HomePage = () => {
     return (
         <>
             <Header />
-            <Flex flexDirection="column" h="100%">
-                <Flex justifyContent="space-between" alignItems="center" px="6">
-                    <Heading as="h3" size="lg">
-                        Category 1
-                    </Heading>
-                    <Button leftIcon={<EditIcon />} colorScheme="twitter" variant="solid">
-                        Edit
-                    </Button>
-                </Flex>
-                <Divider mt="4" />
-                <ExerciseList />
-            </Flex>
+            <DayExcercises />
         </>
     );
 };
 
 const Header = () => {
+    const [date, setDate] = useAtom(currentDateAtom);
+    const isNextDayInFuture = isFuture(addDays(date, 1));
+
     return (
         <Flex p="4" justifyContent="space-between" alignItems="center">
-            <ChevronLeftIcon fontSize="32px" />
-            {/* TODO disable future dates */}
-            <CalendarButton />
-            {/* <Text c>
-                17/02/2022
-            </Text> */}
-            {/* TODO disable si future date */}
-            <ChevronRightIcon fontSize="32px" />
+            <IconButton
+                variant="unstyled"
+                aria-label="Prev day"
+                icon={<ChevronLeftIcon fontSize="32px" />}
+                onClick={() => setDate((current) => addDays(current, -1))}
+            />
+            <CalendarButton selectedDate={date} onChange={setDate} />
+            <IconButton
+                variant="unstyled"
+                aria-label="Next day"
+                icon={<ChevronRightIcon fontSize="32px" />}
+                isDisabled={isNextDayInFuture}
+                onClick={() => setDate((current) => addDays(current, 1))}
+            />
+        </Flex>
+    );
+};
+
+const DayExcercises = () => {
+    return (
+        <Flex flexDirection="column" h="100%">
+            <DayCategory />
+            <Divider mt="4" />
+            <ExerciseList />
+        </Flex>
+    );
+};
+
+const DayCategory = () => {
+    const items = Categories.map((cat) => cat);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
+    return (
+        <Flex justifyContent="space-between" alignItems="center" px="6">
+            <Box pos="relative">
+                <Popover isOpen={isOpen} onClose={onClose} closeOnBlur>
+                    <MultiSelect
+                        isOpen={isOpen}
+                        getValue={(item) => item.id}
+                        itemToString={(item) => item.label}
+                        items={items}
+                        onChange={(item) => {
+                            console.log(item);
+                            onClose();
+                        }}
+                        isMulti={false}
+                        renderButton={(props) => (
+                            <PopoverAnchor>
+                                <Heading {...props.getButtonProps()} as="h3" size="lg">
+                                    Category 1
+                                </Heading>
+                            </PopoverAnchor>
+                        )}
+                        // <PopoverTrigger>
+                        //     <Button variant="unstyled">
+                        //     </Button>
+                        // </PopoverTrigger>
+                        renderList={({ ListComponent, ...props }) =>
+                            isOpen ? (
+                                <PopoverContent>
+                                    <PopoverArrow />
+                                    <PopoverCloseButton />
+                                    <PopoverBody>
+                                        <ListComponent {...props} />
+                                    </PopoverBody>
+                                </PopoverContent>
+                            ) : null
+                        }
+                    />
+                </Popover>
+            </Box>
+
+            <Button leftIcon={<EditIcon />} colorScheme="twitter" variant="solid" onClick={onOpen}>
+                Edit
+            </Button>
         </Flex>
     );
 };
