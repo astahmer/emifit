@@ -2,13 +2,24 @@ import { Combobox } from "@/components/Combobox";
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { MultiSelect } from "@/components/MultiSelect";
-import { SelectInput } from "@/components/SelectInput";
 import { TextInput } from "@/components/TextInput";
 import { Categories } from "@/constants";
 import { onError } from "@/functions/toasts";
 import { makeId, Serie, useExercises } from "@/store";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
-import { Box, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Divider,
+    Flex,
+    FormControl,
+    FormErrorMessage,
+    FormLabel,
+    Heading,
+    IconButton,
+    Stack,
+    Text,
+} from "@chakra-ui/react";
 import { format } from "date-fns";
 import { update } from "idb-keyval";
 import { Fragment, useEffect } from "react";
@@ -99,52 +110,61 @@ export const AddPage = () => {
     );
 };
 
+const required = { value: true, message: "This field is required" };
 const ExoNameAutocomplete = () => {
     const form = useFormContext<typeof defaultValues>();
     const query = useExercises();
     const items = query.data || [];
 
     return (
-        <TextInput
-            label="Exercise name"
-            render={() => (
-                <Combobox
-                    {...form.register("name", { required: true })}
-                    getValue={(item) => item.name}
-                    itemToString={(item) => `${item.name}`}
-                    items={items}
-                />
-            )}
-            error={form.formState.errors.name}
-        />
+        <FormControl isInvalid={Boolean(form.formState.errors.name)}>
+            <Combobox
+                {...form.register("name", { required })}
+                getValue={(item) => item.name}
+                itemToString={(item) => `${item.name}`}
+                items={items}
+                label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise name</FormLabel>}
+            />
+
+            {form.formState.errors.name && <FormErrorMessage>{form.formState.errors.name.message}</FormErrorMessage>}
+        </FormControl>
     );
 };
 
 const TagMultiSelect = ({ catId }: { catId: string }) => {
     const form = useFormContext<typeof defaultValues>();
+    const isInvalid = Boolean(form.formState.errors.tags);
+
     const category = Categories.find((cat) => cat.id === (catId as typeof Categories[number]["id"]));
     const items = category.children as any as Array<{ id: string; label: string }>;
 
     return (
-        <TextInput
-            label="Tag(s)"
-            render={() => (
-                <Controller
-                    control={form.control}
-                    name="tags"
-                    rules={{ required: true }}
-                    render={({ field: { onChange, onBlur, value, ref } }) => (
-                        <MultiSelect
-                            getValue={(item) => item.id}
-                            itemToString={(item) => item.label}
-                            items={items}
-                            onChange={onChange}
-                        />
-                    )}
-                />
+        <FormControl isInvalid={isInvalid}>
+            <Controller
+                control={form.control}
+                name="tags"
+                rules={{ required }}
+                render={({ field: { onChange, onBlur, ref } }) => (
+                    <MultiSelect
+                        ref={ref}
+                        getValue={(item) => item.id}
+                        itemToString={(item) => item.label}
+                        items={items}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        label={(getLabelProps) => <FormLabel {...getLabelProps()}>Tags</FormLabel>}
+                        getButtonProps={() => ({
+                            "aria-invalid": isInvalid,
+                            _invalid: { borderWidth: "1px", borderColor: "red.500", boxShadow: `0 0 0 1px #e53e3e` },
+                        })}
+                    />
+                )}
+            />
+
+            {form.formState.errors.tags && (
+                <FormErrorMessage>{(form.formState.errors.tags as any).message}</FormErrorMessage>
             )}
-            error={form.formState.errors.tags as any}
-        />
+        </FormControl>
     );
 };
 

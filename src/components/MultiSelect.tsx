@@ -1,27 +1,33 @@
-import { Button, Checkbox, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import { Button, ButtonProps, Checkbox, List, ListItem, Stack, Text, useMergeRefs } from "@chakra-ui/react";
 import { useSelect, UseSelectProps, UseSelectReturnValue } from "downshift";
 import React, { ForwardedRef, forwardRef, ReactNode, useCallback, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";
 
-export const MultiSelect = forwardRef<HTMLSelectElement, MultiSelectProps>((props, _ref) => (
-    <MultiSelectBase {...props} />
+export const MultiSelect = forwardRef<HTMLSelectElement, MultiSelectProps>((props, ref) => (
+    <MultiSelectBase {...props} externalRef={ref} />
 )) as <Item>(
     props: MultiSelectProps<Item> & { ref?: ForwardedRef<HTMLSelectElement> }
 ) => ReturnType<typeof MultiSelectBase>;
 
 type MultiSelectProps<Item = any> = {
+    externalRef?: ForwardedRef<HTMLSelectElement | null>;
     items: Item[];
     onChange: (items: Item[]) => void;
     label?: (getLabelProps: UseSelectReturnValue<Item>["getLabelProps"]) => ReactNode;
     getValue?: (item: Item) => string | number;
-} & Pick<UseSelectProps<Item>, "itemToString">;
+    getButtonProps?: () => ButtonProps;
+} & Pick<UseSelectProps<Item>, "itemToString"> &
+    Pick<ButtonProps, "onBlur">;
 
 function MultiSelectBase<Item = any>({
+    externalRef,
     items,
     label,
     getValue = (item) => String(item as any),
     itemToString,
     onChange,
+    onBlur,
+    getButtonProps,
 }: MultiSelectProps<Item>) {
     const [selectedItems, setSelectedItems] = useState([]);
     const parentRef = useRef();
@@ -56,10 +62,13 @@ function MultiSelectBase<Item = any>({
         overscan: 5,
     });
 
+    const buttonProps = getToggleButtonProps(getButtonProps?.() as any);
+    const buttonRef = useMergeRefs(externalRef, buttonProps.ref);
+
     return (
         <>
             {label?.(getLabelProps)}
-            <Button {...getToggleButtonProps()}>
+            <Button {...buttonProps} ref={buttonRef} onBlur={onBlur}>
                 {selectedItems.length ? `${selectedItems.length} elements selected` : "Select one or more"}
             </Button>
             <List
