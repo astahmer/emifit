@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { callAll } from "@pastable/core";
 import { useCombobox, UseComboboxProps, UseComboboxReturnValue } from "downshift";
-import { ForwardedRef, forwardRef, ReactNode, Ref, useCallback, useRef, useState } from "react";
+import { ForwardedRef, forwardRef, ReactNode, Ref, useCallback, useMemo, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";
 
 export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => (
@@ -26,15 +26,18 @@ type ComboboxProps<Item = any> = {
         props: { ref: Ref<HTMLInputElement> } & ReturnType<UseComboboxReturnValue<Item>["getInputProps"]>
     ) => ReactNode;
     label?: (getLabelProps: UseComboboxReturnValue<Item>["getLabelProps"]) => ReactNode;
+    getValue?: (item: Item) => string | number;
 } & InputProps &
-    Pick<UseComboboxProps<Item>, "itemToString">;
+    Pick<UseComboboxProps<Item>, "itemToString" | "onSelectedItemChange">;
 
 function ComboboxBase<Item = any>({
     externalRef,
     items,
     renderInput,
     label,
+    getValue,
     itemToString,
+    onSelectedItemChange,
     ...props
 }: ComboboxProps<Item>) {
     const [inputItems, setInputItems] = useState(items);
@@ -47,6 +50,29 @@ function ComboboxBase<Item = any>({
         overscan: 5,
     });
 
+    // fill inputValue with getValue(item) if defined
+    const stateReducer = useMemo(() => {
+        if (!getValue) return undefined;
+        const reducer: UseComboboxProps<Item>["stateReducer"] = (state, actionAndChanges) => {
+            const { type, changes } = actionAndChanges;
+            switch (type) {
+                case useCombobox.stateChangeTypes.ItemClick:
+                case useCombobox.stateChangeTypes.InputKeyDownEnter:
+                    return {
+                        ...changes,
+                        ...(state.highlightedIndex > -1 &&
+                            changes.selectedItem && {
+                                inputValue: String(getValue(changes.selectedItem)),
+                            }),
+                    };
+                default:
+                    return changes;
+            }
+        };
+
+        return reducer;
+    }, [getValue]);
+
     const {
         isOpen,
         getToggleButtonProps,
@@ -57,8 +83,8 @@ function ComboboxBase<Item = any>({
         highlightedIndex,
         getItemProps,
     } = useCombobox({
+        stateReducer,
         itemToString,
-
         items: inputItems,
         onInputValueChange: ({ inputValue }) => {
             setInputItems(
@@ -69,6 +95,7 @@ function ComboboxBase<Item = any>({
                 )
             );
         },
+        onSelectedItemChange,
     });
     const inputProps = getInputProps();
     const inputRef = useMergeRefs(externalRef, inputProps.ref);
@@ -138,7 +165,11 @@ function ComboboxBase<Item = any>({
                                         transform: `translateY(${virtualRow.start}px)`,
                                     },
                                 })}
-                                key={itemToString(inputItems[virtualRow.index])}
+                                key={
+                                    typeof inputItems[virtualRow.index] === "string"
+                                        ? inputItems[virtualRow.index]
+                                        : itemToString(inputItems[virtualRow.index])
+                                }
                             >
                                 {typeof inputItems[virtualRow.index] === "string"
                                     ? inputItems[virtualRow.index]

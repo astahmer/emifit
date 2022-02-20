@@ -1,5 +1,7 @@
 import { Combobox } from "@/components/Combobox";
+import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
+import { MultiSelect } from "@/components/MultiSelect";
 import { SelectInput } from "@/components/SelectInput";
 import { TextInput } from "@/components/TextInput";
 import { Categories } from "@/constants";
@@ -11,6 +13,7 @@ import { format } from "date-fns";
 import { update } from "idb-keyval";
 import { Fragment, useEffect } from "react";
 import {
+    Controller,
     FormProvider,
     useFieldArray,
     UseFieldArrayReturn,
@@ -21,13 +24,13 @@ import {
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-const defaultValues = { name: "", nbSeries: 1, tag: "", series: [makeSerie(0)] as Serie[] };
+const defaultValues = { name: "", nbSeries: 1, tags: [], series: [makeSerie(0)] as Serie[] };
 
 const makeExercise = (params: typeof defaultValues & { category: string }) => ({
     ...params,
     id: makeId(),
     date: format(new Date(), "dd/MM/yyyy"),
-    series: params.series.map((serie) => serie),
+    series: params.series.map((serie) => ({ ...serie, id: makeId() })),
 });
 function makeSerie(index: number, current = []) {
     return { id: makeId(), kg: current[index - 1]?.kg ?? 1, reps: 1 };
@@ -42,6 +45,7 @@ export const AddPage = () => {
     const mutation = useMutation(
         async (params: typeof defaultValues) => {
             const row = makeExercise({ ...params, category: catId });
+            console.log(row);
             await update("exercises", (current) => [...(current || []), row]);
             return row;
         },
@@ -56,22 +60,13 @@ export const AddPage = () => {
 
     const [params] = useSearchParams();
     const catId = params.get("category") || Categories[0].id;
-    const category = Categories.find((cat) => cat.id === (catId as typeof Categories[number]["id"]));
-    const options = category.children.map((cat) => ({ label: cat.label, value: cat.id }));
 
     return (
         <Box as="form" id="add-form" onSubmit={form.handleSubmit((data) => mutation.mutate(data))} h="100%">
             <FormProvider {...form}>
                 <Stack p="8" overflow="auto" h="100%">
                     <ExoNameAutocomplete />
-                    <SelectInput {...register("tag")} label="Tag">
-                        <option value="">Select a tag</option>
-                        {options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </SelectInput>
+                    <TagMultiSelect catId={catId} />
                     {/* TODO prefill via name */}
                     <TextInput
                         {...register("nbSeries", { valueAsNumber: true })}
@@ -114,12 +109,41 @@ const ExoNameAutocomplete = () => {
             label="Exercise name"
             render={() => (
                 <Combobox
-                    itemToString={(item) => item.name}
                     {...form.register("name", { required: true })}
+                    getValue={(item) => item.name}
+                    itemToString={(item) => `${item.name}`}
                     items={items}
                 />
             )}
             error={form.formState.errors.name}
+        />
+    );
+};
+
+const TagMultiSelect = ({ catId }: { catId: string }) => {
+    const form = useFormContext<typeof defaultValues>();
+    const category = Categories.find((cat) => cat.id === (catId as typeof Categories[number]["id"]));
+    const items = category.children as any as Array<{ id: string; label: string }>;
+
+    return (
+        <TextInput
+            label="Tag(s)"
+            render={() => (
+                <Controller
+                    control={form.control}
+                    name="tags"
+                    rules={{ required: true }}
+                    render={({ field: { onChange, onBlur, value, ref } }) => (
+                        <MultiSelect
+                            getValue={(item) => item.id}
+                            itemToString={(item) => item.label}
+                            items={items}
+                            onChange={onChange}
+                        />
+                    )}
+                />
+            )}
+            error={form.formState.errors.tags as any}
         />
     );
 };
@@ -186,13 +210,18 @@ const SeriesForm = ({
             ) : null}
             <Flex alignItems={"center"}>
                 <Text>Serie {index + 1}</Text>
-                <IconButton
-                    ml="2"
-                    size="xs"
-                    aria-label={"delete serie"}
-                    colorScheme="red"
-                    icon={<DeleteIcon />}
-                    onClick={deleteSerie}
+                <ConfirmationButton
+                    onConfirm={deleteSerie}
+                    renderTrigger={(onOpen) => (
+                        <IconButton
+                            ml="auto"
+                            size="xs"
+                            aria-label={"delete serie"}
+                            colorScheme="red"
+                            icon={<DeleteIcon />}
+                            onClick={onOpen}
+                        />
+                    )}
                 />
                 {/* <Text ml="1" fontSize="xs" color="gray.400">
                     ({nbRepsBySeries})
