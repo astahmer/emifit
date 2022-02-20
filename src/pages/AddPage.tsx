@@ -1,50 +1,97 @@
 import { Combobox } from "@/components/Combobox";
-import { MobileNumberInput, MobileNumberInputProps } from "@/components/MobileNumberInput";
-import { TextInput, TextInputProps } from "@/components/TextInput";
+import { MobileNumberInput } from "@/components/MobileNumberInput";
+import { SelectInput } from "@/components/SelectInput";
+import { TextInput } from "@/components/TextInput";
+import { Categories } from "@/constants";
+import { onError } from "@/functions/toasts";
+import { Exercise, makeId, Serie, useExercises } from "@/store";
 import { AddIcon } from "@chakra-ui/icons";
-import { Button, Divider, Flex, Heading, Input, InputProps, Stack, Text } from "@chakra-ui/react";
-import { callAll, makeArrayOf } from "@pastable/core";
-import { Fragment, useEffect, useRef, useState } from "react";
-import { FormProvider, useForm, useFormContext, UseFormProps, UseFormReturn, useWatch } from "react-hook-form";
-import { proxy, snapshot } from "valtio";
+import { Button, Divider, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { makeArrayOf } from "@pastable/core";
+import { format } from "date-fns";
+import { update } from "idb-keyval";
+import { Fragment, useEffect } from "react";
+import { FormProvider, useForm, useFormContext, UseFormReturn } from "react-hook-form";
+import { useMutation, useQueryClient } from "react-query";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { proxy, snapshot, subscribe } from "valtio";
 
-const defaultValues = { exoName: "", nbSeries: 1, nbRepsBySeries: 1 };
+const defaultValues = { exoName: "", nbSeries: 1, areKgFilled: false, areRepsFilled: false };
 const formData = proxy({ series: {} as Record<number, Serie> });
 
+type MakeExerciseParams = Pick<Exercise, "tag" | "category" | "name" | "nbSeries">;
+
+const makeExercise = (params: MakeExerciseParams) => ({
+    ...params,
+    id: makeId(),
+    date: format(new Date(), "dd/MM/yyyy"),
+    series: Object.values(snapshot(formData.series)).map((serie) => serie),
+});
+
 export const AddPage = () => {
-    // const [value, setValue] = useState("");
     const form = useForm({ defaultValues });
     const register = form.register;
-    const onSubmit = (data, e) => {
-        console.log(data, snapshot(formData), e);
-    };
-    const onError = (errors, e) => console.log(errors, e);
 
-    const exoNameProps = register("exoName", { required: true });
+    // reactivly set/clear errors from values of series[kg/reps]
+    useEffect(() => {
+        form.setError("areKgFilled", { type: "required" });
+        form.setError("areRepsFilled", { type: "required" });
+
+        return subscribe(formData, (ops) => {
+            const series = Object.values(snapshot(formData.series));
+            if (series.every((serie) => serie.kg)) {
+                form.clearErrors("areKgFilled");
+            } else if (form.formState.submitCount) {
+                form.setError("areKgFilled", { type: "required" });
+            }
+            if (series.every((serie) => serie.reps)) {
+                form.clearErrors("areRepsFilled");
+            } else if (form.formState.submitCount) {
+                form.setError("areRepsFilled", { type: "required" });
+            }
+        });
+    }, []);
+
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const mutation = useMutation(
+        async (params: typeof defaultValues) => {
+            const row = makeExercise({
+                tag: "tag",
+                category: catId,
+                name: params.exoName,
+                nbSeries: params.nbSeries,
+            });
+            await update("exercises", (current) => [...(current || []), row]);
+            return row;
+        },
+        {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries("exercises");
+                navigate("/");
+            },
+            onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+        }
+    );
+
+    const [params] = useSearchParams();
+    const catId = params.get("category") || Categories[0].id;
+    const category = Categories.find((cat) => cat.id === (catId as typeof Categories[number]["id"]));
+    const options = category.children.map((cat) => ({ label: cat.label, value: cat.id }));
 
     return (
-        <form id="add-form" onSubmit={form.handleSubmit(onSubmit, onError)}>
+        <form id="add-form" onSubmit={form.handleSubmit((data) => mutation.mutate(data))}>
             <FormProvider {...form}>
                 <Stack p="8" overflow="auto">
-                    <TextInput
-                        label="Exercise name"
-                        render={() => (
-                            <Combobox
-                                ref={exoNameProps.ref}
-                                renderInput={(props) => (
-                                    <Input
-                                        {...props}
-                                        name="exoName"
-                                        onChange={callAll(props.onChange, exoNameProps.onChange)}
-                                        onBlur={callAll(props.onBlur, exoNameProps.onBlur)}
-                                        placeholder="Search..."
-                                    />
-                                )}
-                                items={items}
-                            />
-                        )}
-                        error={form.formState.errors.exoName}
-                    />
+                    <ExoNameAutocomplete />
+                    <SelectInput label="Tag">
+                        <option value="">Select a tag</option>
+                        {options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </SelectInput>
                     {/* TODO prefill via exoName */}
                     <TextInput
                         {...register("nbSeries", { valueAsNumber: true })}
@@ -77,6 +124,26 @@ export const AddPage = () => {
     );
 };
 
+const ExoNameAutocomplete = () => {
+    const form = useFormContext<typeof defaultValues>();
+    const query = useExercises();
+    const items = query.data || [];
+
+    return (
+        <TextInput
+            label="Exercise name"
+            render={() => (
+                <Combobox
+                    itemToString={(item) => item.name}
+                    {...form.register("exoName", { required: true })}
+                    items={items}
+                />
+            )}
+            error={form.formState.errors.exoName}
+        />
+    );
+};
+
 const WeightForm = ({ form }: { form: UseFormReturn<typeof defaultValues> }) => {
     const [nbSeries] = form.watch(["nbSeries"]);
 
@@ -85,17 +152,18 @@ const WeightForm = ({ form }: { form: UseFormReturn<typeof defaultValues> }) => 
             <Heading as="h4" size="md">
                 Weight
             </Heading>
+            {form.formState.submitCount && form.formState.errors.areKgFilled ? (
+                <Text color="red.500">Fill all the "kg" inputs</Text>
+            ) : null}
+            {form.formState.submitCount && form.formState.errors.areRepsFilled ? (
+                <Text color="red.500">Fill all the "reps" inputs</Text>
+            ) : null}
             {makeArrayOf(nbSeries > 0 ? nbSeries : 1).map((_, seriesIndex) => {
                 return <SeriesForm key={seriesIndex} index={seriesIndex} />;
             })}
         </>
     );
 };
-
-interface Serie {
-    kg: number;
-    reps: number;
-}
 
 const SeriesForm = ({ index }: { index: number }) => {
     // const form = useFormContext<typeof defaultValues>();
@@ -104,7 +172,11 @@ const SeriesForm = ({ index }: { index: number }) => {
     // Set this.kg default value to previous serie.kg
     useEffect(() => {
         if (!formData.series[index]) {
-            formData.series[index] = proxy({ kg: snapshot(formData.series)[index - 1]?.kg ?? 0, reps: 0 });
+            formData.series[index] = proxy({
+                id: makeId(),
+                kg: snapshot(formData.series)[index - 1]?.kg ?? 0,
+                reps: 0,
+            });
         }
 
         return () => {
@@ -145,6 +217,7 @@ const SeriesForm = ({ index }: { index: number }) => {
                             onChange={(_, value) => (getSerie().kg = value)}
                             inputProps={{ placeholder: "kg" }}
                             inputMode="numeric"
+                            // required
                         />
                     )}
                 />
@@ -154,6 +227,7 @@ const SeriesForm = ({ index }: { index: number }) => {
                     max={20}
                     label="Nb of reps"
                     onChange={(e) => (getSerie().reps = e.target.valueAsNumber)}
+                    // isRequired
                 />
             </Stack>
         </Fragment>

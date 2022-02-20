@@ -19,15 +19,7 @@ export const MobileNumberInput = forwardRef((props: MobileNumberInputProps, ref)
             <Button size="sm" {...getDecrementButtonProps()}>
                 -
             </Button>
-            <Input
-                maxW="65px"
-                {...inputProps}
-                ref={inputRef}
-                // import { callAll } from "@pastable/core";
-                // getInputProps(props.inputProps)
-                // onChange={(e) => console.log(e) || callAll(inputProps.onChange, props.onChange)(e)}
-            />
-
+            <Input maxW="65px" {...inputProps} ref={inputRef} />
             <Button size="sm" {...getIncrementButtonProps()}>
                 +
             </Button>

@@ -1,22 +1,9 @@
-import {
-    Tabs,
-    TabList,
-    TabPanels,
-    Tab,
-    TabPanel,
-    Icon,
-    IconButton,
-    Box,
-    Button,
-    useMultiStyleConfig,
-    useTab,
-    ButtonProps,
-} from "@chakra-ui/react";
-import { AddIcon, CheckCircleIcon, CheckIcon } from "@chakra-ui/icons";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
+import { Icon, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
+import { reverse } from "@pastable/core";
+import { useEffect, useRef, useState } from "react";
+import { IoIosAddCircle } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
-import { reverse, WithChildren } from "@pastable/core";
-import { IoIosAddCircle, IoMdAddCircle } from "react-icons/io";
 
 export const BottomTabs = () => {
     const [tabIndex, setTabIndex] = useState(0);
@@ -82,53 +69,6 @@ export const BottomTabs = () => {
         </>
     );
 };
-
-const SubmitTab = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-    // 1. Reuse the `useTab` hook
-    const tabProps = useTab({ ...props, ref });
-    // const isSelected = !!tabProps["aria-selected"];
-
-    // 2. Hook into the Tabs `size`, `variant`, props
-    const styles = useMultiStyleConfig("Tabs", tabProps);
-
-    const location = useLocation();
-    const isSelected = location.pathname === "/add";
-    console.log(isSelected, tabProps);
-
-    return isSelected ? (
-        <IconButton
-            __css={styles.tab}
-            {...tabProps}
-            {...props}
-            type="submit"
-            form="hook-form"
-            aria-label="Submit form"
-            icon={<CheckCircleIcon color="whatsapp.600" fontSize="30px" />}
-        />
-    ) : (
-        <Button
-            __css={styles.tab}
-            {...tabProps}
-            {...props}
-            // {...(isSelected
-            //     ? {
-            //         //   type: "submit",
-            //         //   form: "hook-form",
-            //         //   "aria-label": "Submit form",
-            //         //   icon: <CheckCircleIcon color="whatsapp.600" fontSize="30px" />,
-            //         as: <IconButton
-            //         type="submit"
-            //         form="hook-form"
-            //         aria-label="Submit form"
-            //         icon={<CheckCircleIcon color="whatsapp.600" fontSize="30px" />}
-            //     />
-            //       }
-            //     : {})}
-        >
-            {isSelected ? null : tabProps.children}
-        </Button>
-    );
-});
 
 const routesByIndex = { 0: "/", 1: "/add", 2: "/progress" };
 const indexByRoutes = reverse(routesByIndex);
