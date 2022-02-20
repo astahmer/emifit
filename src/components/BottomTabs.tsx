@@ -44,12 +44,6 @@ export const BottomTabs = () => {
                     <Tab h="58px">Home</Tab>
                     <Tab h="58px">
                         {location.pathname === "/add" ? (
-                            // <IconButton
-                            //     as="div"
-                            //     aria-label="Submit form"
-                            //     icon={<CheckCircleIcon color="whatsapp.600" fontSize="30px" />}
-                            //     onClick={() => submitBtnRef.current?.click()}
-                            // />
                             <CheckCircleIcon
                                 color="whatsapp.600"
                                 fontSize="30px"
@@ -59,9 +53,6 @@ export const BottomTabs = () => {
                             <Icon as={IoIosAddCircle} color="twitter.400" fontSize="38px" />
                         )}
                     </Tab>
-                    {/* <SubmitTab h="58px">
-                    <Icon as={IoIosAddCircle} color="twitter.400" fontSize="38px" />
-                </SubmitTab> */}
                     <Tab h="58px">Progress</Tab>
                 </TabList>
             </Tabs>

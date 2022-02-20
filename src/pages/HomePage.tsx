@@ -27,10 +27,12 @@ const Header = () => {
     return (
         <Flex p="4" justifyContent="space-between" alignItems="center">
             <ChevronLeftIcon fontSize="32px" />
+            {/* TODO disable future dates */}
             <CalendarButton />
             {/* <Text c>
                 17/02/2022
             </Text> */}
+            {/* TODO disable si future date */}
             <ChevronRightIcon fontSize="32px" />
         </Flex>
     );
@@ -74,14 +76,16 @@ function ExerciseItem({ exo }: { exo: ExoItem }) {
                     {exo.name}
                 </Heading>
                 <HStack ml="auto" mt="2">
+                    {/* TODO link to add page avec valeurs préfill */}
                     <IconButton
                         rounded="full"
                         variant="solid"
                         size="sm"
-                        colorScheme="twitter"
+                        colorScheme="purple"
                         aria-label="Edit"
                         icon={<EditIcon />}
                     />
+                    {/* Confirmation */}
                     <IconButton
                         rounded="full"
                         variant="solid"
