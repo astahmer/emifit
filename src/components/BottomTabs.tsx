@@ -29,17 +29,6 @@ export const BottomTabs = () => {
                 borderTopColor="gray.300"
                 bgColor="gray.50"
             >
-                <TabPanels>
-                    <TabPanel>
-                        <p>one!</p>
-                    </TabPanel>
-                    <TabPanel>
-                        <p>two!</p>
-                    </TabPanel>
-                    <TabPanel>
-                        <p>three!</p>
-                    </TabPanel>
-                </TabPanels>
                 <TabList>
                     <Tab h="58px">Home</Tab>
                     <Tab h="58px">
@@ -53,7 +42,8 @@ export const BottomTabs = () => {
                             <Icon as={IoIosAddCircle} color="twitter.400" fontSize="38px" />
                         )}
                     </Tab>
-                    <Tab h="58px">Progress</Tab>
+                    {/* <Tab h="58px">Progress</Tab> */}
+                    <Tab h="58px">Programs</Tab>
                 </TabList>
             </Tabs>
             <button ref={submitBtnRef} hidden type="submit" form="add-form" />

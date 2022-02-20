@@ -9,6 +9,7 @@ import { HomePage } from "./pages/HomePage";
 import { ProgressPage } from "./pages/ProgressPage";
 import { AddPage } from "./pages/AddPage";
 import { CalendarDefaultTheme } from "@uselessdev/datepicker";
+import { ProgramsPage } from "./pages/ProgramsPage";
 
 const queryClient = new QueryClient();
 const theme = extendTheme(CalendarDefaultTheme, { config: { initialColorMode: "light" } });
@@ -24,6 +25,7 @@ function App() {
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/add" element={<AddPage />} />
                                 <Route path="/progress" element={<ProgressPage />} />
+                                <Route path="/programs" element={<ProgramsPage />} />
                             </Routes>
                         </Flex>
                         <Box mt="auto" w="100%" flexShrink="0">
