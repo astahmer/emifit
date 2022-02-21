@@ -1,15 +1,14 @@
-import { Button, ButtonGroup, useDisclosure } from "@chakra-ui/react";
-import { ReactNode } from "react";
 import {
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-    PopoverHeader,
-    PopoverBody,
-    PopoverFooter,
-    PopoverArrow,
-    PopoverCloseButton,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogOverlay,
+    Button,
+    useDisclosure,
 } from "@chakra-ui/react";
+import { ReactNode, useRef } from "react";
 
 export function ConfirmationButton({
     renderTrigger,
@@ -19,28 +18,31 @@ export function ConfirmationButton({
     onConfirm: () => void;
 }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const cancelRef = useRef();
 
     return (
-        <Popover isOpen={isOpen} onClose={onClose}>
-            <PopoverTrigger>{renderTrigger(onOpen)}</PopoverTrigger>
-            <PopoverContent color="white" bg="blue.800" borderColor="blue.800">
-                <PopoverHeader fontWeight="semibold" border="0">
-                    Confirmation
-                </PopoverHeader>
-                <PopoverArrow />
-                <PopoverCloseButton />
-                <PopoverBody>Are you sure ?</PopoverBody>
-                <PopoverFooter d="flex" justifyContent="flex-end" border="0">
-                    <ButtonGroup size="sm">
-                        <Button variant="outline" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button colorScheme="red" onClick={() => (onConfirm(), onClose())}>
-                            Apply
-                        </Button>
-                    </ButtonGroup>
-                </PopoverFooter>
-            </PopoverContent>
-        </Popover>
+        <>
+            {renderTrigger(onOpen)}
+            <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} isCentered>
+                <AlertDialogOverlay>
+                    <AlertDialogContent mx="2">
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Confirmation
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>Are you sure? You can't undo this action afterwards.</AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Cancel
+                            </Button>
+                            <Button colorScheme="red" onClick={() => (onConfirm(), onClose())} ml={3}>
+                                Delete
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+        </>
     );
 }
