@@ -1,6 +1,6 @@
 const SharedTags = [
     { id: "Machine", label: "Machine" },
-    { id: "Freeway", label: "Freeway" },
+    { id: "Freeweight", label: "Freeweight" },
     { id: "Bodyweight", label: "Bodyweight" },
 ] as const;
 
@@ -11,7 +11,7 @@ export const Categories = [
         children: [
             ...SharedTags,
             { id: "Chest", label: "Chest" },
-            { id: "Triceps", label: "Triceps (yes)" },
+            { id: "Triceps", label: "Triceps" },
             { id: "Shoulders", label: "Shoulders" },
         ],
     },
