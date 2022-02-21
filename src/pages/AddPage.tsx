@@ -157,6 +157,11 @@ const TagMultiSelect = ({ catId }: { catId: string }) => {
                             "aria-invalid": isInvalid,
                             _invalid: { borderWidth: "1px", borderColor: "red.500", boxShadow: `0 0 0 1px #e53e3e` },
                         })}
+                        renderButtonText={(selection) =>
+                            selection.length
+                                ? `(${selection.length}) ${selection.map((item) => item.label).join(", ")}`
+                                : "Select one or more tags"
+                        }
                     />
                 )}
             />

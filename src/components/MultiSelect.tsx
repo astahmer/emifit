@@ -22,6 +22,7 @@ type MultiSelectProps<Item, IsMulti extends boolean = undefined> = {
         getButtonProps: UseSelectReturnValue<Item>["getToggleButtonProps"];
         selectedItems: Item[];
     }) => ReactNode;
+    renderButtonText?: (selection: undefined extends Item ? Item[] : true extends IsMulti ? Item[] : Item) => ReactNode;
     renderList?: (props: ListComponentProps<Item> & { ListComponent: typeof ListComponent }) => ReactNode;
     listProps?: ListProps;
     isOpen?: boolean;
@@ -39,6 +40,7 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
     getButtonProps,
     isMulti = true as any,
     renderButton,
+    renderButtonText,
     renderList,
     listProps,
     isOpen: isOpenProp,
@@ -108,7 +110,11 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
                 renderButton({ getButtonProps: getToggleButtonProps, selectedItems: selection })
             ) : (
                 <Button {...buttonProps} ref={buttonRef} onBlur={onBlur}>
-                    {selection.length ? `${selection.length} elements selected` : "Select one or more"}
+                    {renderButtonText
+                        ? renderButtonText(selection)
+                        : selection.length
+                        ? `${selection.length} elements selected`
+                        : "Select one or more"}
                 </Button>
             )}
             {renderList ? (
