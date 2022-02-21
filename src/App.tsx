@@ -19,8 +19,8 @@ function App() {
         <QueryClientProvider client={queryClient}>
             <ChakraProvider theme={theme}>
                 <BrowserRouter>
-                    <Flex direction="column" boxSize="100%">
-                        <Flex direction="column" h="100%" overflow="hidden">
+                    <Flex as="main" direction="column" boxSize="100%">
+                        <Flex as="section" direction="column" h="100%" overflow="hidden">
                             <Routes>
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/add" element={<AddPage />} />
@@ -28,7 +28,7 @@ function App() {
                                 <Route path="/programs" element={<ProgramsPage />} />
                             </Routes>
                         </Flex>
-                        <Box mt="auto" w="100%" flexShrink="0">
+                        <Box as="footer" mt="auto" w="100%" flexShrink="0">
                             <BottomTabs />
                         </Box>
                     </Flex>
