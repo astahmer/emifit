@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "scripts": {
         "dev": "vite",
+        "local": "vite --host --port 3001",
         "build": "tsc && vite build",
         "serve": "vite preview",
         "prettier": "prettier --write \"./{src,tests}/**/*\""

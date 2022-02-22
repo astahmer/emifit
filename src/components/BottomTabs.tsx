@@ -34,12 +34,12 @@ export const BottomTabs = () => {
                     <Tab h="58px">
                         {location.pathname === "/add" ? (
                             <CheckCircleIcon
-                                color="whatsapp.600"
+                                color="pink.400"
                                 fontSize="30px"
                                 onClick={() => submitBtnRef.current?.click()}
                             />
                         ) : (
-                            <Icon as={IoIosAddCircle} color="twitter.400" fontSize="38px" />
+                            <Icon as={IoIosAddCircle} color="pink.400" fontSize="38px" />
                         )}
                     </Tab>
                     {/* <Tab h="58px">Progress</Tab> */}
@@ -51,5 +51,5 @@ export const BottomTabs = () => {
     );
 };
 
-const routesByIndex = { 0: "/", 1: "/add", 2: "/progress" };
+const routesByIndex = { 0: "/", 1: "/add", 2: "/programs" };
 const indexByRoutes = reverse(routesByIndex);

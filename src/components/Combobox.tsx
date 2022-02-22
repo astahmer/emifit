@@ -19,7 +19,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref)
     <ComboboxBase {...props} externalRef={ref} />
 )) as <Item>(props: ComboboxProps<Item> & { ref?: ForwardedRef<HTMLInputElement> }) => ReturnType<typeof ComboboxBase>;
 
-type ComboboxProps<Item = any> = {
+export type ComboboxProps<Item = any> = {
     externalRef?: ForwardedRef<HTMLInputElement | null>;
     items: Item[];
     renderInput?: (
@@ -125,7 +125,7 @@ function ComboboxBase<Item = any>({
                             {...getToggleButtonProps()}
                             size="sm"
                             aria-label={"toggle menu"}
-                            colorScheme={isOpen ? "gray" : "twitter"}
+                            colorScheme={isOpen ? "gray" : "pink"}
                             icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
                         />
                     </InputRightElement>
