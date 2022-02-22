@@ -120,7 +120,7 @@ const WeightForm = ({ form }: { form: UseFormReturn<typeof defaultValues> }) => 
 
         for (let i = 0; i < nbSeries; i++) {
             if (i >= current.length) {
-                series.append(makeSerie(i, current));
+                series.append(makeSerie(i, current), { shouldFocus: false });
             }
         }
     }, [nbSeries, series.fields]);
