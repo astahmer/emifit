@@ -1,13 +1,14 @@
 import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
 import { Exercise, useExerciseList } from "@/store";
 import { AddIcon, CheckCircleIcon, CheckIcon } from "@chakra-ui/icons";
-import { Alert, AlertIcon, Box, Button, Divider, Fade, Heading, IconButton } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Button, Divider, Heading, IconButton } from "@chakra-ui/react";
 import { useMachine } from "@xstate/react";
 import { createContext, useContext, useState } from "react";
 import { InterpreterFrom } from "xstate";
 import { programFormMachine } from "../Programs/programFormMachine";
 import { CategoryRadioPicker } from "../Exercises/CategoryRadioPicker";
 import { ExerciseAccordionList } from "../Exercises/ExerciseAccordionList";
+import { Show } from "@/components/Show";
 
 const ProgramContext = createContext(null as InterpreterFrom<typeof programFormMachine>["send"]);
 
@@ -17,7 +18,7 @@ export const ProgramsPage = () => {
 
     return (
         <ProgramContext.Provider value={send}>
-            <Box d="flex" h="100%" p="4" w="100%" overflow="auto">
+            <Box id="ProgramsPage" d="flex" h="100%" p="4" w="100%">
                 {state.matches("initial") && <InitialState />}
                 {state.matches("creating") && <CreateProgramForm />}
             </Box>
@@ -70,16 +71,18 @@ const CreateProgramForm = () => {
     const onCreated = (created: Exercise) => send({ type: "SelectExercises", value: [created.id] });
 
     return (
-        <Box m="auto" w="100%">
-            <PickCategoryStep isCategorySelected={isCategorySelected} onChange={setCategory} />
-            <Fade in={isCategorySelected}>
+        <Box d="flex" flexDirection="column" m="auto" w="100%" h="100%">
+            <Box m="auto">
+                <PickCategoryStep isCategorySelected={isCategorySelected} onChange={setCategory} />
+            </Box>
+            <Show cond={isCategorySelected}>
                 {Boolean(false && exercises.length) && (
                     <PickExercisesStep hasSelectedExercises={hasSelectedExercises} />
                 )}
                 {Boolean(true || !exercises.length) && isCategorySelected && (
                     <CreateExerciseStep {...{ hasSelectedExercises, category, onCreated }} />
                 )}
-            </Fade>
+            </Show>
         </Box>
     );
 };
@@ -126,7 +129,7 @@ function CreateExerciseStep({
                                 <Divider />
                                 <div>
                                     <Button
-                                        mt="8"
+                                        mt="4"
                                         isFullWidth
                                         leftIcon={<CheckIcon />}
                                         colorScheme="pink"

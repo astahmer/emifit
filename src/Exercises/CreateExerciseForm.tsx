@@ -69,9 +69,9 @@ export const CreateExerciseForm = ({
     );
 
     return (
-        <Box as="form" id="add-form" onSubmit={form.handleSubmit((data) => mutation.mutate(data))} h="100%">
             <FormProvider {...form}>
-                <Stack p="8" overflow="auto" h="100%">
+            <Box as="form" id="add-form" onSubmit={form.handleSubmit(onCreate)} h="100%" minH={0}>
+                <Stack p="8" overflow="auto" h="100%" minH={0}>
                     <ExoNameAutocomplete {...form.register("name", { required })} />
                     <TagMultiSelect
                         control={form.control}
@@ -100,17 +100,17 @@ export const CreateExerciseForm = ({
                             isFullWidth
                             leftIcon={<AddIcon />}
                             colorScheme="pink"
-                            variant="solid"
+                            variant="outline"
                             onClick={() => form.setValue("nbSeries", form.getValues().nbSeries + 1)}
                             size="sm"
                         >
                             Add serie
                         </Button>
                     </div>
-                    {renderSubmit?.(form)}
                 </Stack>
+            </Box>
+            <Box mb="2">{renderSubmit?.(form)}</Box>
             </FormProvider>
-        </Box>
     );
 };
 
