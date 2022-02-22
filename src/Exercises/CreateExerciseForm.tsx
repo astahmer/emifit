@@ -1,12 +1,11 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { TextInput } from "@/components/TextInput";
-import { onError } from "@/functions/toasts";
-import { Exercise, makeId, Serie } from "@/store";
+import { toasts } from "@/functions/toasts";
+import { Exercise, makeId, Serie, store } from "@/store";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
 import { format } from "date-fns";
-import { update } from "idb-keyval";
 import { Fragment, ReactNode, useEffect } from "react";
 import {
     FormProvider,
@@ -16,7 +15,6 @@ import {
     useFormContext,
     UseFormReturn,
 } from "react-hook-form";
-import { useMutation, useQueryClient } from "react-query";
 import { ExoNameAutocomplete } from "./ExoNameAutocomplete";
 import { TagMultiSelect } from "./TagMultiSelect";
 
@@ -51,25 +49,15 @@ export const CreateExerciseForm = ({
 }) => {
     const form = useForm({ defaultValues });
 
-    const queryClient = useQueryClient();
-    const mutation = useMutation(
-        async (params: typeof defaultValues) => {
-            const row = makeExercise({ ...params, category: catId });
-            console.log(row);
-            await update("exercises", (current) => [...(current || []), row]);
-            return row;
-        },
-        {
-            onSuccess: (data) => {
-                queryClient.invalidateQueries("exercises");
-                onCreated?.(data);
-            },
-            onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
-        }
-    );
+    const onCreate = (params: typeof defaultValues) => {
+        const row = makeExercise({ ...params, category: catId });
+        store.exercises.push(row);
+        onCreated?.(row);
+        toasts.success("Created !");
+    };
 
     return (
-            <FormProvider {...form}>
+        <FormProvider {...form}>
             <Box as="form" id="add-form" onSubmit={form.handleSubmit(onCreate)} h="100%" minH={0}>
                 <Stack p="8" overflow="auto" h="100%" minH={0}>
                     <ExoNameAutocomplete {...form.register("name", { required })} />
@@ -110,7 +98,7 @@ export const CreateExerciseForm = ({
                 </Stack>
             </Box>
             <Box mb="2">{renderSubmit?.(form)}</Box>
-            </FormProvider>
+        </FormProvider>
     );
 };
 
