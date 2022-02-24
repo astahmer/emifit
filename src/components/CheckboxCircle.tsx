@@ -26,3 +26,18 @@ export function CheckboxCircle({
         </Box>
     );
 }
+
+export const CheckboxButton = ({ isActive, ...props }: IconButtonProps & { isActive: boolean }) => {
+    return (
+        <IconButton
+            colorScheme={isActive ? "pink" : "gray"}
+            size="xs"
+            icon={isActive ? <CheckCircleIcon fontSize="lg" /> : undefined}
+            variant="outline"
+            rounded="full"
+            mr="2"
+            pointerEvents="none"
+            {...props}
+        />
+    );
+};

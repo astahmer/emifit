@@ -2,7 +2,12 @@
 
 export interface Typegen0 {
     "@@xstate/typegen": true;
-    eventsCausingActions: {};
+    eventsCausingActions: {
+        assignCategory: "SelectCategory";
+        filterExercisesWithPrevCategory: "SelectCategory";
+        createExercise: "CreateExercise";
+        addExercise: "PickExercise";
+    };
     internalEvents: {
         "xstate.init": { type: "xstate.init" };
     };
@@ -14,14 +19,27 @@ export interface Typegen0 {
         delays: never;
     };
     eventsCausingServices: {};
-    eventsCausingGuards: {};
+    eventsCausingGuards: {
+        hasExercises: "SelectCategory";
+    };
     eventsCausingDelays: {};
     matchesStates:
         | "initial"
         | "creating"
-        | "creating.withoutCategory"
-        | "creating.categorySelected"
+        | "creating.selectingCategory"
+        | "creating.maybeCreatingExercise"
+        | "creating.maybeCreatingExercise.shouldCreateChoice"
+        | "creating.maybeCreatingExercise.creatingExercise"
         | "creating.selectingExercises"
-        | { creating?: "withoutCategory" | "categorySelected" | "selectingExercises" };
+        | "creating.editSettings"
+        | "done"
+        | {
+              creating?:
+                  | "selectingCategory"
+                  | "maybeCreatingExercise"
+                  | "selectingExercises"
+                  | "editSettings"
+                  | { maybeCreatingExercise?: "shouldCreateChoice" | "creatingExercise" };
+          };
     tags: never;
 }

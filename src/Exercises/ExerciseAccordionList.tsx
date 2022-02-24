@@ -49,7 +49,7 @@ const ExerciseAccordion = ({
                         {Boolean(exercise.tags?.length) && (
                             <Stack direction="row">
                                 {exercise.tags.map((tag) => (
-                                    <Badge variant="subtle" colorScheme="pink" fontSize="xx-small">
+                                    <Badge key={tag.id} variant="subtle" colorScheme="pink" fontSize="xx-small">
                                         {tag.label}
                                     </Badge>
                                 ))}
@@ -69,7 +69,7 @@ const ExerciseAccordion = ({
             >
                 <Stack spacing="4">
                     {exercise.series.map((serie, index) => (
-                        <ExerciseSerie key={index} serie={serie} index={index} />
+                        <ExerciseSerie key={serie.id} serie={serie} index={index} />
                     ))}
                 </Stack>
             </AccordionPanel>

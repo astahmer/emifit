@@ -34,7 +34,7 @@ export const store = {
     // TODO categories/tags ?
 };
 
-export const useExerciseList = () => useSnapshot(store.exercises);
+export const useExerciseList = () => useSnapshot(store.exercises) as typeof store.exercises;
 
 export const makeId = () => nanoid(10);
 // export const useExercises = () => useQuery<Exercise[]>("exercises", () => get("exercises"), { initialData: [] });

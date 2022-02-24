@@ -42,62 +42,77 @@ export const CreateExerciseForm = ({
     renderSubmit,
     catId,
     onCreated,
+    shouldPersist = true,
 }: {
     catId: string;
     onCreated?: (data: Exercise) => void;
     renderSubmit?: (form: UseFormReturn<typeof defaultValues>) => ReactNode;
+    shouldPersist?: boolean;
 }) => {
     const form = useForm({ defaultValues });
 
     const onCreate = (params: typeof defaultValues) => {
         const row = makeExercise({ ...params, category: catId });
-        store.exercises.push(row);
+        if (shouldPersist) {
+            store.exercises.push(row);
+            toasts.success("Created !");
+        }
+
         onCreated?.(row);
-        toasts.success("Created !");
     };
 
     return (
         <FormProvider {...form}>
-            <Box as="form" id="add-form" onSubmit={form.handleSubmit(onCreate)} h="100%" minH={0}>
-                <Stack p="8" overflow="auto" h="100%" minH={0}>
-                    <ExoNameAutocomplete {...form.register("name", { required })} />
-                    <TagMultiSelect
-                        control={form.control}
-                        name="tags"
-                        rules={{ required }}
-                        catId={catId}
-                        error={(form.formState.errors.tags as any)?.message}
-                    />
-                    {/* TODO prefill via name */}
-                    <TextInput
-                        {...form.register("nbSeries", { valueAsNumber: true })}
-                        min={1}
-                        max={10}
-                        name="nbSeries"
-                        label="Nb of series"
-                        type="number"
-                        error={form.formState.errors.nbSeries}
-                    />
-                    <div>
-                        <Divider my="4" />
-                    </div>
-                    <WeightForm form={form} />
-                    <div>
-                        <Button
-                            mt="8"
-                            isFullWidth
-                            leftIcon={<AddIcon />}
-                            colorScheme="pink"
-                            variant="outline"
-                            onClick={() => form.setValue("nbSeries", form.getValues().nbSeries + 1)}
-                            size="sm"
-                        >
-                            Add serie
-                        </Button>
-                    </div>
-                </Stack>
+            <Box
+                as="form"
+                id="add-form"
+                onSubmit={form.handleSubmit(onCreate)}
+                h="100%"
+                minH={0}
+                d="flex"
+                flexDirection="column"
+            >
+                <Box h="100%" minH={0}>
+                    <Stack p="8" pt="4" overflow="auto" h="100%" minH={0}>
+                        <ExoNameAutocomplete {...form.register("name", { required })} />
+                        <TagMultiSelect
+                            control={form.control}
+                            name="tags"
+                            rules={{ required }}
+                            catId={catId}
+                            error={(form.formState.errors.tags as any)?.message}
+                        />
+                        {/* TODO prefill via name */}
+                        <TextInput
+                            {...form.register("nbSeries", { valueAsNumber: true })}
+                            min={1}
+                            max={10}
+                            name="nbSeries"
+                            label="Nb of series"
+                            type="number"
+                            error={form.formState.errors.nbSeries}
+                        />
+                        <div>
+                            <Divider my="4" />
+                        </div>
+                        <WeightForm form={form} />
+                        <div>
+                            <Button
+                                mt="8"
+                                isFullWidth
+                                leftIcon={<AddIcon />}
+                                colorScheme="pink"
+                                variant="outline"
+                                onClick={() => form.setValue("nbSeries", form.getValues().nbSeries + 1)}
+                                size="sm"
+                            >
+                                Add serie
+                            </Button>
+                        </div>
+                    </Stack>
+                </Box>
+                <Box mb="2">{renderSubmit?.(form)}</Box>
             </Box>
-            <Box mb="2">{renderSubmit?.(form)}</Box>
         </FormProvider>
     );
 };

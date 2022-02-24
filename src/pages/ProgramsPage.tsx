@@ -1,27 +1,34 @@
 import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
 import { Exercise, useExerciseList } from "@/store";
 import { AddIcon, CheckCircleIcon, CheckIcon } from "@chakra-ui/icons";
-import { Alert, AlertIcon, Box, Button, Divider, Heading, IconButton } from "@chakra-ui/react";
-import { useMachine } from "@xstate/react";
-import { createContext, useContext, useState } from "react";
+import { Alert, AlertIcon, Box, Button, Divider, Heading, IconButton, UseRadioGroupReturn } from "@chakra-ui/react";
+import { useMachine, useSelector } from "@xstate/react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { InterpreterFrom } from "xstate";
 import { programFormMachine } from "../Programs/programFormMachine";
 import { CategoryRadioPicker } from "../Exercises/CategoryRadioPicker";
 import { ExerciseAccordionList } from "../Exercises/ExerciseAccordionList";
 import { Show } from "@/components/Show";
+import { createContextWithHook } from "@/functions/createContext";
+import { CheckboxButton } from "@/components/CheckboxCircle";
+import { RadioCard, RadioCardPicker } from "@/components/RadioCard";
 
 const ProgramContext = createContext(null as InterpreterFrom<typeof programFormMachine>["send"]);
+const [ProgramInterpretProvider, useProgramInterpretContext] =
+    createContextWithHook<InterpreterFrom<typeof programFormMachine>>("ProgramInterpretContext");
 
 export const ProgramsPage = () => {
-    const [state, send] = useMachine(programFormMachine);
+    const [state, send, interpret] = useMachine(programFormMachine);
     console.log(state.value);
 
     return (
         <ProgramContext.Provider value={send}>
-            <Box id="ProgramsPage" d="flex" h="100%" p="4" w="100%">
-                {state.matches("initial") && <InitialState />}
-                {state.matches("creating") && <CreateProgramForm />}
-            </Box>
+            <ProgramInterpretProvider value={interpret}>
+                <Box id="ProgramsPage" d="flex" h="100%" p="4" w="100%">
+                    {state.matches("initial") && <InitialState />}
+                    {state.matches("creating") && <CreateProgramForm />}
+                </Box>
+            </ProgramInterpretProvider>
         </ProgramContext.Provider>
     );
 };
@@ -60,32 +67,69 @@ const InitialState = () => {
 };
 
 const CreateProgramForm = () => {
-    const [category, setCategory] = useState(null as string);
-    const isCategorySelected = Boolean(category);
     const exercises = useExerciseList();
-
     const [selectedExercises, setSelectedExercises] = useState([] as string[]);
     const hasSelectedExercises = Boolean(selectedExercises.length);
-    const send = useContext(ProgramContext);
 
-    const onCreated = (created: Exercise) => send({ type: "SelectExercises", value: [created.id] });
+    const send = useContext(ProgramContext);
+    const interpret = useProgramInterpretContext();
+
+    const category = useSelector(interpret, (s) => s.context.categoryId);
+    const isCategorySelected = Boolean(category);
+
+    const onCreated = (exercise: Exercise) => send({ type: "CreateExercise", exercise });
+    const hasSomeExercisePersisted = Boolean(exercises.length);
+    console.log(exercises.length, interpret.state.value, interpret.state.context);
 
     return (
         <Box d="flex" flexDirection="column" m="auto" w="100%" h="100%">
             <Box m="auto">
-                <PickCategoryStep isCategorySelected={isCategorySelected} onChange={setCategory} />
-            </Box>
-            <Show cond={isCategorySelected}>
-                {Boolean(false && exercises.length) && (
+                <PickCategoryStep
+                    isCategorySelected={isCategorySelected}
+                    onChange={(catId) =>
+                        send({ type: "SelectCategory", categoryId: catId, hasExercises: hasSomeExercisePersisted })
+                    }
+                />
+                {interpret.state.matches("creating.maybeCreatingExercise.shouldCreateChoice") && (
+                    <>
+                        <Divider mb="4" />
+                        <RadioCardPicker
+                            onChange={(v) =>
+                                send({ type: v === "create" ? "GoToCreateExercise" : "GoToSelectExercises" })
+                            }
+                            renderOptions={(getRadioProps) => (
+                                <>
+                                    <RadioCard
+                                        {...getRadioProps({ value: "create" })}
+                                        getButtonProps={(state) => ({ opacity: state.isDisabled ? undefined : 1 })}
+                                    >
+                                        {interpret.state.context.exerciseList.length ? "Create another" : "Create"}
+                                    </RadioCard>
+                                    <RadioCard
+                                        {...getRadioProps({ value: "select" })}
+                                        isDisabled={!hasSomeExercisePersisted}
+                                        getButtonProps={(state) => ({ opacity: state.isDisabled ? undefined : 1 })}
+                                    >
+                                        {interpret.state.context.exerciseList.length
+                                            ? "Select exercises"
+                                            : "Skip & select exercises"}
+                                    </RadioCard>
+                                </>
+                            )}
+                        />
+                    </>
+                )}
+                {interpret.state.matches("creating.selectingExercises") && (
                     <PickExercisesStep hasSelectedExercises={hasSelectedExercises} />
                 )}
-                {Boolean(true || !exercises.length) && isCategorySelected && (
-                    <CreateExerciseStep {...{ hasSelectedExercises, category, onCreated }} />
-                )}
-            </Show>
+            </Box>
+            {interpret.state.matches("creating.maybeCreatingExercise.creatingExercise") && isCategorySelected && (
+                <CreateExerciseStep {...{ hasSelectedExercises, category, onCreated }} />
+            )}
         </Box>
     );
 };
+
 function CreateExerciseStep({
     hasSelectedExercises,
     category,
@@ -104,22 +148,15 @@ function CreateExerciseStep({
                 textDecoration={hasSelectedExercises ? "line-through" : undefined}
                 opacity={hasSelectedExercises ? "0.5" : undefined}
                 color="pink.500"
+                mb="3"
             >
-                <IconButton
-                    colorScheme={hasSelectedExercises ? "pink" : "gray"}
-                    aria-label="Step 1 done"
-                    size="md"
-                    icon={hasSelectedExercises ? <CheckCircleIcon fontSize="x-large" /> : undefined}
-                    variant="outline"
-                    rounded="full"
-                    mr="2"
-                    pointerEvents="none"
-                />
+                <CheckboxButton isActive={hasSelectedExercises} aria-label="Step 1 done" />
                 Create an exercise :
             </Heading>
             <CreateExerciseForm
                 catId={category}
                 onCreated={onCreated}
+                // shouldPersist={false}
                 renderSubmit={(form) => {
                     const [name, tags] = form.watch(["name", "tags"]);
 
@@ -161,17 +198,8 @@ function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercises: boo
                 opacity={hasSelectedExercises ? "0.5" : undefined}
                 color="pink.500"
             >
-                <IconButton
-                    colorScheme={hasSelectedExercises ? "pink" : "gray"}
-                    aria-label="Step 1 done"
-                    size="md"
-                    icon={hasSelectedExercises ? <CheckCircleIcon fontSize="x-large" /> : undefined}
-                    variant="outline"
-                    rounded="full"
-                    mr="2"
-                    pointerEvents="none"
-                />
-                Then, select one or more exercises :
+                <CheckboxButton isActive={hasSelectedExercises} aria-label="Select one or more exercises" />
+                Then, select some exercises:
             </Heading>
             <Box p="4">
                 <ExerciseAccordionList />
@@ -197,21 +225,11 @@ function PickCategoryStep({
                 opacity={isCategorySelected ? "0.5" : undefined}
                 color="pink.500"
             >
-                <IconButton
-                    colorScheme={isCategorySelected ? "pink" : "gray"}
-                    aria-label="Step 1 done"
-                    size="sm"
-                    icon={isCategorySelected ? <CheckCircleIcon fontSize="xl" /> : undefined}
-                    variant="outline"
-                    rounded="full"
-                    mr="2"
-                    pointerEvents="none"
-                />
+                <CheckboxButton isActive={isCategorySelected} aria-label="Pick a category" />
                 First, pick a category :
             </Heading>
             <Box d="flex" w="100%" p="4">
                 <CategoryRadioPicker onChange={onChange} />
-                {/* (value) => send({ type: "SelectCategory", value }) */}
             </Box>
         </>
     );
