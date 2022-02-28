@@ -13,6 +13,19 @@ import {
 import { WithChildren } from "@pastable/core";
 import { ReactNode } from "react";
 
+export const RadioCardButton = (props: ButtonProps) => (
+    <Button
+        colorScheme="pink"
+        borderWidth="1px"
+        borderRadius="md"
+        boxShadow="md"
+        _focus={{ boxShadow: "outline" }}
+        transition="all 0.2s"
+        variant="outline"
+        {...props}
+    />
+);
+
 export function RadioCard({
     children,
     getButtonProps,
@@ -23,21 +36,15 @@ export function RadioCard({
     return (
         <Box as="label">
             <input {...getInputProps()} />
-            <Button
-                {...getCheckboxProps()}
+            <RadioCardButton
                 as="div"
-                colorScheme="pink"
-                borderWidth="1px"
-                borderRadius="md"
-                boxShadow="md"
-                _focus={{ boxShadow: "outline" }}
+                {...getCheckboxProps()}
                 opacity={!state.isChecked ? 0.5 : 1}
-                transition="all 0.2s"
                 variant={state.isChecked ? "solid" : "outline"}
                 {...getButtonProps?.(state)}
             >
                 {children}
-            </Button>
+            </RadioCardButton>
         </Box>
     );
 }
