@@ -1,10 +1,7 @@
-import { CheckCircleIcon } from "@chakra-ui/icons";
+import { CheckCircleIcon, CheckIcon } from "@chakra-ui/icons";
 import { Box, CheckboxState, IconButton, IconButtonProps, useCheckbox, UseCheckboxProps } from "@chakra-ui/react";
 
-export function CheckboxCircle({
-    getIconProps,
-    ...props
-}: UseCheckboxProps & { getIconProps?: (state: CheckboxState) => IconButtonProps }) {
+export function CheckboxCircle({ getIconProps, ...props }: CheckboxCircleProps) {
     const { state, getInputProps, getCheckboxProps } = useCheckbox(props);
     const isChecked = state.isChecked;
 
@@ -26,6 +23,16 @@ export function CheckboxCircle({
         </Box>
     );
 }
+
+type CheckboxCircleProps = UseCheckboxProps & { getIconProps?: (state: CheckboxState) => Partial<IconButtonProps> };
+
+const getSquareIconProps = (state: CheckboxState) => ({
+    rounded: "none",
+    icon: state.isChecked ? <CheckIcon fontSize="lg" /> : undefined,
+});
+export const CheckboxSquare = (props: CheckboxCircleProps) => (
+    <CheckboxCircle getIconProps={getSquareIconProps} {...props} />
+);
 
 export const CheckboxButton = ({ isActive, ...props }: IconButtonProps & { isActive: boolean }) => {
     return (
