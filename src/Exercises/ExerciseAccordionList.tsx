@@ -1,30 +1,27 @@
 import { Exercise, Serie, useExerciseList } from "@/store";
+import { StringOrNumber, WithOnChange } from "@/types";
 import {
     Accordion,
     AccordionButton,
     AccordionIcon,
     AccordionItem,
     AccordionPanel,
-    Avatar,
     Badge,
     Stack,
     Stat,
     StatGroup,
     StatLabel,
     StatNumber,
-    Tag,
-    TagLabel,
     Text,
     useCheckboxGroup,
     UseCheckboxGroupReturn,
 } from "@chakra-ui/react";
-import { CheckboxCircle } from "../components/CheckboxCircle";
+import { CheckboxSquare } from "../components/CheckboxCircle";
 
-export const ExerciseAccordionList = () => {
+export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[]>) => {
     const exercises = useExerciseList();
 
-    const { value, getCheckboxProps } = useCheckboxGroup();
-    console.log(value);
+    const { getCheckboxProps } = useCheckboxGroup({ onChange });
 
     return (
         <Accordion allowToggle w="100%">
@@ -38,12 +35,11 @@ const ExerciseAccordion = ({
     exercise,
     getCheckboxProps,
 }: { exercise: Exercise } & Pick<UseCheckboxGroupReturn, "getCheckboxProps">) => {
-    console.log(exercise);
     return (
         <AccordionItem w="100%">
             <AccordionButton w="100%">
                 <Stack direction="row" alignItems="center" w="100%">
-                    <CheckboxCircle {...getCheckboxProps({ value: exercise.id })} />
+                    <CheckboxSquare {...getCheckboxProps({ value: exercise.id })} />
                     <Stack alignItems="flex-start" w="100%">
                         <Text>{exercise.name}</Text>
                         {Boolean(exercise.tags?.length) && (
@@ -91,13 +87,5 @@ const ExerciseSerie = ({ serie, index }: { serie: Serie; index: number }) => {
                 <StatNumber fontSize="md">{serie.kg}</StatNumber>
             </Stat>
         </StatGroup>
-    );
-};
-const ExerciseName = ({ exercise }: { exercise: Exercise }) => {
-    return (
-        <Tag size="lg" colorScheme="red" borderRadius="full">
-            <TagLabel>{exercise.name}</TagLabel>
-            <Avatar size="xs" name={String(exercise.nbSeries)} ml={-1} mr={2} />
-        </Tag>
     );
 };
