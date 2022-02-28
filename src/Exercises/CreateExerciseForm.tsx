@@ -1,11 +1,12 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { TextInput } from "@/components/TextInput";
-import { toasts } from "@/functions/toasts";
-import { Exercise, makeId, Serie, store } from "@/store";
+import { onError } from "@/functions/toasts";
+import { Exercise, makeId, Serie } from "@/store";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
 import { format } from "date-fns";
+import { update } from "idb-keyval";
 import { Fragment, ReactNode, useEffect } from "react";
 import {
     FormProvider,
@@ -15,6 +16,7 @@ import {
     useFormContext,
     UseFormReturn,
 } from "react-hook-form";
+import { useMutation, useQueryClient } from "react-query";
 import { ExoNameAutocomplete } from "./ExoNameAutocomplete";
 import { TagMultiSelect } from "./TagMultiSelect";
 
@@ -51,15 +53,27 @@ export const CreateExerciseForm = ({
 }) => {
     const form = useForm({ defaultValues });
 
-    const onCreate = (params: typeof defaultValues) => {
-        const row = makeExercise({ ...params, category: catId });
-        if (shouldPersist) {
-            store.exercises.push(row);
-            toasts.success("Created !");
-        }
+    const queryClient = useQueryClient();
+    const mutation = useMutation(
+        async (params: typeof defaultValues) => {
+            const row = makeExercise({ ...params, category: catId });
+            console.log(row);
+            if (shouldPersist) {
+                await update("exerciseList", (current) => [...(current || []), row]);
+            }
 
-        onCreated?.(row);
-    };
+            return row;
+        },
+        {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries("exerciseList");
+                onCreated?.(data);
+            },
+            onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+        }
+    );
+
+    const onCreate = (params: typeof defaultValues) => mutation.mutate(makeExercise({ ...params, category: catId }));
 
     return (
         <FormProvider {...form}>
@@ -87,7 +101,6 @@ export const CreateExerciseForm = ({
                             {...form.register("nbSeries", { valueAsNumber: true })}
                             min={1}
                             max={10}
-                            name="nbSeries"
                             label="Nb of series"
                             type="number"
                             error={form.formState.errors.nbSeries}
