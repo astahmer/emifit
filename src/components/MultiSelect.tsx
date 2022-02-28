@@ -239,6 +239,8 @@ function ListComponent<IsMulti extends boolean, Item = any>({
                                         item: item,
                                         index: virtualRow.index,
                                     })}
+                                    fontWeight="bold"
+                                    color="pink.300"
                                 >
                                     <Text>{label}</Text>
                                 </SelectListItem>
