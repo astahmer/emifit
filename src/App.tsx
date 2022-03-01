@@ -25,7 +25,7 @@ function App() {
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/add" element={<AddPage />} />
                                 <Route path="/progress" element={<ProgressPage />} />
-                                <Route path="/programs" element={<ProgramsPage />} />
+                                <Route path="/programs/*" element={<ProgramsPage />} />
                             </Routes>
                         </Flex>
                         <Box as="footer" mt="auto" w="100%" flexShrink="0">

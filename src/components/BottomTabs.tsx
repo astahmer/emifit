@@ -12,7 +12,12 @@ export const BottomTabs = () => {
     const location = useLocation();
 
     useEffect(() => {
-        setTabIndex(indexByRoutes[location.pathname]);
+        let index = indexByRoutes[location.pathname];
+        if (index === undefined && location.pathname.startsWith(routesByIndex[2])) {
+            index = 2;
+        }
+
+        setTabIndex(index);
     }, [location.pathname]);
 
     const submitBtnRef = useRef<HTMLButtonElement>(null);
