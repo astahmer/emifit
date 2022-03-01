@@ -93,12 +93,12 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
 
     const groupedItems = groupByKeyGetter ? groupBy(items, groupByKeyGetter) : {};
     const groups = Object.keys(groupedItems);
-    const rows: typeof items = groupByKeyGetter
+    const itemsWithGroups: typeof items = groupByKeyGetter
         ? groups.reduce((acc, k) => [...acc, k, ...groupedItems[k]], [])
         : items;
 
     const rowVirtualizer = useVirtual({
-        size: rows.length,
+        size: itemsWithGroups.length,
         parentRef,
         estimateSize: useCallback(() => 35, []),
         overscan: 5,
@@ -122,7 +122,8 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
         menuProps,
         menuRef,
         rowVirtualizer,
-        items: rows,
+        items,
+        itemsWithGroups,
         itemToString,
         getValue,
         highlightedIndex,
@@ -179,6 +180,7 @@ interface ListComponentProps<IsMulti extends boolean, Item = any>
     getItemProps: ReturnType<typeof useSelect>["getItemProps"];
     values: string[];
     groups: string[];
+    itemsWithGroups: (Item | string)[];
 }
 
 function ListComponent<IsMulti extends boolean, Item = any>({
@@ -194,6 +196,7 @@ function ListComponent<IsMulti extends boolean, Item = any>({
     getItemProps,
     values,
     groups,
+    itemsWithGroups,
 }: ListComponentProps<IsMulti, Item>) {
     const rows = rowVirtualizer.virtualItems;
 
@@ -216,7 +219,7 @@ function ListComponent<IsMulti extends boolean, Item = any>({
                 }}
             >
                 {rows.map((virtualRow) => {
-                    const item = items[virtualRow.index];
+                    const item = itemsWithGroups[virtualRow.index];
                     const label = typeof item === "string" ? item : itemToString(item);
 
                     if (groups.includes(label)) {
@@ -234,29 +237,23 @@ function ListComponent<IsMulti extends boolean, Item = any>({
                                 }}
                             >
                                 {virtualRow.index > 0 && <Divider mt="2" />}
-                                <SelectListItem
-                                    {...getItemProps({
-                                        item: item,
-                                        index: virtualRow.index,
-                                    })}
-                                    fontWeight="bold"
-                                    color="pink.300"
-                                >
+                                <SelectListItem fontWeight="bold" color="pink.300">
                                     <Text>{label}</Text>
                                 </SelectListItem>
                             </div>
                         );
                     }
 
-                    const value = String(getValue(item));
+                    const value = String(getValue(item as Item));
+                    const itemIndex = items.findIndex((i) => getValue(i) === value);
                     return (
                         <SelectListItem
                             key={value}
                             cursor="pointer"
-                            bg={virtualRow.index === highlightedIndex ? "twitter.100" : null}
+                            bg={itemIndex === highlightedIndex ? "twitter.100" : null}
                             {...getItemProps({
-                                item: item,
-                                index: virtualRow.index,
+                                item,
+                                index: itemIndex,
                                 style: {
                                     position: "absolute",
                                     top: 0,
