@@ -1,7 +1,7 @@
 const SharedTags = [
-    { id: "Machine", label: "Machine", catId: "Shared" },
-    { id: "Freeweight", label: "Freeweight", catId: "Shared" },
-    { id: "Bodyweight", label: "Bodyweight", catId: "Shared" },
+    { id: "Machine", label: "Machine", tag: "Type" },
+    { id: "Freeweight", label: "Freeweight", tag: "Type" },
+    { id: "Bodyweight", label: "Bodyweight", tag: "Type" },
 ] as const;
 
 export const Categories = [
@@ -10,9 +10,9 @@ export const Categories = [
         label: "Push day",
         children: [
             ...SharedTags,
-            { id: "Chest", label: "Chest", catId: "PushDay" },
-            { id: "Triceps", label: "Triceps", catId: "PushDay" },
-            { id: "Shoulders", label: "Shoulders", catId: "PushDay" },
+            { id: "Chest", label: "Chest", tag: "Muscle" },
+            { id: "Triceps", label: "Triceps", tag: "Muscle" },
+            { id: "Shoulders", label: "Shoulders", tag: "Muscle" },
         ],
     },
     {
@@ -20,8 +20,8 @@ export const Categories = [
         label: "Pull day",
         children: [
             ...SharedTags,
-            { id: "Back", label: "Back", catId: "PullDay" },
-            { id: "Biceps", label: "Biceps", catId: "PullDay" },
+            { id: "Back", label: "Back", tag: "Muscle" },
+            { id: "Biceps", label: "Biceps", tag: "Muscle" },
         ],
     },
     {
@@ -29,8 +29,8 @@ export const Categories = [
         label: "Leg day",
         children: [
             ...SharedTags,
-            { id: "QuadFocus", label: "Quad focus", catId: "LegDay" },
-            { id: "GlutesFocus", label: "Glutes focus", catId: "LegDay" },
+            { id: "QuadFocus", label: "Quad focus", tag: "Muscle" },
+            { id: "GlutesFocus", label: "Glutes focus", tag: "Muscle" },
         ],
     },
 ] as const;
