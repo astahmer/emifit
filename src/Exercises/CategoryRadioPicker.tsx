@@ -2,7 +2,13 @@ import { RadioCard, RadioCardPicker, RadioCardPickerProps } from "@/components/R
 import { Categories } from "@/constants";
 
 const options = Categories.map((cat) => cat);
-export const CategoryRadioPicker = ({ renderOptions, ...props }: RadioCardPickerProps) => (
+export const CategoryRadioPicker = ({
+    isOptionDisabled,
+    ...props
+}: { isOptionDisabled?: (option: typeof options[number]) => boolean } & Omit<
+    RadioCardPickerProps,
+    "renderOptions"
+>) => (
     <RadioCardPicker
         {...props}
         renderOptions={(getRadioProps) =>
@@ -11,7 +17,7 @@ export const CategoryRadioPicker = ({ renderOptions, ...props }: RadioCardPicker
                 const radio = getRadioProps({ value });
 
                 return (
-                    <RadioCard key={value} {...radio}>
+                    <RadioCard key={value} {...radio} isDisabled={radio.disabled || isOptionDisabled?.(option)}>
                         {value}
                     </RadioCard>
                 );

@@ -39,7 +39,9 @@ export function RadioCard({
             <RadioCardButton
                 as="div"
                 {...getCheckboxProps()}
-                opacity={!state.isChecked ? 0.5 : 1}
+                opacity="0.6"
+                _checked={{ opacity: 1 }}
+                _disabled={{ opacity: 0.3 }}
                 variant={state.isChecked ? "solid" : "outline"}
                 {...getButtonProps?.(state)}
             >
