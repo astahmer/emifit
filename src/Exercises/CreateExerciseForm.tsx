@@ -17,7 +17,7 @@ import {
     UseFormReturn,
 } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
-import { ExoNameAutocomplete } from "./ExoNameAutocomplete";
+import { ExerciseCombobox } from "./ExerciseCombobox";
 import { TagMultiSelect } from "./TagMultiSelect";
 
 const defaultValues: Pick<Exercise, "name" | "nbSeries" | "tags" | "series"> = {
@@ -31,7 +31,8 @@ const makeExercise = (params: typeof defaultValues & { category: string }) =>
     ({
         ...params,
         id: makeId(),
-        date: format(new Date(), "dd/MM/yyyy"),
+        date: format(new Date(), "MM/dd/yyyy"),
+        datetime: new Date(),
         series: params.series.map((serie) => ({ ...serie, id: makeId() })),
     } as Exercise);
 function makeSerie(index: number, current = []) {
@@ -88,7 +89,7 @@ export const CreateExerciseForm = ({
             >
                 <Box h="100%" minH={0}>
                     <Stack p="8" pt="4" overflow="auto" h="100%" minH={0}>
-                        <ExoNameAutocomplete {...form.register("name", { required })} />
+                        <ExerciseCombobox {...form.register("name", { required })} />
                         <TagMultiSelect
                             control={form.control}
                             name="tags"
