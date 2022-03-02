@@ -37,6 +37,7 @@ export const CheckboxSquare = (props: CheckboxCircleProps) => (
 export const CheckboxButton = ({ isActive, ...props }: IconButtonProps & { isActive: boolean }) => {
     return (
         <IconButton
+            opacity={isActive ? "1" : "0"}
             colorScheme={isActive ? "pink" : "gray"}
             size="xs"
             icon={isActive ? <CheckCircleIcon fontSize="lg" /> : undefined}
