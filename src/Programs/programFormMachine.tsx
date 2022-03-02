@@ -6,6 +6,7 @@ import { assign, createMachine } from "xstate";
 interface ProgramCtx {
     categoryId: string;
     exerciseList: Exercise[];
+    programName: string;
     prevState: string;
 }
 
@@ -43,12 +44,17 @@ export const programFormMachine =
                 categoryId: undefined,
                 exerciseList: [],
                 prevState: undefined,
-                stack: [{ categoryId: undefined, exerciseList: [], prevState: undefined }],
+                programName: undefined,
+                stack: [{ categoryId: undefined, exerciseList: [], programName: undefined, prevState: undefined }],
             },
             states: {
                 initial: {
-                    exit: "pushHistoryStack",
-                    on: { StartCreatingProgram: { target: "creating.selectingCategory" } },
+                    on: {
+                        StartCreatingProgram: {
+                            target: "creating.selectingCategory",
+                            actions: ["pushHistoryStack", "navigateTo"],
+                        },
+                    },
                     meta: { path: "/" },
                 },
                 creating: {
@@ -56,17 +62,19 @@ export const programFormMachine =
                     initial: "selectingCategory",
                     states: {
                         selectingCategory: {
-                            exit: "pushHistoryStack",
                             meta: { path: "/creating/selecting-category" },
                             on: {
                                 GoBack: { target: "#programForm.initial", actions: "popHistoryStack" },
                                 SelectCategory: [
                                     {
                                         target: "maybeCreatingExercise.shouldCreateChoice",
-                                        actions: "assignCategory",
+                                        actions: ["assignCategory", "pushHistoryStack", "navigateTo"],
                                         cond: "hasExercisesInCategory",
                                     },
-                                    { target: "maybeCreatingExercise.creatingExercise", actions: "assignCategory" },
+                                    {
+                                        target: "maybeCreatingExercise.creatingExercise",
+                                        actions: ["assignCategory", "pushHistoryStack", "navigateTo"],
+                                    },
                                 ],
                             },
                         },
@@ -74,30 +82,33 @@ export const programFormMachine =
                             initial: "shouldCreateChoice",
                             states: {
                                 shouldCreateChoice: {
-                                    exit: "pushHistoryStack",
                                     meta: { path: "/creating/select-or-create" },
                                     on: {
                                         GoBack: { target: "#creating.selectingCategory", actions: "popHistoryStack" },
-                                        GoToCreateExercise: { target: "creatingExercise" },
+                                        GoToCreateExercise: {
+                                            target: "creatingExercise",
+                                            actions: ["pushHistoryStack", "navigateTo"],
+                                        },
                                         GoToSelectExercises: [
                                             {
                                                 target: "#creating.selectingExercises.emptySelection",
                                                 cond: "hasNotSelectedExercises",
+                                                actions: ["pushHistoryStack", "navigateTo"],
                                             },
                                             {
                                                 target: "#creating.selectingExercises.hasSelection",
+                                                actions: ["pushHistoryStack", "navigateTo"],
                                             },
                                         ],
                                     },
                                 },
                                 creatingExercise: {
-                                    exit: "pushHistoryStack",
                                     meta: { path: "/creating/exercise" },
                                     on: {
                                         GoBack: { target: "#creating.selectingCategory", actions: "popHistoryStack" },
                                         CreateExercise: {
                                             target: "#creating.maybeCreatingExercise.shouldCreateChoice",
-                                            actions: "createExercise",
+                                            actions: ["createExercise", "pushHistoryStack", "navigateTo"],
                                         },
                                     },
                                 },
@@ -106,16 +117,18 @@ export const programFormMachine =
                                 SelectCategory: [
                                     {
                                         target: "maybeCreatingExercise.shouldCreateChoice",
-                                        actions: "assignCategory",
+                                        actions: ["assignCategory"],
                                         cond: "hasExercisesInCategory",
                                     },
-                                    { target: "maybeCreatingExercise.creatingExercise", actions: "assignCategory" },
+                                    {
+                                        target: "maybeCreatingExercise.creatingExercise",
+                                        actions: ["assignCategory", "pushHistoryStack", "navigateTo"],
+                                    },
                                 ],
                             },
                         },
                         selectingExercises: {
                             initial: "emptySelection",
-                            exit: "pushHistoryStack",
                             meta: { path: "/creating/selecting-exercise" },
                             states: {
                                 emptySelection: {
@@ -133,7 +146,10 @@ export const programFormMachine =
                                             },
                                             { actions: "updateSelection" },
                                         ],
-                                        GoToProgramSettings: { target: "#creating.editSettings.initial" },
+                                        GoToProgramSettings: {
+                                            target: "#creating.editSettings.initial",
+                                            actions: ["pushHistoryStack", "navigateTo"],
+                                        },
                                     },
                                 },
                             },
@@ -147,7 +163,6 @@ export const programFormMachine =
                         },
                         editSettings: {
                             initial: "initial",
-                            exit: "pushHistoryStack",
                             meta: { path: "/creating/editing-settings" },
                             states: {
                                 initial: {
@@ -167,7 +182,10 @@ export const programFormMachine =
                                     actions: "popHistoryStack",
                                 },
                                 UnselectExercise: { actions: "unselectExercise" },
-                                Submit: { target: "#programForm.done", actions: "assignProgramName" },
+                                Submit: {
+                                    target: "#programForm.done",
+                                    actions: ["assignProgramName", "pushHistoryStack", "navigateTo", "onDone"],
+                                },
                                 SelectCategory: [
                                     {
                                         target: "maybeCreatingExercise.creatingExercise",
@@ -200,7 +218,7 @@ export const programFormMachine =
                 selectExercise: assign({
                     exerciseList: (ctx, e) => ctx.exerciseList.concat(e.exercise),
                 }),
-                assignProgramName: assign({ categoryId: (_ctx, e) => e.programName }),
+                assignProgramName: assign({ programName: (_ctx, e) => e.programName }),
                 pushHistoryStack: assign({
                     stack: (ctx) => [...ctx.stack, omit(ctx, ["stack"])],
                     prevState: (_ctx, _e, meta) => (meta.state ? getStatesPathValue(meta.state)[0] : "initial"),

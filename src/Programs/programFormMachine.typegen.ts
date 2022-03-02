@@ -3,6 +3,22 @@
 export interface Typegen0 {
     "@@xstate/typegen": true;
     eventsCausingActions: {
+        pushHistoryStack:
+            | "StartCreatingProgram"
+            | "SelectCategory"
+            | "GoToCreateExercise"
+            | "GoToSelectExercises"
+            | "CreateExercise"
+            | "GoToProgramSettings"
+            | "Submit";
+        navigateTo:
+            | "StartCreatingProgram"
+            | "SelectCategory"
+            | "GoToCreateExercise"
+            | "GoToSelectExercises"
+            | "CreateExercise"
+            | "GoToProgramSettings"
+            | "Submit";
         popHistoryStack: "GoBack";
         assignCategory: "SelectCategory";
         createExercise: "CreateExercise";
@@ -10,15 +26,15 @@ export interface Typegen0 {
         updateSelection: "UpdateSelection" | "ConfirmEditing";
         unselectExercise: "UnselectExercise";
         assignProgramName: "Submit";
+        onDone: "Submit";
         selectExercise: "AddExercise";
-        pushHistoryStack: "xstate.init";
     };
     internalEvents: {
         "xstate.init": { type: "xstate.init" };
     };
     invokeSrcNameMap: {};
     missingImplementations: {
-        actions: never;
+        actions: "navigateTo" | "onDone";
         services: never;
         guards: never;
         delays: never;
