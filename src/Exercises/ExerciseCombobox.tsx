@@ -36,7 +36,6 @@ export const ExerciseListCombobox = forwardRef(
         ref
     ) => {
         const items = useExerciseList();
-        console.log(items);
 
         return (
             <FormControl isInvalid={Boolean(error)}>
@@ -48,7 +47,6 @@ export const ExerciseListCombobox = forwardRef(
                     items={items}
                     label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise list</FormLabel>}
                 />
-
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
             </FormControl>
         );

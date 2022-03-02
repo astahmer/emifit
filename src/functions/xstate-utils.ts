@@ -1,3 +1,4 @@
+import { ObjectLiteral } from "@pastable/core";
 import { State, AnyState } from "xstate";
 
 export const getStatesPathValue = (state: AnyState) => {
@@ -33,3 +34,15 @@ export const parseStateValue = (stateStr: string) => {
     }
 };
 export const areEqualStateValuePath = (a: AnyState, b: AnyState) => getStatesPathValue(a) === getStatesPathValue(b);
+
+// https://xstate.js.org/docs/guides/states.html#state-meta-data
+export function mergeMeta<Meta extends ObjectLiteral>(meta: Meta) {
+    return Object.keys(meta).reduce((acc, key) => {
+        const value = meta[key];
+
+        // Assuming each meta value is an object
+        Object.assign(acc, value);
+
+        return acc;
+    }, {} as Meta);
+}

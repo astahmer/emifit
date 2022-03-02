@@ -3,10 +3,15 @@
 export interface Typegen0 {
     "@@xstate/typegen": true;
     eventsCausingActions: {
+        popHistoryStack: "GoBack";
         assignCategory: "SelectCategory";
-        filterExercisesWithPrevCategory: "SelectCategory";
         createExercise: "CreateExercise";
-        addExercise: "PickExercise";
+        filterExercisesWithPrevCategory: "SelectCategory";
+        updateSelection: "UpdateSelection" | "ConfirmEditing";
+        unselectExercise: "UnselectExercise";
+        assignProgramName: "Submit";
+        selectExercise: "AddExercise";
+        pushHistoryStack: "xstate.init";
     };
     internalEvents: {
         "xstate.init": { type: "xstate.init" };
@@ -20,7 +25,10 @@ export interface Typegen0 {
     };
     eventsCausingServices: {};
     eventsCausingGuards: {
-        hasExercises: "SelectCategory";
+        hasExercisesInCategory: "SelectCategory";
+        hasNotSelectedExercises: "GoToSelectExercises";
+        isSelectionEmpty: "UpdateSelection";
+        hasNoExercisesInCategory: "SelectCategory";
     };
     eventsCausingDelays: {};
     matchesStates:
@@ -31,7 +39,11 @@ export interface Typegen0 {
         | "creating.maybeCreatingExercise.shouldCreateChoice"
         | "creating.maybeCreatingExercise.creatingExercise"
         | "creating.selectingExercises"
+        | "creating.selectingExercises.emptySelection"
+        | "creating.selectingExercises.hasSelection"
         | "creating.editSettings"
+        | "creating.editSettings.initial"
+        | "creating.editSettings.editingExerciseList"
         | "done"
         | {
               creating?:
@@ -39,7 +51,11 @@ export interface Typegen0 {
                   | "maybeCreatingExercise"
                   | "selectingExercises"
                   | "editSettings"
-                  | { maybeCreatingExercise?: "shouldCreateChoice" | "creatingExercise" };
+                  | {
+                        maybeCreatingExercise?: "shouldCreateChoice" | "creatingExercise";
+                        selectingExercises?: "emptySelection" | "hasSelection";
+                        editSettings?: "initial" | "editingExerciseList";
+                    };
           };
     tags: never;
 }

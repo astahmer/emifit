@@ -1,3 +1,4 @@
+import { useProgramInterpret } from "@/Programs/useProgramInterpret";
 import { Exercise, Serie, useExerciseList } from "@/store";
 import { StringOrNumber, WithOnChange } from "@/types";
 import {
@@ -16,18 +17,24 @@ import {
     useCheckboxGroup,
     UseCheckboxGroupReturn,
 } from "@chakra-ui/react";
+import { useSelector } from "@xstate/react";
 import { CheckboxSquare } from "../components/CheckboxCircle";
 
 export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[]>) => {
     const exercises = useExerciseList();
+    const interpret = useProgramInterpret();
+    const catId = useSelector(interpret, (s) => s.context.categoryId);
+    const exerciseList = useSelector(interpret, (s) => s.context.exerciseList);
 
-    const { getCheckboxProps } = useCheckboxGroup({ onChange });
+    const { getCheckboxProps } = useCheckboxGroup({ onChange, defaultValue: exerciseList.map((ex) => ex.id) });
 
     return (
         <Accordion allowToggle w="100%">
-            {exercises.map((exercise) => (
-                <ExerciseAccordion key={exercise.id} exercise={exercise} getCheckboxProps={getCheckboxProps} />
-            ))}
+            {exercises
+                .filter((ex) => ex.category === catId)
+                .map((exercise) => (
+                    <ExerciseAccordion key={exercise.id} exercise={exercise} getCheckboxProps={getCheckboxProps} />
+                ))}
         </Accordion>
     );
 };
@@ -76,7 +83,7 @@ const ExerciseSerie = ({ serie, index }: { serie: Serie; index: number }) => {
     return (
         <StatGroup>
             <Stat alignSelf="center">
-                <StatLabel>Série {index}</StatLabel>
+                <StatLabel>Série {index + 1}</StatLabel>
             </Stat>
             <Stat>
                 <StatLabel>kg</StatLabel>
