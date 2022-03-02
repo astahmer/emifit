@@ -16,7 +16,13 @@ import {
     WrapItem,
 } from "@chakra-ui/react";
 import { callAll } from "@pastable/core";
-import { useCombobox, UseComboboxProps, UseComboboxReturnValue, useMultipleSelection } from "downshift";
+import {
+    useCombobox,
+    UseComboboxProps,
+    UseComboboxReturnValue,
+    useMultipleSelection,
+    UseMultipleSelectionProps,
+} from "downshift";
 import { ForwardedRef, forwardRef, ReactNode, Ref, useCallback, useMemo, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";
 
@@ -34,8 +40,11 @@ export type MultiComboboxProps<Item = any> = {
     ) => ReactNode;
     label?: (getLabelProps: UseComboboxReturnValue<Item>["getLabelProps"]) => ReactNode;
     getValue?: (item: Item) => string | number;
+    renderRight?: () => ReactNode;
+    minItems?: number;
 } & InputProps &
-    Pick<UseComboboxProps<Item>, "itemToString" | "onSelectedItemChange">;
+    Pick<UseComboboxProps<Item>, "itemToString" | "onSelectedItemChange"> &
+    Pick<UseMultipleSelectionProps<Item>, "onSelectedItemsChange" | "initialSelectedItems">;
 
 function MultiComboboxBase<Item = any>({
     externalRef,
@@ -45,10 +54,14 @@ function MultiComboboxBase<Item = any>({
     getValue = (item) => String(item as any),
     itemToString = (item) => String(item as any),
     onSelectedItemChange,
+    onSelectedItemsChange,
+    renderRight,
+    initialSelectedItems,
+    minItems,
     ...props
 }: MultiComboboxProps<Item>) {
     const { getSelectedItemProps, getDropdownProps, addSelectedItem, removeSelectedItem, selectedItems } =
-        useMultipleSelection({ initialSelectedItems: [] as Item[] });
+        useMultipleSelection({ initialSelectedItems: initialSelectedItems || [], onSelectedItemsChange });
 
     const [inputItems, setInputItems] = useState(items);
     const values = selectedItems.map(getValue);
@@ -96,7 +109,6 @@ function MultiComboboxBase<Item = any>({
         highlightedIndex,
         getItemProps,
         setInputValue,
-        inputValue,
     } = useCombobox({
         defaultHighlightedIndex: 0, // after selection, highlight the first item.
         selectedItem: null,
@@ -141,6 +153,8 @@ function MultiComboboxBase<Item = any>({
         onBlur: callAll(props.onBlur, inputProps.onBlur),
     };
 
+    const canRemoveItems = minItems ? values.length > minItems : values.length > 0;
+
     return (
         <>
             {label?.(getLabelProps)}
@@ -149,7 +163,7 @@ function MultiComboboxBase<Item = any>({
                     <WrapItem key={getValue(item)} {...getSelectedItemProps({ selectedItem: item, index })}>
                         <Tag size="lg" colorScheme="pink" borderRadius="full" variant="subtle">
                             <TagLabel>{typeof item === "string" ? item : itemToString(item)}</TagLabel>
-                            <TagCloseButton onClick={() => removeSelectedItem(item)} />
+                            {canRemoveItems && <TagCloseButton onClick={() => removeSelectedItem(item)} />}
                         </Tag>
                     </WrapItem>
                 ))}
@@ -225,6 +239,7 @@ function MultiComboboxBase<Item = any>({
                         </List>
                     </Flex>
                 </WrapItem>
+                {renderRight?.()}
             </Wrap>
         </>
     );
