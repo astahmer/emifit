@@ -3,16 +3,14 @@ import { Box, Heading } from "@chakra-ui/react";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { useProgramInterpret } from "../useProgramInterpret";
 import { useExerciseList } from "@/store";
+import { useSelector } from "@xstate/react";
 
-export function PickCategoryStep({
-    isCategorySelected,
-    onChange,
-}: {
-    isCategorySelected: boolean;
-    onChange: (value: string) => void;
-}) {
+export function PickCategoryStep() {
     const interpret = useProgramInterpret();
     const exercises = useExerciseList();
+
+    const category = useSelector(interpret, (s) => s.context.categoryId);
+    const isCategorySelected = Boolean(category);
 
     return (
         <>
@@ -29,7 +27,14 @@ export function PickCategoryStep({
             </Heading>
             <Box d="flex" w="100%" p="4">
                 <CategoryRadioPicker
-                    onChange={onChange}
+                    defaultValue={category}
+                    onChange={(categoryId) =>
+                        interpret.send({
+                            type: "SelectCategory",
+                            categoryId,
+                            hasExercises: exercises.some((ex) => ex.category === categoryId),
+                        })
+                    }
                     isOptionDisabled={
                         interpret.state.matches("creating.selectingExercises")
                             ? (option) => !exercises.some((ex) => ex.category === option.id)

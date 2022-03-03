@@ -1,9 +1,10 @@
 import { getStatesPathValue } from "@/functions/xstate-utils";
-import { Exercise } from "@/store";
+import { Exercise, Program } from "@/store";
 import { omit } from "@pastable/core";
 import { assign, createMachine } from "xstate";
 
 interface ProgramCtx {
+    programId: string;
     categoryId: string;
     exerciseList: Exercise[];
     programName: string;
@@ -20,6 +21,7 @@ export const programFormMachine =
                 events: {} as
                     | { type: "GoBack" }
                     | { type: "StartCreatingProgram" }
+                    | { type: "StartEditingProgram"; program: Program }
                     | { type: "SelectCategory"; categoryId: string; hasExercises: boolean }
                     | { type: "CreateExercise"; exercise: Exercise }
                     | { type: "GoToCreateExercise" }
@@ -36,16 +38,26 @@ export const programFormMachine =
                     | { type: "hasExercisesInCategory"; hasExercises: boolean }
                     | { type: "hasNoExercisesInCategory"; hasExercises: boolean }
                     | { type: "isSelectionEmpty"; selection: Exercise[] }
-                    | { type: "hasNotSelectedExercises" },
+                    | { type: "hasNotSelectedExercises" }
+                    | { type: "isPrevStateInitial" },
             },
             id: "programForm",
             initial: "initial",
             context: {
+                programId: undefined,
                 categoryId: undefined,
                 exerciseList: [],
                 prevState: undefined,
                 programName: undefined,
-                stack: [{ categoryId: undefined, exerciseList: [], programName: undefined, prevState: undefined }],
+                stack: [
+                    {
+                        programId: undefined,
+                        categoryId: undefined,
+                        exerciseList: [],
+                        programName: undefined,
+                        prevState: undefined,
+                    },
+                ],
             },
             states: {
                 initial: {
@@ -53,6 +65,10 @@ export const programFormMachine =
                         StartCreatingProgram: {
                             target: "creating.selectingCategory",
                             actions: ["pushHistoryStack", "navigateTo"],
+                        },
+                        StartEditingProgram: {
+                            target: "creating.editSettings.editingExerciseList",
+                            actions: ["assignExistingProgram", "pushHistoryStack", "navigateTo"],
                         },
                     },
                     meta: { path: "/" },
@@ -103,9 +119,12 @@ export const programFormMachine =
                                     },
                                 },
                                 creatingExercise: {
-                                    meta: { path: "/creating/exercise" },
+                                    // meta: { path: "/creating/exercise" },
                                     on: {
-                                        GoBack: { target: "#creating.selectingCategory", actions: "popHistoryStack" },
+                                        GoBack: {
+                                            target: "#creating.maybeCreatingExercise.shouldCreateChoice",
+                                            actions: "popHistoryStack",
+                                        },
                                         CreateExercise: {
                                             target: "#creating.maybeCreatingExercise.shouldCreateChoice",
                                             actions: ["createExercise", "pushHistoryStack", "navigateTo"],
@@ -177,14 +196,21 @@ export const programFormMachine =
                                 },
                             },
                             on: {
-                                GoBack: {
-                                    target: "#creating.selectingExercises.hasSelection",
-                                    actions: "popHistoryStack",
-                                },
+                                GoBack: [
+                                    {
+                                        target: "#programForm.initial",
+                                        actions: "popHistoryStack",
+                                        cond: "isPrevStateInitial",
+                                    },
+                                    {
+                                        target: "#creating.selectingExercises.hasSelection",
+                                        actions: "popHistoryStack",
+                                    },
+                                ],
                                 UnselectExercise: { actions: "unselectExercise" },
                                 Submit: {
                                     target: "#programForm.done",
-                                    actions: ["assignProgramName", "pushHistoryStack", "navigateTo", "onDone"],
+                                    actions: ["assignProgramName", "onDone"],
                                 },
                                 SelectCategory: [
                                     {
@@ -199,7 +225,6 @@ export const programFormMachine =
                     },
                 },
                 done: {
-                    meta: { path: "/creating/done" },
                     type: "final",
                 },
             },
@@ -229,12 +254,19 @@ export const programFormMachine =
                     // console.log(ctx.stack.length, stack.length);
                     return { ...prev, stack };
                 }),
+                assignExistingProgram: assign((_ctx, e) => ({
+                    programId: e.program.id,
+                    programName: e.program.name,
+                    categoryId: e.program.category,
+                    exerciseList: e.program.exercises,
+                })),
             },
             guards: {
                 hasExercisesInCategory: (_ctx, event) => event.hasExercises,
                 hasNoExercisesInCategory: (_ctx, event) => !event.hasExercises,
                 isSelectionEmpty: (_ctx, event) => !event.selection.length,
                 hasNotSelectedExercises: (ctx) => !ctx.exerciseList.length,
+                isPrevStateInitial: (ctx) => ctx.prevState === "initial",
             },
         }
     );

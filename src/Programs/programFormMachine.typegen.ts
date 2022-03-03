@@ -5,20 +5,21 @@ export interface Typegen0 {
     eventsCausingActions: {
         pushHistoryStack:
             | "StartCreatingProgram"
+            | "StartEditingProgram"
             | "SelectCategory"
             | "GoToCreateExercise"
             | "GoToSelectExercises"
             | "CreateExercise"
-            | "GoToProgramSettings"
-            | "Submit";
+            | "GoToProgramSettings";
         navigateTo:
             | "StartCreatingProgram"
+            | "StartEditingProgram"
             | "SelectCategory"
             | "GoToCreateExercise"
             | "GoToSelectExercises"
             | "CreateExercise"
-            | "GoToProgramSettings"
-            | "Submit";
+            | "GoToProgramSettings";
+        assignExistingProgram: "StartEditingProgram";
         popHistoryStack: "GoBack";
         assignCategory: "SelectCategory";
         createExercise: "CreateExercise";
@@ -44,6 +45,7 @@ export interface Typegen0 {
         hasExercisesInCategory: "SelectCategory";
         hasNotSelectedExercises: "GoToSelectExercises";
         isSelectionEmpty: "UpdateSelection";
+        isPrevStateInitial: "GoBack";
         hasNoExercisesInCategory: "SelectCategory";
     };
     eventsCausingDelays: {};

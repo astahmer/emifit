@@ -1,24 +1,28 @@
-import "./App.css";
-
-import { ChakraProvider, Flex, extendTheme, Box } from "@chakra-ui/react";
-import { QueryClient, QueryClientProvider } from "react-query";
-
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { BottomTabs } from "./components/BottomTabs";
-import { HomePage } from "./pages/HomePage";
-import { ProgressPage } from "./pages/ProgressPage";
-import { AddPage } from "./pages/AddPage";
+import { Box, ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { CalendarDefaultTheme } from "@uselessdev/datepicker";
+import { useSetAtom } from "jotai";
+import { useHotkeys } from "react-hotkeys-hook";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
+import "./App.css";
+import { BottomTabs } from "./components/BottomTabs";
+import { AddPage } from "./pages/AddPage";
+import { HomePage } from "./pages/HomePage";
 import { ProgramsPage } from "./pages/ProgramsPage";
+import { ProgressPage } from "./pages/ProgressPage";
+import { debugModeAtom, browserHistory } from "./store";
 
 const queryClient = new QueryClient();
 const theme = extendTheme(CalendarDefaultTheme, { config: { initialColorMode: "light" } });
 
 function App() {
+    const setDebugMode = useSetAtom(debugModeAtom);
+    useHotkeys("cmd+k", () => setDebugMode((current) => !current));
+
     return (
         <QueryClientProvider client={queryClient}>
             <ChakraProvider theme={theme}>
-                <BrowserRouter>
+                <HistoryRouter history={browserHistory}>
                     <Flex as="main" direction="column" boxSize="100%">
                         <Flex as="section" direction="column" h="100%" overflow="hidden">
                             <Routes>
@@ -32,7 +36,7 @@ function App() {
                             <BottomTabs />
                         </Box>
                     </Flex>
-                </BrowserRouter>
+                </HistoryRouter>
             </ChakraProvider>
         </QueryClientProvider>
     );

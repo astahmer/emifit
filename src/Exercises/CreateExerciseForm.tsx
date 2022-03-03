@@ -2,11 +2,9 @@ import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { TextInput } from "@/components/TextInput";
 import { onError } from "@/functions/toasts";
-import { Exercise, makeId, Serie } from "@/store";
+import { Exercise, makeExercise, makeSerie, persistExercise, Serie } from "@/store";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
-import { format } from "date-fns";
-import { update } from "idb-keyval";
 import { Fragment, ReactNode, useEffect } from "react";
 import {
     FormProvider,
@@ -20,24 +18,14 @@ import { useMutation, useQueryClient } from "react-query";
 import { ExerciseCombobox } from "./ExerciseCombobox";
 import { TagMultiSelect } from "./TagMultiSelect";
 
-const defaultValues: Pick<Exercise, "name" | "nbSeries" | "tags" | "series"> = {
+const defaultValues: Pick<Exercise, "name" | "tags" | "series"> & { nbSeries: number } = {
     name: "",
     nbSeries: 1,
     tags: [],
     series: [makeSerie(0)] as Serie[],
 };
 
-const makeExercise = (params: typeof defaultValues & { category: string }) =>
-    ({
-        ...params,
-        id: makeId(),
-        date: format(new Date(), "MM/dd/yyyy"),
-        datetime: new Date(),
-        series: params.series.map((serie) => ({ ...serie, id: makeId() })),
-    } as Exercise);
-function makeSerie(index: number, current = []) {
-    return { id: makeId(), kg: current[index - 1]?.kg ?? 1, reps: 1 };
-}
+type CreateExerciseParams = Omit<typeof defaultValues, "nbSeries"> & { category: string };
 
 const required = { value: true, message: "This field is required" };
 
@@ -56,11 +44,11 @@ export const CreateExerciseForm = ({
 
     const queryClient = useQueryClient();
     const mutation = useMutation(
-        async (params: typeof defaultValues) => {
+        async (params: CreateExerciseParams) => {
             const row = makeExercise({ ...params, category: catId });
             console.log(row);
             if (shouldPersist) {
-                await update("exerciseList", (current) => [...(current || []), row]);
+                await persistExercise(row);
             }
 
             return row;
@@ -125,7 +113,9 @@ export const CreateExerciseForm = ({
                         </div>
                     </Stack>
                 </Box>
-                <Box mb="2">{renderSubmit?.(form)}</Box>
+                <Box mb="2" flexShrink={0}>
+                    {renderSubmit?.(form)}
+                </Box>
             </Box>
         </FormProvider>
     );

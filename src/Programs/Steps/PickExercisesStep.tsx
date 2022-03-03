@@ -25,7 +25,7 @@ export function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercis
                 Then, select some exercises:
             </Heading>
             {interpret.state.matches("creating.selectingExercises") && (
-                <Box p="4">
+                <Box p="4" overflow="auto" minH={0} h="100%">
                     <ExerciseAccordionList
                         onChange={(ids) =>
                             send({
@@ -45,6 +45,7 @@ export function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercis
                     variant="solid"
                     size="lg"
                     onClick={() => send({ type: "GoToProgramSettings" })}
+                    flexShrink={0}
                 >
                     Edit program settings
                 </Button>

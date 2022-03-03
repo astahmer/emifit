@@ -38,19 +38,17 @@ export function CreateExerciseStep({
                         Boolean(name && tags.length) && (
                             <>
                                 <Divider />
-                                <div>
-                                    <Button
-                                        mt="4"
-                                        isFullWidth
-                                        leftIcon={<CheckIcon />}
-                                        colorScheme="pink"
-                                        variant="solid"
-                                        type="submit"
-                                        size="lg"
-                                    >
-                                        Create
-                                    </Button>
-                                </div>
+                                <Button
+                                    mt="4"
+                                    isFullWidth
+                                    leftIcon={<CheckIcon />}
+                                    colorScheme="pink"
+                                    variant="solid"
+                                    type="submit"
+                                    size="lg"
+                                >
+                                    Create
+                                </Button>
                             </>
                         )
                     );

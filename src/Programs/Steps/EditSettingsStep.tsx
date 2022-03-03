@@ -13,7 +13,10 @@ export function EditSettingsStep() {
     const send = interpret.send;
 
     const selectedExercises = useSelector(interpret, (s) => s.context.exerciseList);
-    const form = useForm({ defaultValues: { programName: "" } });
+    const programId = useSelector(interpret, (s) => s.context.programId);
+    const programName = useSelector(interpret, (s) => s.context.programName);
+
+    const form = useForm({ defaultValues: { programName } });
 
     const editExerciseList = useRef([]);
 
@@ -85,7 +88,7 @@ export function EditSettingsStep() {
                         type="submit"
                         size="lg"
                     >
-                        Create
+                        {Boolean(programId) ? "Edit" : "Create"} program
                     </Button>
                 </Box>
             </Stack>

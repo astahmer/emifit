@@ -51,8 +51,8 @@ export function RadioCard({
     );
 }
 
-export function RadioCardPicker({ renderOptions, onChange, isDisabled }: RadioCardPickerProps) {
-    const { getRootProps, getRadioProps } = useRadioGroup({ name: "category", onChange, isDisabled });
+export function RadioCardPicker({ renderOptions, ...props }: RadioCardPickerProps) {
+    const { getRootProps, getRadioProps } = useRadioGroup({ ...props, name: "category" });
 
     return (
         <Stack direction="row" {...getRootProps()} textAlign="center" justifyContent="space-around" w="100%">
@@ -61,6 +61,6 @@ export function RadioCardPicker({ renderOptions, onChange, isDisabled }: RadioCa
     );
 }
 
-export type RadioCardPickerProps = Pick<UseRadioGroupProps, "onChange" | "isDisabled"> & {
+export type RadioCardPickerProps = Omit<UseRadioGroupProps, "name"> & {
     renderOptions?: (getter: UseRadioGroupReturn["getRadioProps"]) => ReactNode;
 };

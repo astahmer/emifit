@@ -26,18 +26,9 @@ export function CreateProgramForm() {
     const onCreated = (exercise: Exercise) => send({ type: "CreateExercise", exercise });
 
     return (
-        <Box d="flex" flexDirection="column" m="auto" w="100%" h="100%">
-            <Box m="auto">
-                <PickCategoryStep
-                    isCategorySelected={isCategorySelected}
-                    onChange={(categoryId) =>
-                        send({
-                            type: "SelectCategory",
-                            categoryId,
-                            hasExercises: exercises.some((ex) => ex.category === categoryId),
-                        })
-                    }
-                />
+        <Box d="flex" flexDirection="column" m="auto" w="100%" h="100%" minH={0}>
+            <Box d="flex" flexDirection="column" m="auto" maxH="100%">
+                <PickCategoryStep />
                 {interpret.state.matches("creating.maybeCreatingExercise.shouldCreateChoice") && (
                     <>
                         <Divider mb="4" />
