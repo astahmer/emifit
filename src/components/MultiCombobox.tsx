@@ -42,6 +42,7 @@ export type MultiComboboxProps<Item = any> = {
     getValue?: (item: Item) => string | number;
     renderRight?: () => ReactNode;
     minItems?: number;
+    getSuggestions?: (props: { inputValue: string; inputItems: Item[], selectedItems: Item[], values: (string|number)[] }) => Item[];
 } & InputProps &
     Pick<UseComboboxProps<Item>, "itemToString" | "onSelectedItemChange"> &
     Pick<UseMultipleSelectionProps<Item>, "onSelectedItemsChange" | "initialSelectedItems">;
@@ -58,14 +59,18 @@ function MultiComboboxBase<Item = any>({
     renderRight,
     initialSelectedItems,
     minItems,
+    getSuggestions,
     ...props
 }: MultiComboboxProps<Item>) {
     const { getSelectedItemProps, getDropdownProps, addSelectedItem, removeSelectedItem, selectedItems } =
         useMultipleSelection({ initialSelectedItems: initialSelectedItems || [], onSelectedItemsChange });
 
+    const inputValueRef = useRef<string>("");
     const [inputItems, setInputItems] = useState(items);
     const values = selectedItems.map(getValue);
-    const suggestions = inputItems.filter((item) => !values.includes(getValue(item)));
+    const suggestions = getSuggestions
+        ? getSuggestions({ inputValue: inputValueRef.current, inputItems, selectedItems, values })
+        : inputItems.filter((item) => !values.includes(getValue(item)));
 
     const parentRef = useRef();
     const rowVirtualizer = useVirtual({
@@ -116,6 +121,7 @@ function MultiComboboxBase<Item = any>({
         itemToString,
         items: suggestions,
         onInputValueChange: ({ inputValue }) => {
+            inputValueRef.current = inputValue;
             setInputItems(
                 items.filter((item) =>
                     (typeof item === "string" ? item : itemToString(item))

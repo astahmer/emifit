@@ -39,13 +39,19 @@ export const ExerciseListCombobox = forwardRef(
 
         return (
             <FormControl isInvalid={Boolean(error)}>
-                <MultiCombobox
+                <MultiCombobox<Exercise>
                     {...props}
                     ref={ref}
-                    getValue={(item: Exercise) => item.id}
-                    itemToString={(item) => (item ? `${item.name}` : "")}
+                    getValue={(item) => item.id}
+                    itemToString={(item) => item?.name ?? ""}
                     items={items}
                     label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise list</FormLabel>}
+                    getSuggestions={({ inputItems, values, selectedItems }) => {
+                        const selectedNames = selectedItems.map((item) => item.name);
+                        return inputItems.filter(
+                            (item) => !values.includes(item.id) && !selectedNames.includes(item.name)
+                        );
+                    }}
                 />
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
             </FormControl>
