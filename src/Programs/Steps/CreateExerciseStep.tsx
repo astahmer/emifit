@@ -1,17 +1,17 @@
 import { CheckboxButton } from "@/components/CheckboxCircle";
 import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
-import { Exercise } from "@/store";
+import { Exercise } from "@/orm-types";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Button, Divider, Heading } from "@chakra-ui/react";
 
 export function CreateExerciseStep({
     hasSelectedExercises,
     category,
-    onCreated,
+    onSubmit,
 }: {
     hasSelectedExercises: boolean;
     category: string;
-    onCreated: (data: Exercise) => void;
+    onSubmit: (data: Exercise) => void;
 }) {
     return (
         <>
@@ -29,7 +29,7 @@ export function CreateExerciseStep({
             </Heading>
             <CreateExerciseForm
                 catId={category}
-                onCreated={onCreated}
+                onSubmit={onSubmit}
                 // shouldPersist={false}
                 renderSubmit={(form) => {
                     const [name, tags] = form.watch(["name", "tags"]);
@@ -54,7 +54,6 @@ export function CreateExerciseStep({
                     );
                 }}
             />
-            {/* TODO Program.name */}
         </>
     );
 }

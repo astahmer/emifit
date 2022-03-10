@@ -1,6 +1,7 @@
 import { Combobox, ComboboxProps } from "@/components/Combobox";
 import { MultiCombobox, MultiComboboxProps } from "@/components/MultiCombobox";
-import { Exercise, useExerciseList } from "@/store";
+import { Exercise } from "@/orm-types";
+import { useExerciseList } from "@/store";
 import { FormControl, FormErrorMessage, FormLabel, forwardRef } from "@chakra-ui/react";
 
 export const ExerciseCombobox = forwardRef(

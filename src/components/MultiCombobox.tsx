@@ -42,7 +42,12 @@ export type MultiComboboxProps<Item = any> = {
     getValue?: (item: Item) => string | number;
     renderRight?: () => ReactNode;
     minItems?: number;
-    getSuggestions?: (props: { inputValue: string; inputItems: Item[], selectedItems: Item[], values: (string|number)[] }) => Item[];
+    getSuggestions?: (props: {
+        inputValue: string;
+        inputItems: Item[];
+        selectedItems: Item[];
+        values: (string | number)[];
+    }) => Item[];
 } & InputProps &
     Pick<UseComboboxProps<Item>, "itemToString" | "onSelectedItemChange"> &
     Pick<UseMultipleSelectionProps<Item>, "onSelectedItemsChange" | "initialSelectedItems">;

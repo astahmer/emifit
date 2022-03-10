@@ -1,5 +1,6 @@
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
-import { Exercise, Serie, useExerciseList } from "@/store";
+import { useExerciseList } from "@/store";
+import { Exercise, Serie } from "@/orm-types";
 import { StringOrNumber, WithOnChange } from "@/types";
 import {
     Accordion,

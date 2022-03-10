@@ -1,6 +1,7 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { onError, successToast } from "@/functions/toasts";
-import { Program, removeProgram } from "@/store";
+import { orm } from "@/orm";
+import { Program } from "@/orm-types";
 import { ChevronDownIcon, ChevronUpIcon, DeleteIcon, DragHandleIcon, EditIcon } from "@chakra-ui/icons";
 import {
     Badge,
@@ -28,7 +29,7 @@ export const ProgramCard = ({ program, onEdit }: ProgramCardProps) => {
     const { isOpen, onToggle } = useDisclosure();
 
     const queryClient = useQueryClient();
-    const mutation = useMutation(async (program: Program) => removeProgram(program), {
+    const mutation = useMutation(async (program: Program) => orm.program.remove(program), {
         onSuccess: () => {
             queryClient.invalidateQueries("programList");
             successToast(`Program <${program.name}> deleted`);
@@ -76,7 +77,7 @@ export const ProgramCard = ({ program, onEdit }: ProgramCardProps) => {
             <Collapse in={isOpen} animateOpacity>
                 <Stack p="4" pl="2" w="100%" pos="relative">
                     <UnorderedList color="grey" listStyleType="none">
-                        {program.exercises.map((exo) => (
+                        {program.exerciseList.map((exo) => (
                             <ListItem key={exo.id}>
                                 - {exo.name} ({exo.series.length} set)
                             </ListItem>

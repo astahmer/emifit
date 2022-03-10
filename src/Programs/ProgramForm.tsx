@@ -1,6 +1,7 @@
 import { RadioCard, RadioCardPicker } from "@/components/RadioCard";
+import { Exercise } from "@/orm-types";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
-import { Exercise, useExerciseList } from "@/store";
+import { useExerciseList } from "@/store";
 import { Box, Divider } from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { CreateExerciseStep } from "./Steps/CreateExerciseStep";
@@ -8,7 +9,7 @@ import { EditSettingsStep } from "./Steps/EditSettingsStep";
 import { PickCategoryStep } from "./Steps/PickCategoryStep";
 import { PickExercisesStep } from "./Steps/PickExercisesStep";
 
-export function CreateProgramForm() {
+export function ProgramForm() {
     const exercises = useExerciseList();
 
     const interpret = useProgramInterpret();
@@ -23,7 +24,7 @@ export function CreateProgramForm() {
     const scopedExercises = exercises.filter((ex) => ex.category === category);
     const hasExercises = Boolean(scopedExercises.length);
 
-    const onCreated = (exercise: Exercise) => send({ type: "CreateExercise", exercise });
+    const onSubmit = (exercise: Exercise) => send({ type: "CreateExercise", exercise });
 
     return (
         <Box d="flex" flexDirection="column" m="auto" w="100%" h="100%" minH={0}>
@@ -62,7 +63,7 @@ export function CreateProgramForm() {
                 {interpret.state.matches("creating.editSettings") && <EditSettingsStep />}
             </Box>
             {interpret.state.matches("creating.maybeCreatingExercise.creatingExercise") && isCategorySelected && (
-                <CreateExerciseStep {...{ hasSelectedExercises, category, onCreated }} />
+                <CreateExerciseStep {...{ hasSelectedExercises, category, onSubmit }} />
             )}
         </Box>
     );

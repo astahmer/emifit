@@ -1,35 +1,46 @@
+import { onError, successToast } from "@/functions/toasts";
+import { makeId, rmTrailingSlash } from "@/functions/utils";
 import { mergeMeta, printStatesPathValue } from "@/functions/xstate-utils";
+import { orm } from "@/orm";
 import { ProgramInterpretProvider } from "@/Programs/useProgramInterpret";
+import { browserHistory, debugModeAtom, useProgramList } from "@/store";
 import { Box, Heading, Tag } from "@chakra-ui/react";
 import { useMachine } from "@xstate/react";
-import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { programFormMachine } from "../Programs/programFormMachine";
-import { CreateProgramForm } from "../Programs/CreateProgramForm";
-import { InitialState } from "../Programs/InitialState";
-import { browserHistory, debugModeAtom, makeProgram, persistProgram } from "@/store";
 import confetti from "canvas-confetti";
-import { onError, successToast } from "@/functions/toasts";
-import { rmTrailingSlash } from "@/functions/utils";
 import { useAtomValue } from "jotai";
+import { useEffect, useRef } from "react";
 import { useMutation, useQueryClient } from "react-query";
+import { useNavigate } from "react-router-dom";
+import { InitialState } from "../Programs/InitialState";
+import { ProgramForm } from "../Programs/ProgramForm";
+import { programFormMachine } from "../Programs/programFormMachine";
 
 export const ProgramsPage = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+
+    const programs = useProgramList();
     const mutation = useMutation(
         async (ctx: typeof programFormMachine["context"]) => {
+            const currentProgram = ctx.programId ? programs.find((p) => p.id === ctx.programId) : null;
+            const isEditing = Boolean(currentProgram);
+
             navigate("/");
             confetti();
-            successToast(`Program <${ctx.programName}> created`);
+            successToast(`Program <${ctx.programName}> ${isEditing ? "updated" : "created"}`);
 
-            persistProgram(
-                makeProgram({
-                    name: ctx.programName,
-                    category: ctx.categoryId,
-                    exercises: ctx.exerciseList,
-                })
-            );
+            const params = {
+                ...currentProgram,
+                name: ctx.programName,
+                category: ctx.categoryId,
+                exerciseList: ctx.exerciseList.map((exo) => ({ id: makeId(), madeFromExerciseId: exo.id, ...exo })),
+            };
+            const now = new Date();
+            if (params.id) {
+                return orm.program.update({ ...params, updatedAt: now });
+            }
+
+            return orm.program.create({ ...params, id: makeId(), createdAt: now, updatedAt: now });
         },
         {
             onSuccess: (data) => {
@@ -72,9 +83,9 @@ export const ProgramsPage = () => {
     return (
         <ProgramInterpretProvider value={interpret}>
             <Box id="ProgramsPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
-                <Heading as="h1">Programs list</Heading>
+                <Heading as="h1">Programs</Heading>
                 {state.matches("initial") && <InitialState />}
-                {state.matches("creating") && <CreateProgramForm />}
+                {state.matches("creating") && <ProgramForm />}
             </Box>
             {debugMode && (
                 <Box position="fixed" top="10px" w="100%" textAlign="center">

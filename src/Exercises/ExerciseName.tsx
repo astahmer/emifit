@@ -1,4 +1,4 @@
-import { Exercise } from "@/store";
+import { Exercise } from "@/orm-types";
 import { AddIcon } from "@chakra-ui/icons";
 import { Tag, TagCloseButton, TagLabel, TagProps } from "@chakra-ui/react";
 

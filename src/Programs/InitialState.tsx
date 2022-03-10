@@ -14,7 +14,9 @@ export function InitialState() {
         <>
             {Boolean(programs.length) ? (
                 <>
-                    <ProgramList onEdit={(program) => send({ type: "StartEditingProgram", program })} />
+                    <HFlex h="100%" overflow="auto">
+                        <ProgramList onEdit={(program) => send({ type: "StartEditingProgram", program })} />
+                    </HFlex>
                     <Button
                         mt="auto"
                         leftIcon={<AddIcon />}

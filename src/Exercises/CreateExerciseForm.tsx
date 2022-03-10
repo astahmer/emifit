@@ -2,7 +2,9 @@ import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { TextInput } from "@/components/TextInput";
 import { onError } from "@/functions/toasts";
-import { Exercise, makeExercise, makeSerie, persistExercise, Serie } from "@/store";
+import { orm } from "@/orm";
+import { Exercise, Serie } from "@/orm-types";
+import { makeExercise, makeSerie } from "@/store";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
 import { Fragment, ReactNode, useEffect } from "react";
@@ -32,11 +34,11 @@ const required = { value: true, message: "This field is required" };
 export const CreateExerciseForm = ({
     renderSubmit,
     catId,
-    onCreated,
+    onSubmit,
     shouldPersist = true,
 }: {
     catId: string;
-    onCreated?: (data: Exercise) => void;
+    onSubmit?: (data: Exercise) => void;
     renderSubmit?: (form: UseFormReturn<typeof defaultValues>) => ReactNode;
     shouldPersist?: boolean;
 }) => {
@@ -48,7 +50,7 @@ export const CreateExerciseForm = ({
             const row = makeExercise({ ...params, category: catId });
             console.log(row);
             if (shouldPersist) {
-                await persistExercise(row);
+                await orm.exercise.create(row);
             }
 
             return row;
@@ -56,7 +58,7 @@ export const CreateExerciseForm = ({
         {
             onSuccess: (data) => {
                 queryClient.invalidateQueries("exerciseList");
-                onCreated?.(data);
+                onSubmit?.(data);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
         }

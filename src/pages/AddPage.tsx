@@ -15,7 +15,7 @@ export const AddPage = () => {
             <Box mt="auto">
                 <CreateExerciseForm
                     catId={catId}
-                    onCreated={() => navigate("/")}
+                    onSubmit={() => navigate("/")}
                     renderSubmit={(form) => {
                         const [name, tags] = form.watch(["name", "tags"]);
 

@@ -1,28 +1,26 @@
 import { useProgramList } from "@/store";
 import { Box, type BoxProps } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
-import { ComponentProps, forwardRef, ForwardRefExoticComponent, useState } from "react";
+import { ComponentProps, forwardRef, ForwardRefExoticComponent, useEffect, useState } from "react";
 import { ProgramCard, ProgramCardProps } from "./ProgramsCard";
 
 export function ProgramList({ onEdit }: Pick<ProgramCardProps, "onEdit">) {
     const programs = useProgramList();
+
     const [items, setItems] = useState(programs.map((p) => p.id));
+
+    // Update items when programs change
+    useEffect(() => setItems(programs.map((p) => p.id)), [programs]);
     console.log(programs.length, items.length);
     // TODO setItems = persist program orders
-    // TODO keep items up to date with program list
+
     return (
-        <Box
-            as={Reorder.Group}
-            axis="y"
-            values={items}
-            onReorder={setItems}
-            listStyleType="none"
-            overflow="auto"
-            mb="6"
-        >
-            {items.map((item) => (
-                <ReorderProgramCardItem key={item} program={programs.find((p) => p.id === item)} onEdit={onEdit} />
-            ))}
+        <Box as={Reorder.Group} axis="y" values={items} onReorder={setItems} listStyleType="none" mb="6">
+            {items
+                .filter((id) => programs.some((p) => p.id === id))
+                .map((item) => (
+                    <ReorderProgramCardItem key={item} program={programs.find((p) => p.id === item)} onEdit={onEdit} />
+                ))}
         </Box>
     );
 }

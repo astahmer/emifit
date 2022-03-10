@@ -1,5 +1,5 @@
 import { getStatesPathValue } from "@/functions/xstate-utils";
-import { Exercise, Program } from "@/store";
+import { Exercise, Program } from "@/orm-types";
 import { omit } from "@pastable/core";
 import { assign, createMachine } from "xstate";
 
@@ -258,7 +258,7 @@ export const programFormMachine =
                     programId: e.program.id,
                     programName: e.program.name,
                     categoryId: e.program.category,
-                    exerciseList: e.program.exercises,
+                    exerciseList: e.program.exerciseList,
                 })),
             },
             guards: {
