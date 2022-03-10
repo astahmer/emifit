@@ -88,8 +88,9 @@ export const ProgramCard = ({ program, onEdit }: ProgramCardProps) => {
     );
 };
 
-const DotsIconButton = forwardRef((props: IconButtonProps) => (
+const DotsIconButton = forwardRef((props: IconButtonProps, ref) => (
     <IconButton
+        ref={ref}
         aria-label="validate"
         {...props}
         icon={<BsThreeDotsVertical />}
