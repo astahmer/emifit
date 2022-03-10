@@ -44,7 +44,7 @@ export const ProgramsPage = () => {
         },
         {
             onSuccess: (data) => {
-                queryClient.invalidateQueries("programList");
+                queryClient.invalidateQueries(orm.program.key);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
         }

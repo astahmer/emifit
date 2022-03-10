@@ -57,7 +57,7 @@ export const CreateExerciseForm = ({
         },
         {
             onSuccess: (data) => {
-                queryClient.invalidateQueries("exerciseList");
+                queryClient.invalidateQueries(orm.exercise.key);
                 onSubmit?.(data);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),

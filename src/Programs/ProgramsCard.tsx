@@ -31,7 +31,7 @@ export const ProgramCard = ({ program, onEdit }: ProgramCardProps) => {
     const queryClient = useQueryClient();
     const mutation = useMutation(async (program: Program) => orm.program.remove(program), {
         onSuccess: () => {
-            queryClient.invalidateQueries("programList");
+            queryClient.invalidateQueries(orm.program.key);
             successToast(`Program <${program.name}> deleted`);
         },
         onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),

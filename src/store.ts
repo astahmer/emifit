@@ -15,7 +15,7 @@ export const currentDateAtom = atom<CalendarDate>(today);
 export const currentCategoryAtom = atom<string>(null);
 export const debugModeAtom = atom<boolean>(false);
 
-export const useExercises = () => useQuery<Exercise[]>("exerciseList", () => orm.exercise.get(), { initialData: [] });
+export const useExercises = () => useQuery<Exercise[]>(orm.exercise.key, () => orm.exercise.get(), { initialData: [] });
 export const useExerciseList = () => {
     const list = useExercises().data || [];
     const groupByNames = groupBy(list, "name");
@@ -23,7 +23,7 @@ export const useExerciseList = () => {
     return mostRecents;
 };
 
-export const usePrograms = () => useQuery<Program[]>("programList", () => orm.program.get(), { initialData: [] });
+export const usePrograms = () => useQuery<Program[]>(orm.program.key, () => orm.program.get(), { initialData: [] });
 export const useProgramList = () => usePrograms().data || [];
 
 export const makeExercise = (params: Pick<Exercise, "name" | "tags" | "series"> & { category: string }) =>
