@@ -1,5 +1,6 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { onError, successToast } from "@/functions/toasts";
+import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
 import { Program } from "@/orm-types";
 import { ChevronDownIcon, ChevronUpIcon, DeleteIcon, DragHandleIcon, EditIcon } from "@chakra-ui/icons";
@@ -22,6 +23,7 @@ import {
     useDisclosure,
 } from "@chakra-ui/react";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { HiOutlineDuplicate } from "react-icons/hi";
 import { useMutation, useQueryClient } from "react-query";
 
 export type ProgramCardProps = { program: Program; onEdit: (program: Program) => void };
@@ -29,13 +31,24 @@ export const ProgramCard = ({ program, onEdit }: ProgramCardProps) => {
     const { isOpen, onToggle } = useDisclosure();
 
     const queryClient = useQueryClient();
-    const mutation = useMutation(async (program: Program) => orm.program.remove(program), {
+    const deleteMutation = useMutation(async (program: Program) => orm.program.remove(program), {
         onSuccess: () => {
             queryClient.invalidateQueries(orm.program.key);
             successToast(`Program <${program.name}> deleted`);
         },
         onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
     });
+
+    const cloneMutation = useMutation(
+        async (program: Program) => orm.program.create({ ...program, id: makeId(), name: program.name + " (clone)" }),
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries(orm.program.key);
+                successToast(`Program <${program.name}> cloned`);
+            },
+            onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+        }
+    );
 
     return (
         <Box d="flex" flexDirection="column" w="100%" bgColor="white">
@@ -60,13 +73,19 @@ export const ProgramCard = ({ program, onEdit }: ProgramCardProps) => {
                         <MenuItem icon={<EditIcon />} onClick={() => onEdit(program)}>
                             Edit program
                         </MenuItem>
+                        <MenuItem
+                            icon={<Icon as={HiOutlineDuplicate} fontSize="md" d="flex" />}
+                            onClick={() => cloneMutation.mutate(program)}
+                        >
+                            Clone program
+                        </MenuItem>
                         <ConfirmationButton
                             renderTrigger={(onOpen) => (
                                 <MenuItem icon={<DeleteIcon />} onClick={onOpen}>
                                     Delete program
                                 </MenuItem>
                             )}
-                            onConfirm={() => mutation.mutate(program)}
+                            onConfirm={() => deleteMutation.mutate(program)}
                         />
                     </MenuList>
                 </Menu>

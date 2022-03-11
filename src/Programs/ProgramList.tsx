@@ -1,25 +1,40 @@
-import { useProgramList } from "@/store";
+import { orm } from "@/orm";
+import { setProgramsOrder, useProgramList } from "@/store";
 import { Box, type BoxProps } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
-import { ComponentProps, forwardRef, ForwardRefExoticComponent, useEffect, useState } from "react";
+import { ComponentProps, forwardRef, ForwardRefExoticComponent, useEffect, useMemo, useState } from "react";
+import { useMutation, useQueryClient } from "react-query";
 import { ProgramCard, ProgramCardProps } from "./ProgramsCard";
 
 export function ProgramList({ onEdit }: Pick<ProgramCardProps, "onEdit">) {
     const programs = useProgramList();
+    const programIdList = useMemo(() => programs.map((p) => p.id), [programs]);
+    const [items, setItems] = useState(programIdList);
 
-    const [items, setItems] = useState(programs.map((p) => p.id));
+    // Keep items up to date with programIdList whenever a program is created/deleted
+    useEffect(() => {
+        if (programIdList.length === items.length) return;
+        if (programIdList.join() === items.join()) return;
 
-    // Update items when programs change
-    useEffect(() => setItems(programs.map((p) => p.id)), [programs]);
-    console.log(programs.length, items.length);
-    // TODO setItems = persist program orders
+        setItems(programIdList);
+    }, [programIdList]);
+
+    const queryClient = useQueryClient();
+    const mutation = useMutation((ordered: string[]) => setProgramsOrder(ordered), {
+        onSuccess: () => queryClient.invalidateQueries(orm.program.key),
+    });
 
     return (
         <Box as={Reorder.Group} axis="y" values={items} onReorder={setItems} listStyleType="none" mb="6">
             {items
                 .filter((id) => programs.some((p) => p.id === id))
                 .map((item) => (
-                    <ReorderProgramCardItem key={item} program={programs.find((p) => p.id === item)} onEdit={onEdit} />
+                    <ReorderProgramCardItem
+                        key={item}
+                        program={programs.find((p) => p.id === item)}
+                        onEdit={onEdit}
+                        onAnimationComplete={() => mutation.mutate(items)}
+                    />
                 ))}
         </Box>
     );
@@ -30,7 +45,11 @@ const ReorderItemBox = forwardRef<HTMLDivElement, BoxProps & ComponentProps<type
     <Box ref={ref} {...props} as={Reorder.Item} />
 )) as ReorderItemBoxComponent;
 
-export const ReorderProgramCardItem = ({ program, onEdit }: ProgramCardProps) => {
+export const ReorderProgramCardItem = ({
+    program,
+    onEdit,
+    onAnimationComplete,
+}: ProgramCardProps & { onAnimationComplete?: () => void }) => {
     const y = useMotionValue(0);
 
     return (
@@ -41,6 +60,7 @@ export const ReorderProgramCardItem = ({ program, onEdit }: ProgramCardProps) =>
             boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1)"
             style={{ position: "relative", y }}
             whileDrag={{ scale: 1.1, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2)" }}
+            onAnimationComplete={(e: any) => e.scale === 1 && onAnimationComplete()}
         >
             <ProgramCard program={program} onEdit={onEdit} />
         </ReorderItemBox>

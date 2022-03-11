@@ -1,4 +1,4 @@
-import { sortBy } from "@pastable/core";
+import { sortArrayOfObjectByPropFromArray, sortBy } from "@pastable/core";
 import { CalendarDate } from "@uselessdev/datepicker";
 import { atom } from "jotai";
 import { useQuery } from "react-query";
@@ -7,6 +7,7 @@ import { createBrowserHistory } from "history";
 import { makeId } from "./functions/utils";
 import { orm } from "./orm";
 import { Exercise, Program } from "./orm-types";
+import { get, update } from "idb-keyval";
 
 export const browserHistory = createBrowserHistory({ window });
 
@@ -23,8 +24,19 @@ export const useExerciseList = () => {
     return mostRecents;
 };
 
-export const usePrograms = () => useQuery<Program[]>(orm.program.key, () => orm.program.get(), { initialData: [] });
-export const useProgramList = () => usePrograms().data || [];
+export const useProgramList = () => {
+    const listQ = useQuery<Program[]>(
+        orm.program.key,
+        async () => {
+            const [list, order] = await Promise.all([orm.program.get(), get("programListOrder")]);
+            return sortArrayOfObjectByPropFromArray(list || [], "id", order || []);
+        },
+        { initialData: [] }
+    );
+
+    return listQ.data;
+};
+export const setProgramsOrder = (programIds: string[]) => update("programListOrder", () => programIds);
 
 export const makeExercise = (params: Pick<Exercise, "name" | "tags" | "series"> & { category: string }) =>
     ({

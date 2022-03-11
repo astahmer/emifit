@@ -8,7 +8,6 @@ import { ProgramList } from "./ProgramList";
 export function InitialState() {
     const send = useProgramInterpret().send;
     const programs = useProgramList();
-    console.log(programs);
 
     return (
         <>

@@ -7,8 +7,8 @@ const baseToastConfig: UseToastOptions & UniqueToastOptions = {
     duration: 3000,
     isClosable: true,
     unique: true,
-    position: "bottom",
-    containerStyle: { marginBottom: "70px" },
+    position: "top",
+    containerStyle: { marginTop: "70px" },
 };
 
 type ToastStatus = Exclude<UseToastOptions["status"], undefined> | "default";
