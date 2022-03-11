@@ -1,8 +1,11 @@
 import { CheckCircleIcon } from "@chakra-ui/icons";
-import { Icon, Tab, TabList, Tabs } from "@chakra-ui/react";
+import { chakra, Icon, Tab, TabList, Tabs } from "@chakra-ui/react";
 import { useRef } from "react";
 import { IoIosAddCircle } from "react-icons/io";
+import { GoTasklist } from "react-icons/go";
+import { AiFillHome } from "react-icons/ai";
 import { Link as ReactLink, useLocation } from "react-router-dom";
+import { HFlex } from "./HFlex";
 
 export const BottomTabs = () => {
     const location = useLocation();
@@ -20,24 +23,36 @@ export const BottomTabs = () => {
             >
                 <TabList>
                     <Tab as={ReactLink} to="/" w="100%" h="58px">
-                        Home
+                        <HFlex alignItems="center">
+                            <Icon as={AiFillHome} />
+                            <span>Home</span>
+                        </HFlex>
                     </Tab>
                     <Tab as={ReactLink} to="/add" w="100%" h="58px">
                         {location.pathname === "/add" ? (
-                            <CheckCircleIcon
-                                color="pink.400"
-                                fontSize="30px"
-                                onClick={() => submitBtnRef.current?.click()}
-                            />
+                            <HFlex alignItems="center">
+                                <CheckCircleIcon
+                                    color="pink.400"
+                                    fontSize="30px"
+                                    onClick={() => submitBtnRef.current?.click()}
+                                />
+                                {/* <chakra.span fontSize="xs">Create exercise</chakra.span> */}
+                            </HFlex>
                         ) : (
-                            <Icon as={IoIosAddCircle} color="pink.400" fontSize="38px" />
+                            <HFlex alignItems="center">
+                                <Icon as={IoIosAddCircle} color="pink.400" fontSize="38px" />
+                                {/* <chakra.span fontSize="xs">Add exercise</chakra.span> */}
+                            </HFlex>
                         )}
                     </Tab>
                     {/* <Tab as={ReactLink} to="/"
 as={ReactLink} to="/add"
 as={ReactLink} to="/programs"  w="100%" h="58px">Progress</Tab> */}
                     <Tab as={ReactLink} to="/programs" w="100%" h="58px">
-                        Programs
+                        <HFlex alignItems="center">
+                            <Icon as={GoTasklist} />
+                            <span>Programs</span>
+                        </HFlex>
                     </Tab>
                 </TabList>
             </Tabs>

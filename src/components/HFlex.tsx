@@ -1,3 +1,3 @@
-import { Flex, forwardRef } from "@chakra-ui/react";
+import { Flex, FlexProps, forwardRef } from "@chakra-ui/react";
 
-export const HFlex = forwardRef((props, ref) => <Flex ref={ref} {...props} flexDirection="column" />);
+export const HFlex = forwardRef((props: FlexProps, ref) => <Flex ref={ref} {...props} flexDirection="column" />);
