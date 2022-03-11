@@ -53,6 +53,7 @@ export const ExerciseListCombobox = forwardRef(
                             (item) => !values.includes(item.id) && !selectedNames.includes(item.name)
                         );
                     }}
+                    placeholder="Search exercise list..."
                 />
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
             </FormControl>
