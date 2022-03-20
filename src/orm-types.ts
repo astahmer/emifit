@@ -27,3 +27,16 @@ export interface Program {
     updatedAt: Date | number;
     // TODO exerciseOrderList: string[]
 }
+
+export interface Daily {
+    id: string;
+    date: Date | number;
+    category: string;
+    exerciseList: Exercise[];
+    /** Completed exerciseId list */
+    completedList: Array<Exercise["id"]>;
+    /** if made from X program */
+    programId?: Program["id"] | null;
+    /** ex: cardio done yes/no */
+    metadata?: string[];
+}
