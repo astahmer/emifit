@@ -27,7 +27,7 @@ function App() {
                         <Flex as="section" direction="column" h="100%" overflow="hidden">
                             <Routes>
                                 <Route path="/" element={<HomePage />} />
-                                <Route path="/add" element={<AddPage />} />
+                                <Route path="/add-exercise" element={<AddPage />} />
                                 <Route path="/progress" element={<ProgressPage />} />
                                 <Route path="/programs/*" element={<ProgramsPage />} />
                             </Routes>

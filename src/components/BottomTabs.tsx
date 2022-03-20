@@ -2,8 +2,10 @@ import { CheckCircleIcon } from "@chakra-ui/icons";
 import { chakra, Icon, Tab, TabList, Tabs } from "@chakra-ui/react";
 import { useRef } from "react";
 import { IoIosAddCircle } from "react-icons/io";
+import { GiProgression } from "react-icons/gi";
 import { GoTasklist } from "react-icons/go";
 import { AiFillHome } from "react-icons/ai";
+import { FiSettings } from "react-icons/fi";
 import { Link as ReactLink, useLocation } from "react-router-dom";
 import { HFlex } from "./HFlex";
 
@@ -25,16 +27,24 @@ export const BottomTabs = () => {
                     <Tab as={ReactLink} to="/" w="100%" h="58px">
                         <HFlex alignItems="center">
                             <Icon as={AiFillHome} />
-                            <span>Home</span>
+                            <chakra.span fontSize="xs">Home</chakra.span>
                         </HFlex>
                     </Tab>
-                    <Tab as={ReactLink} to="/add" w="100%" h="58px">
-                        {location.pathname === "/add" ? (
+                    <Tab as={ReactLink} to="/" w="100%" h="58px">
+                        <HFlex alignItems="center">
+                            <Icon as={GiProgression} />
+                            <chakra.span fontSize="xs">Progress</chakra.span>
+                        </HFlex>
+                    </Tab>
+                    <Tab as={ReactLink} to="/add-exercise" w="100%" h="58px">
+                        {location.pathname === "/add-exercise" ? (
                             <HFlex alignItems="center">
                                 <CheckCircleIcon
                                     color="pink.400"
                                     fontSize="30px"
-                                    onClick={() => submitBtnRef.current?.click()}
+                                    onClick={(e) => (
+                                        e.stopPropagation(), e.preventDefault(), submitBtnRef.current?.click()
+                                    )}
                                 />
                                 {/* <chakra.span fontSize="xs">Create exercise</chakra.span> */}
                             </HFlex>
@@ -45,13 +55,16 @@ export const BottomTabs = () => {
                             </HFlex>
                         )}
                     </Tab>
-                    {/* <Tab as={ReactLink} to="/"
-as={ReactLink} to="/add"
-as={ReactLink} to="/programs"  w="100%" h="58px">Progress</Tab> */}
                     <Tab as={ReactLink} to="/programs" w="100%" h="58px">
                         <HFlex alignItems="center">
-                            <Icon as={GoTasklist} />
-                            <span>Programs</span>
+                            <Icon as={GoTasklist} fontSize="sm" />
+                            <chakra.span fontSize="xs">Programs</chakra.span>
+                        </HFlex>
+                    </Tab>
+                    <Tab as={ReactLink} to="/" w="100%" h="58px">
+                        <HFlex alignItems="center">
+                            <Icon as={FiSettings} />
+                            <chakra.span fontSize="xs">Settings</chakra.span>
                         </HFlex>
                     </Tab>
                 </TabList>
