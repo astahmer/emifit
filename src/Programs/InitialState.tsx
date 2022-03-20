@@ -16,17 +16,20 @@ export function InitialState() {
                     <HFlex h="100%" overflow="auto">
                         <ProgramList onEdit={(program) => send({ type: "StartEditingProgram", program })} />
                     </HFlex>
-                    <Button
-                        mt="auto"
-                        leftIcon={<AddIcon />}
-                        colorScheme="pink"
-                        variant="solid"
-                        py="4"
-                        size="lg"
-                        onClick={() => send("StartCreatingProgram")}
-                    >
-                        Create program
-                    </Button>
+                    <Box mt="auto">
+                        <Button
+                            w="100%"
+                            mt="4"
+                            leftIcon={<AddIcon />}
+                            colorScheme="pink"
+                            variant="solid"
+                            py="4"
+                            size="lg"
+                            onClick={() => send("StartCreatingProgram")}
+                        >
+                            Create program
+                        </Button>
+                    </Box>
                 </>
             ) : (
                 <Box d="flex" flexDirection="column" m="auto" mt="auto" alignItems="center">
@@ -52,7 +55,7 @@ const EmptyProgramList = () => {
     return (
         <>
             <Box m="4">
-                <Alert status="info" rounded="full">
+                <Alert status="info" rounded="full" justifyContent="center">
                     <AlertIcon />
                     No programs yet !
                 </Alert>
