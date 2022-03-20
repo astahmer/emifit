@@ -3,19 +3,38 @@ import { Categories } from "@/constants";
 import { Box, Button, Divider, Heading } from "@chakra-ui/react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckIcon } from "@chakra-ui/icons";
+import { useAtomValue } from "jotai";
+import { currentDailyIdAtom, useDailyInvalidate } from "@/store";
+import { useMutation } from "react-query";
+import { orm } from "@/orm";
+import { Exercise } from "@/orm-types";
 
 export const AddPage = () => {
     const [params] = useSearchParams();
     const catId = params.get("category") || Categories[0].id;
 
+    const dailyId = useAtomValue(currentDailyIdAtom);
+    const invalidate = useDailyInvalidate();
+
     const navigate = useNavigate();
+    const updateDaily = useMutation(
+        (exo: Exercise) =>
+            orm.daily.upsert(dailyId, (current) => ({ ...current, exerciseList: current.exerciseList.concat(exo) })),
+        {
+            onSuccess: () => {
+                invalidate();
+                navigate("/");
+            },
+        }
+    );
+
     return (
         <Box id="CreateExercisePage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
-            <Heading as="h1">Create exercise</Heading>
+            <Heading as="h1">Add daily exercise</Heading>
             <Box mt="auto">
                 <CreateExerciseForm
                     catId={catId}
-                    onSubmit={() => navigate("/")}
+                    onSubmit={updateDaily.mutate}
                     renderSubmit={(form) => {
                         const [name, tags] = form.watch(["name", "tags"]);
 
