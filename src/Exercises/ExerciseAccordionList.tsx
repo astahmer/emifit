@@ -20,6 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { CheckboxSquare } from "../components/CheckboxCircle";
+import { ExerciseTag } from "./ExerciseTag";
 
 export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[]>) => {
     const exercises = useExerciseList();
@@ -39,6 +40,7 @@ export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[
         </Accordion>
     );
 };
+
 const ExerciseAccordion = ({
     exercise,
     getCheckboxProps,
@@ -53,9 +55,7 @@ const ExerciseAccordion = ({
                         {Boolean(exercise.tags?.length) && (
                             <Stack direction="row">
                                 {exercise.tags.map((tag) => (
-                                    <Badge key={tag.id} variant="subtle" colorScheme="pink" fontSize="xx-small">
-                                        {tag.label}
-                                    </Badge>
+                                    <ExerciseTag key={tag.id} tag={tag} />
                                 ))}
                             </Stack>
                         )}
@@ -80,6 +80,7 @@ const ExerciseAccordion = ({
         </AccordionItem>
     );
 };
+
 const ExerciseSerie = ({ serie, index }: { serie: Serie; index: number }) => {
     return (
         <StatGroup>

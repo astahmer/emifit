@@ -87,7 +87,6 @@ export const CreateExerciseForm = ({
                             catId={catId}
                             error={(form.formState.errors.tags as any)?.message}
                         />
-                        {/* TODO prefill via name */}
                         <TextInput
                             {...form.register("nbSeries", { valueAsNumber: true })}
                             min={1}

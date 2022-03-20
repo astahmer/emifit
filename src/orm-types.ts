@@ -13,7 +13,7 @@ export interface Serie {
     reps: number;
 }
 
-interface Tag {
+export interface Tag {
     id: string;
     label: string;
 }
