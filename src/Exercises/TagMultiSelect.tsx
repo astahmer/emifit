@@ -14,7 +14,7 @@ export function TagMultiSelect({
 }) {
     const isInvalid = Boolean(error);
     const category = Categories.find((cat) => cat.id === (catId as typeof Categories[number]["id"]));
-    const items = category.children as any as Array<{ id: string; label: string }>;
+    const items = category.children as any as Array<{ id: string; label: string; tag: string }>;
 
     return (
         <FormControl isInvalid={isInvalid}>
@@ -25,6 +25,7 @@ export function TagMultiSelect({
                         ref={ref}
                         getValue={(item) => item.id}
                         itemToString={(item) => item.label}
+                        groupByKeyGetter={(item) => item.tag}
                         items={items}
                         onChange={onChange}
                         onBlur={onBlur}

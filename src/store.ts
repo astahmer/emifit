@@ -1,72 +1,65 @@
-import { nanoid } from "nanoid";
-import { atom } from "jotai";
+import { sortArrayOfObjectByPropFromArray, sortBy } from "@pastable/core";
 import { CalendarDate } from "@uselessdev/datepicker";
+import { atom, useAtomValue } from "jotai";
+import { useQuery, useQueryClient } from "react-query";
+import { groupBy } from "./functions/groupBy";
+import { createBrowserHistory } from "history";
+import { makeId, printDate } from "./functions/utils";
+import { orm } from "./orm";
+import { Exercise, Program } from "./orm-types";
+import { get, update } from "idb-keyval";
+import { isToday } from "date-fns";
 
-import * as Y from "yjs";
-import { proxy, useSnapshot } from "valtio";
-import { bindProxyAndYMap, bindProxyAndYArray } from "valtio-yjs";
-import { IndexeddbPersistence } from "y-indexeddb";
-import { ObjectLiteral } from "@pastable/core";
-
-const ydoc = new Y.Doc();
-
-// this allows you to instantly get the (cached) documents data
-const indexeddbProvider = new IndexeddbPersistence("emifit", ydoc);
-indexeddbProvider.on("synced", (data: typeof indexeddbProvider) => {
-    console.log("loaded data from indexed db:", data.db.name, data.db.version);
-});
-
-export const makeYmapProxy = <Obj extends ObjectLiteral>(name: string, obj: Obj) => {
-    const ymap = ydoc.getMap(name);
-    const state = proxy(obj);
-    bindProxyAndYMap(state, ymap);
-    return state;
-};
-export const makeYArrayProxy = <Item>(name: string, arr: Array<Item>) => {
-    const yarr = ydoc.getArray(name);
-    const state = proxy(arr);
-    bindProxyAndYArray(state, yarr);
-    return state;
-};
-export const store = {
-    programs: makeYArrayProxy<Program>("programs", []),
-    exercises: makeYArrayProxy<Exercise>("exercises", []),
-    // TODO categories/tags ?
-};
-
-export const useExerciseList = () => useSnapshot(store.exercises);
-
-export const makeId = () => nanoid(10);
-// export const useExercises = () => useQuery<Exercise[]>("exercises", () => get("exercises"), { initialData: [] });
-// export const useExerciseList = () => useExercises().data || [];
+export const browserHistory = createBrowserHistory({ window });
+export const debugModeAtom = atom<boolean>(false);
 
 const today = new Date();
 export const currentDateAtom = atom<CalendarDate>(today);
-export const currentCategoryAtom = atom<string>(null);
+export const currentDailyIdAtom = atom((get) => printDate(get(currentDateAtom)));
+export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
 
-export interface Exercise {
-    id: string;
-    date: string;
-    series: Serie[];
-    tags: Tag[];
-    category: string;
-    name: string;
-    nbSeries: number;
-}
-export interface Serie {
-    id: string;
-    kg: number;
-    reps: number;
-}
+export const useDaily = () => {
+    const id = useAtomValue(currentDailyIdAtom);
+    const query = useQuery(["daily", id], () => orm.daily.get(id));
+    const invalidate = useDailyInvalidate();
 
-interface Tag {
-    id: string;
-    label: string;
-}
+    return { ...query, invalidate };
+};
 
-export interface Program {
-    id: string;
-    name: string;
-    category: string;
-    exercises: Exercise[];
-}
+export const useDailyInvalidate = () => {
+    const id = useAtomValue(currentDailyIdAtom);
+    const queryClient = useQueryClient();
+
+    return () => void queryClient.invalidateQueries(["daily", id]);
+};
+
+export const useExercises = () => useQuery<Exercise[]>(orm.exercise.key, () => orm.exercise.get(), { initialData: [] });
+export const useExerciseList = () => {
+    const list = useExercises().data || [];
+    const groupByNames = groupBy(list, "name");
+    const mostRecents = Object.keys(groupByNames).map((name) => sortBy(groupByNames[name], "createdAt", "desc")[0]);
+    return mostRecents;
+};
+
+export const useProgramList = () => {
+    const listQ = useQuery<Program[]>(
+        orm.program.key,
+        async () => {
+            const [list, order] = await Promise.all([orm.program.get(), get("programListOrder")]);
+            return sortArrayOfObjectByPropFromArray(list || [], "id", order || []);
+        },
+        { initialData: [] }
+    );
+
+    return listQ.data;
+};
+export const setProgramsOrder = (programIds: string[]) => update("programListOrder", () => programIds);
+
+export const makeExercise = (params: Pick<Exercise, "name" | "tags" | "series"> & { category: string }) =>
+    ({
+        ...params,
+        id: makeId(),
+        createdAt: new Date(),
+        series: params.series.map((serie) => ({ ...serie, id: makeId() })),
+    } as Exercise);
+export const makeSerie = (index: number, current = []) => ({ id: makeId(), kg: current[index - 1]?.kg ?? 1, reps: 1 });

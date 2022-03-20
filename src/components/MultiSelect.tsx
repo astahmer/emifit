@@ -1,4 +1,17 @@
-import { Button, ButtonProps, Checkbox, List, ListItem, ListProps, Stack, Text, useMergeRefs } from "@chakra-ui/react";
+import { groupBy } from "@/functions/groupBy";
+import {
+    Button,
+    ButtonProps,
+    Checkbox,
+    Divider,
+    List,
+    ListItem,
+    ListItemProps,
+    ListProps,
+    Stack,
+    Text,
+    useMergeRefs,
+} from "@chakra-ui/react";
 import { ObjectLiteral } from "@pastable/core";
 import { useSelect, UseSelectProps, UseSelectReturnValue } from "downshift";
 import React, { ForwardedRef, forwardRef, ReactNode, useCallback, useRef, useState } from "react";
@@ -10,7 +23,7 @@ export const MultiSelect = forwardRef<HTMLSelectElement, MultiSelectProps<any, t
     props: MultiSelectProps<Item, IsMulti> & { ref?: ForwardedRef<HTMLSelectElement> }
 ) => ReturnType<typeof MultiSelectBase>;
 
-type MultiSelectProps<Item, IsMulti extends boolean = undefined> = {
+interface MultiSelectBaseProps<Item, IsMulti extends boolean = undefined> {
     externalRef?: ForwardedRef<HTMLSelectElement | null>;
     items: Item[];
     onChange: (items: undefined extends Item ? Item[] : true extends IsMulti ? Item[] : Item) => void;
@@ -23,9 +36,13 @@ type MultiSelectProps<Item, IsMulti extends boolean = undefined> = {
         selectedItems: Item[];
     }) => ReactNode;
     renderButtonText?: (selection: undefined extends Item ? Item[] : true extends IsMulti ? Item[] : Item) => ReactNode;
-    renderList?: (props: ListComponentProps<Item> & { ListComponent: typeof ListComponent }) => ReactNode;
-    listProps?: ListProps;
+    renderList?: (props: ListComponentProps<IsMulti, Item> & { ListComponent: typeof ListComponent }) => ReactNode;
     isOpen?: boolean;
+    groupByKeyGetter?: (item: Item) => string | number;
+}
+
+type MultiSelectProps<Item, IsMulti extends boolean = undefined> = MultiSelectBaseProps<Item, IsMulti> & {
+    listProps?: ListProps;
 } & Pick<UseSelectProps<Item>, "itemToString"> &
     Pick<ButtonProps, "onBlur">;
 
@@ -44,6 +61,7 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
     renderList,
     listProps,
     isOpen: isOpenProp,
+    groupByKeyGetter,
 }: MultiSelectProps<Item, IsMulti>) {
     const [selection, setSelection] = useState(isMulti ? [] : null);
     const parentRef = useRef();
@@ -73,17 +91,25 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
             },
         });
 
+    const groupedItems = groupByKeyGetter ? groupBy(items, groupByKeyGetter) : {};
+    const groups = Object.keys(groupedItems);
+    const itemsWithGroups: typeof items = groupByKeyGetter
+        ? groups.reduce((acc, k) => [...acc, k, ...groupedItems[k]], [])
+        : items;
+
+    const rowVirtualizer = useVirtual({
+        size: itemsWithGroups.length,
+        parentRef,
+        estimateSize: useCallback(() => 35, []),
+        overscan: 5,
+    });
+
     const values = isMulti
         ? selection.map((v) => String(getValue(v)))
         : selection
         ? [String(getValue(selection as any))]
         : [];
-    const rowVirtualizer = useVirtual({
-        size: items.length,
-        parentRef,
-        estimateSize: useCallback(() => 35, []),
-        overscan: 5,
-    });
+
     const menuProps = getMenuProps(listProps as any, { suppressRefError: true });
     const menuRef = useMergeRefs(parentRef, menuProps.ref);
 
@@ -97,12 +123,15 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
         menuRef,
         rowVirtualizer,
         items,
+        itemsWithGroups,
         itemToString,
         getValue,
         highlightedIndex,
         getItemProps,
         values,
+        groups,
     };
+
     return (
         <>
             {label?.(getLabelProps)}
@@ -141,21 +170,20 @@ const stateReducer: UseSelectProps<any>["stateReducer"] = (state, actionAndChang
             return changes;
     }
 };
-interface ListComponentProps<Item = any> {
-    isOpen: boolean;
-    isMulti: boolean;
+interface ListComponentProps<IsMulti extends boolean, Item = any>
+    extends Pick<MultiSelectBaseProps<Item, IsMulti>, "items" | "isMulti" | "items" | "getValue" | "isOpen">,
+        Pick<UseSelectProps<Item>, "itemToString"> {
     menuProps: ObjectLiteral;
     menuRef: (node: undefined) => void;
     rowVirtualizer: ReturnType<typeof useVirtual>;
-    items: Item[];
-    itemToString: (item: Item) => string;
-    getValue: (item: Item) => string | number;
     highlightedIndex: number;
     getItemProps: ReturnType<typeof useSelect>["getItemProps"];
     values: string[];
+    groups: string[];
+    itemsWithGroups: (Item | string)[];
 }
 
-function ListComponent<Item = any>({
+function ListComponent<IsMulti extends boolean, Item = any>({
     isOpen,
     isMulti,
     menuProps,
@@ -167,7 +195,11 @@ function ListComponent<Item = any>({
     highlightedIndex,
     getItemProps,
     values,
-}: ListComponentProps<Item>) {
+    groups,
+    itemsWithGroups,
+}: ListComponentProps<IsMulti, Item>) {
+    const rows = rowVirtualizer.virtualItems;
+
     return (
         <List
             display={isOpen ? null : "none"}
@@ -186,21 +218,42 @@ function ListComponent<Item = any>({
                     position: "relative",
                 }}
             >
-                {rowVirtualizer.virtualItems.map((virtualRow) => {
-                    const item = items[virtualRow.index];
+                {rows.map((virtualRow) => {
+                    const item = itemsWithGroups[virtualRow.index];
                     const label = typeof item === "string" ? item : itemToString(item);
-                    const value = String(getValue(item));
 
+                    if (groups.includes(label)) {
+                        const value = item as any as string;
+                        return (
+                            <div
+                                key={value}
+                                style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    height: `${virtualRow.size}px`,
+                                    transform: `translateY(${virtualRow.start}px)`,
+                                }}
+                            >
+                                {virtualRow.index > 0 && <Divider mt="2" />}
+                                <SelectListItem fontWeight="bold" color="pink.300">
+                                    <Text>{label}</Text>
+                                </SelectListItem>
+                            </div>
+                        );
+                    }
+
+                    const value = String(getValue(item as Item));
+                    const itemIndex = items.findIndex((i) => getValue(i) === value);
                     return (
-                        <ListItem
-                            transition="background-color 220ms, color 220ms"
-                            bg={virtualRow.index === highlightedIndex ? "twitter.100" : null}
-                            px={4}
-                            py={2}
+                        <SelectListItem
+                            key={value}
                             cursor="pointer"
+                            bg={itemIndex === highlightedIndex ? "twitter.100" : null}
                             {...getItemProps({
-                                item: item,
-                                index: virtualRow.index,
+                                item,
+                                index: itemIndex,
                                 style: {
                                     position: "absolute",
                                     top: 0,
@@ -210,18 +263,23 @@ function ListComponent<Item = any>({
                                     transform: `translateY(${virtualRow.start}px)`,
                                 },
                             })}
-                            key={value}
                         >
-                            <Stack direction="row">
-                                {isMulti ? (
-                                    <Checkbox isChecked={values.includes(value)} value={value} onChange={() => null} />
-                                ) : null}
-                                <Text>{label}</Text>
-                            </Stack>
-                        </ListItem>
+                            {isMulti ? (
+                                <Checkbox isChecked={values.includes(value)} value={value} onChange={() => null} />
+                            ) : null}
+                            <Text>{label}</Text>
+                        </SelectListItem>
                     );
                 })}
             </div>
         </List>
     );
 }
+
+const SelectListItem = forwardRef<HTMLLIElement, ListItemProps>(({ children, ...props }: ListItemProps, ref) => {
+    return (
+        <ListItem ref={ref} transition="background-color 220ms, color 220ms" px={4} py={2} {...props}>
+            <Stack direction="row">{children}</Stack>
+        </ListItem>
+    );
+});

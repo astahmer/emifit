@@ -1,26 +1,66 @@
-import { Box, Button, useRadio, UseRadioProps } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    ButtonProps,
+    Stack,
+    useRadio,
+    useRadioGroup,
+    UseRadioGroupProps,
+    UseRadioGroupReturn,
+    UseRadioProps,
+    UseRadioReturn,
+} from "@chakra-ui/react";
 import { WithChildren } from "@pastable/core";
+import { ReactNode } from "react";
 
-export function RadioCard({ children, ...props }: UseRadioProps & WithChildren) {
+export const RadioCardButton = (props: ButtonProps) => (
+    <Button
+        colorScheme="pink"
+        borderWidth="1px"
+        borderRadius="md"
+        boxShadow="md"
+        _focus={{ boxShadow: "outline" }}
+        transition="all 0.2s"
+        variant="outline"
+        {...props}
+    />
+);
+
+export function RadioCard({
+    children,
+    getButtonProps,
+    ...props
+}: UseRadioProps & WithChildren & { getButtonProps?: (state: UseRadioReturn["state"]) => ButtonProps }) {
     const { state, getInputProps, getCheckboxProps } = useRadio(props);
 
     return (
         <Box as="label">
             <input {...getInputProps()} />
-            <Button
-                {...getCheckboxProps()}
+            <RadioCardButton
                 as="div"
-                colorScheme="pink"
-                borderWidth="1px"
-                borderRadius="md"
-                boxShadow="md"
-                _focus={{ boxShadow: "outline" }}
-                opacity={!state.isChecked ? 0.5 : 1}
-                transition="all 0.2s"
+                {...getCheckboxProps()}
+                opacity="0.6"
+                _checked={{ opacity: 1 }}
+                _disabled={{ opacity: 0.3 }}
                 variant={state.isChecked ? "solid" : "outline"}
+                {...getButtonProps?.(state)}
             >
                 {children}
-            </Button>
+            </RadioCardButton>
         </Box>
     );
 }
+
+export function RadioCardPicker({ renderOptions, ...props }: RadioCardPickerProps) {
+    const { getRootProps, getRadioProps } = useRadioGroup({ ...props, name: "category" });
+
+    return (
+        <Stack direction="row" {...getRootProps()} textAlign="center" justifyContent="space-around" w="100%">
+            {renderOptions(getRadioProps)}
+        </Stack>
+    );
+}
+
+export type RadioCardPickerProps = Omit<UseRadioGroupProps, "name"> & {
+    renderOptions?: (getter: UseRadioGroupReturn["getRadioProps"]) => ReactNode;
+};

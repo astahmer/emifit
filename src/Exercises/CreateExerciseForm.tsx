@@ -1,11 +1,12 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { TextInput } from "@/components/TextInput";
-import { toasts } from "@/functions/toasts";
-import { Exercise, makeId, Serie, store } from "@/store";
+import { onError } from "@/functions/toasts";
+import { orm } from "@/orm";
+import { Exercise, Serie } from "@/orm-types";
+import { makeExercise, makeSerie } from "@/store";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
-import { format } from "date-fns";
 import { Fragment, ReactNode, useEffect } from "react";
 import {
     FormProvider,
@@ -15,89 +16,108 @@ import {
     useFormContext,
     UseFormReturn,
 } from "react-hook-form";
-import { ExoNameAutocomplete } from "./ExoNameAutocomplete";
+import { useMutation, useQueryClient } from "react-query";
+import { ExerciseCombobox } from "./ExerciseCombobox";
 import { TagMultiSelect } from "./TagMultiSelect";
 
-const defaultValues: Pick<Exercise, "name" | "nbSeries" | "tags" | "series"> = {
+const defaultValues: Pick<Exercise, "name" | "tags" | "series"> & { nbSeries: number } = {
     name: "",
     nbSeries: 1,
     tags: [],
     series: [makeSerie(0)] as Serie[],
 };
 
-const makeExercise = (params: typeof defaultValues & { category: string }) =>
-    ({
-        ...params,
-        id: makeId(),
-        date: format(new Date(), "dd/MM/yyyy"),
-        series: params.series.map((serie) => ({ ...serie, id: makeId() })),
-    } as Exercise);
-function makeSerie(index: number, current = []) {
-    return { id: makeId(), kg: current[index - 1]?.kg ?? 1, reps: 1 };
-}
+type CreateExerciseParams = Omit<typeof defaultValues, "nbSeries"> & { category: string };
 
 const required = { value: true, message: "This field is required" };
 
 export const CreateExerciseForm = ({
     renderSubmit,
     catId,
-    onCreated,
+    onSubmit,
+    shouldPersist = true,
 }: {
     catId: string;
-    onCreated?: (data: Exercise) => void;
+    onSubmit?: (data: Exercise) => void;
     renderSubmit?: (form: UseFormReturn<typeof defaultValues>) => ReactNode;
+    shouldPersist?: boolean;
 }) => {
     const form = useForm({ defaultValues });
 
-    const onCreate = (params: typeof defaultValues) => {
-        const row = makeExercise({ ...params, category: catId });
-        store.exercises.push(row);
-        onCreated?.(row);
-        toasts.success("Created !");
-    };
+    const queryClient = useQueryClient();
+    const mutation = useMutation(
+        async (params: CreateExerciseParams) => {
+            const row = makeExercise({ ...params, category: catId });
+            console.log(row);
+            if (shouldPersist) {
+                await orm.exercise.create(row);
+            }
+
+            return row;
+        },
+        {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries(orm.exercise.key);
+                onSubmit?.(data);
+            },
+            onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+        }
+    );
+
+    const onCreate = (params: typeof defaultValues) => mutation.mutate(makeExercise({ ...params, category: catId }));
 
     return (
         <FormProvider {...form}>
-            <Box as="form" id="add-form" onSubmit={form.handleSubmit(onCreate)} h="100%" minH={0}>
-                <Stack p="8" overflow="auto" h="100%" minH={0}>
-                    <ExoNameAutocomplete {...form.register("name", { required })} />
-                    <TagMultiSelect
-                        control={form.control}
-                        name="tags"
-                        rules={{ required }}
-                        catId={catId}
-                        error={(form.formState.errors.tags as any)?.message}
-                    />
-                    {/* TODO prefill via name */}
-                    <TextInput
-                        {...form.register("nbSeries", { valueAsNumber: true })}
-                        min={1}
-                        max={10}
-                        name="nbSeries"
-                        label="Nb of series"
-                        type="number"
-                        error={form.formState.errors.nbSeries}
-                    />
-                    <div>
-                        <Divider my="4" />
-                    </div>
-                    <WeightForm form={form} />
-                    <div>
-                        <Button
-                            mt="8"
-                            isFullWidth
-                            leftIcon={<AddIcon />}
-                            colorScheme="pink"
-                            variant="outline"
-                            onClick={() => form.setValue("nbSeries", form.getValues().nbSeries + 1)}
-                            size="sm"
-                        >
-                            Add serie
-                        </Button>
-                    </div>
-                </Stack>
+            <Box
+                as="form"
+                id="add-form"
+                onSubmit={form.handleSubmit(onCreate)}
+                h="100%"
+                minH={0}
+                d="flex"
+                flexDirection="column"
+            >
+                <Box h="100%" minH={0}>
+                    <Stack p="8" pt="4" overflow="auto" h="100%" minH={0}>
+                        <ExerciseCombobox {...form.register("name", { required })} />
+                        <TagMultiSelect
+                            control={form.control}
+                            name="tags"
+                            rules={{ required }}
+                            catId={catId}
+                            error={(form.formState.errors.tags as any)?.message}
+                        />
+                        <TextInput
+                            {...form.register("nbSeries", { valueAsNumber: true })}
+                            min={1}
+                            max={10}
+                            label="Nb of series"
+                            type="number"
+                            error={form.formState.errors.nbSeries}
+                        />
+                        <div>
+                            <Divider my="4" />
+                        </div>
+                        <WeightForm form={form} />
+                        <div>
+                            <Button
+                                mt="8"
+                                isFullWidth
+                                leftIcon={<AddIcon />}
+                                colorScheme="pink"
+                                variant="outline"
+                                onClick={() => form.setValue("nbSeries", form.getValues().nbSeries + 1)}
+                                size="sm"
+                            >
+                                Add serie
+                            </Button>
+                        </div>
+                    </Stack>
+                </Box>
+                <Box mb="2" flexShrink={0}>
+                    {renderSubmit?.(form)}
+                </Box>
             </Box>
-            <Box mb="2">{renderSubmit?.(form)}</Box>
         </FormProvider>
     );
 };

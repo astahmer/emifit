@@ -1,57 +1,61 @@
-import { Exercise, Serie, useExerciseList } from "@/store";
+import { useProgramInterpret } from "@/Programs/useProgramInterpret";
+import { useExerciseList } from "@/store";
+import { Exercise, Serie } from "@/orm-types";
+import { StringOrNumber, WithOnChange } from "@/types";
 import {
     Accordion,
     AccordionButton,
     AccordionIcon,
     AccordionItem,
     AccordionPanel,
-    Avatar,
     Badge,
     Stack,
     Stat,
     StatGroup,
     StatLabel,
     StatNumber,
-    Tag,
-    TagLabel,
     Text,
     useCheckboxGroup,
     UseCheckboxGroupReturn,
 } from "@chakra-ui/react";
-import { CheckboxCircle } from "../components/CheckboxCircle";
+import { useSelector } from "@xstate/react";
+import { CheckboxSquare } from "../components/CheckboxCircle";
+import { ExerciseTag } from "./ExerciseTag";
 
-export const ExerciseAccordionList = () => {
+export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[]>) => {
     const exercises = useExerciseList();
+    const interpret = useProgramInterpret();
+    const catId = useSelector(interpret, (s) => s.context.categoryId);
+    const exerciseList = useSelector(interpret, (s) => s.context.exerciseList);
 
-    const { value, getCheckboxProps } = useCheckboxGroup();
-    console.log(value);
+    const { getCheckboxProps } = useCheckboxGroup({ onChange, defaultValue: exerciseList.map((ex) => ex.id) });
 
     return (
         <Accordion allowToggle w="100%">
-            {exercises.map((exercise) => (
-                <ExerciseAccordion key={exercise.id} exercise={exercise} getCheckboxProps={getCheckboxProps} />
-            ))}
+            {exercises
+                .filter((ex) => ex.category === catId)
+                .map((exercise) => (
+                    <ExerciseAccordion key={exercise.id} exercise={exercise} getCheckboxProps={getCheckboxProps} />
+                ))}
         </Accordion>
     );
 };
+
 const ExerciseAccordion = ({
     exercise,
     getCheckboxProps,
 }: { exercise: Exercise } & Pick<UseCheckboxGroupReturn, "getCheckboxProps">) => {
-    console.log(exercise);
     return (
         <AccordionItem w="100%">
             <AccordionButton w="100%">
                 <Stack direction="row" alignItems="center" w="100%">
-                    <CheckboxCircle {...getCheckboxProps({ value: exercise.id })} />
+                    <CheckboxSquare {...getCheckboxProps({ value: exercise.id })} />
                     <Stack alignItems="flex-start" w="100%">
                         <Text>{exercise.name}</Text>
                         {Boolean(exercise.tags?.length) && (
                             <Stack direction="row">
                                 {exercise.tags.map((tag) => (
-                                    <Badge variant="subtle" colorScheme="pink" fontSize="xx-small">
-                                        {tag.label}
-                                    </Badge>
+                                    <ExerciseTag key={tag.id} tag={tag} />
                                 ))}
                             </Stack>
                         )}
@@ -69,18 +73,19 @@ const ExerciseAccordion = ({
             >
                 <Stack spacing="4">
                     {exercise.series.map((serie, index) => (
-                        <ExerciseSerie key={index} serie={serie} index={index} />
+                        <ExerciseSerie key={serie.id} serie={serie} index={index} />
                     ))}
                 </Stack>
             </AccordionPanel>
         </AccordionItem>
     );
 };
+
 const ExerciseSerie = ({ serie, index }: { serie: Serie; index: number }) => {
     return (
         <StatGroup>
             <Stat alignSelf="center">
-                <StatLabel>Série {index}</StatLabel>
+                <StatLabel>Série {index + 1}</StatLabel>
             </Stat>
             <Stat>
                 <StatLabel>kg</StatLabel>
@@ -91,13 +96,5 @@ const ExerciseSerie = ({ serie, index }: { serie: Serie; index: number }) => {
                 <StatNumber fontSize="md">{serie.kg}</StatNumber>
             </Stat>
         </StatGroup>
-    );
-};
-const ExerciseName = ({ exercise }: { exercise: Exercise }) => {
-    return (
-        <Tag size="lg" colorScheme="red" borderRadius="full">
-            <TagLabel>{exercise.name}</TagLabel>
-            <Avatar size="xs" name={String(exercise.nbSeries)} ml={-1} mr={2} />
-        </Tag>
     );
 };

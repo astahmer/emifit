@@ -7,15 +7,19 @@ specifiers:
   '@emotion/react': ^11.7.1
   '@emotion/styled': ^11.6.0
   '@pastable/core': ^0.1.19
+  '@types/canvas-confetti': ^1.4.2
   '@types/react': ^17.0.39
   '@types/react-dom': ^17.0.11
   '@uselessdev/datepicker': ^2.1.1
   '@vitejs/plugin-react': ^1.2.0
   '@xstate/react': ^2.0.0
   axios: ^0.25.0
+  canvas-confetti: ^1.5.1
   date-fns: ^2.28.0
   downshift: ^6.1.7
   framer-motion: ^6.2.6
+  history: ^5.3.0
+  idb-keyval: ^6.1.0
   jotai: ^1.6.0
   nanoid: ^3.3.1
   prettier: ^2.5.1
@@ -23,6 +27,7 @@ specifiers:
   react: ^17.0.2
   react-dom: ^17.0.2
   react-hook-form: ^7.27.1
+  react-hotkeys-hook: ^3.4.4
   react-icons: ^4.3.1
   react-query: ^3.34.15
   react-router-dom: ^6.2.1
@@ -31,12 +36,9 @@ specifiers:
   ts-toolbelt: ^9.6.0
   typescript: ^4.5.5
   valtio: ^1.3.0
-  valtio-yjs: ^0.3.1
   vite: ^2.8.4
   vite-plugin-pwa: ^0.11.13
   xstate: ^4.30.1
-  y-indexeddb: ^9.0.7
-  yjs: ^13.5.27
 
 dependencies:
   '@babel/core': 7.17.5
@@ -48,26 +50,28 @@ dependencies:
   '@uselessdev/datepicker': 2.1.1_a58330b18321bc71ae2f56fb2c0b06e4
   '@xstate/react': 2.0.0_2698eca3c5a94ce60637347750fb01d7
   axios: 0.25.0
+  canvas-confetti: 1.5.1
   date-fns: 2.28.0
   downshift: 6.1.7_react@17.0.2
   framer-motion: 6.2.6_react-dom@17.0.2+react@17.0.2
+  history: 5.3.0
+  idb-keyval: 6.1.0
   jotai: 1.6.0_95d9d3681c9b45b58d6bb106670aab24
   nanoid: 3.3.1
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-hook-form: 7.27.1_react@17.0.2
+  react-hotkeys-hook: 3.4.4_react-dom@17.0.2+react@17.0.2
   react-icons: 4.3.1_react@17.0.2
   react-query: 3.34.15_react-dom@17.0.2+react@17.0.2
   react-router-dom: 6.2.1_react-dom@17.0.2+react@17.0.2
   react-virtual: 2.10.4_react@17.0.2
   redaxios: 0.4.1
   valtio: 1.3.0_react@17.0.2
-  valtio-yjs: 0.3.1_valtio@1.3.0+yjs@13.5.27
   xstate: 4.30.1
-  y-indexeddb: 9.0.7_yjs@13.5.27
-  yjs: 13.5.27
 
 devDependencies:
+  '@types/canvas-confetti': 1.4.2
   '@types/react': 17.0.39
   '@types/react-dom': 17.0.11
   '@vitejs/plugin-react': 1.2.0
@@ -2410,6 +2414,10 @@ packages:
       string.prototype.matchall: 4.0.6
     dev: true
 
+  /@types/canvas-confetti/1.4.2:
+    resolution: {integrity: sha512-t45KUDHlwrD9PJVRHc5z1SlXhO82BQEgMKUXGEV1KnWLFMPA6Y5LfUsLTHHzH9KcKDHZLEiYYH5nIDcjRKWNTg==}
+    dev: true
+
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
     dev: true
@@ -2715,6 +2723,10 @@ packages:
 
   /caniuse-lite/1.0.30001312:
     resolution: {integrity: sha512-Wiz1Psk2MEK0pX3rUzWaunLTZzqS2JYZFzNKqAiJGiuxIjRPLgV6+VDPOg6lQOUxmDwhTlh198JsTTi8Hzw6aQ==}
+
+  /canvas-confetti/1.5.1:
+    resolution: {integrity: sha512-Ncz+oZJP6OvY7ti4E1slxVlyAV/3g7H7oQtcCDXgwGgARxPnwYY9PW5Oe+I8uvspYNtuHviAdgA0LfcKFWJfpg==}
+    dev: false
 
   /chalk/2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -3147,6 +3159,7 @@ packages:
 
   /fast-deep-equal/3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
+    dev: true
 
   /fast-glob/3.2.11:
     resolution: {integrity: sha512-xrO3+1bxSo3ZVHAnqzyuewYT6aMFHRAd4Kcs92MAonjwQZLsK9d0SF1IyQ3k5PoirxTW0Oe/RqFgMQ6TcNE5Ew==}
@@ -3344,8 +3357,8 @@ packages:
     resolution: {integrity: sha512-COpmrF2NOg4TBWUJ5UVyaCU2A88wEMkUPK4hNqyCkqHbxT92BbvfjoSozkAIIm6XhicGlJHhFdullInrdhwU8Q==}
     dev: false
 
-  /history/5.2.0:
-    resolution: {integrity: sha512-uPSF6lAJb3nSePJ43hN3eKj1dTWpN9gMod0ZssbFTIsen+WehTmEadgL+kg78xLJFdRfrrC//SavDzmRVdE+Ig==}
+  /history/5.3.0:
+    resolution: {integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==}
     dependencies:
       '@babel/runtime': 7.17.2
     dev: false
@@ -3354,6 +3367,16 @@ packages:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
     dependencies:
       react-is: 16.13.1
+    dev: false
+
+  /hotkeys-js/3.8.7:
+    resolution: {integrity: sha512-ckAx3EkUr5XjDwjEHDorHxRO2Kb7z6Z2Sxul4MbBkN8Nho7XDslQsgMJT+CiJ5Z4TgRxxvKHEpuLE3imzqy4Lg==}
+    dev: false
+
+  /idb-keyval/6.1.0:
+    resolution: {integrity: sha512-u/qHZ75rlD3gH+Zah8dAJVJcGW/RfCnfNrFkElC5RpRCnpsCXXhqjVk+6MoVKJ3WhmNbRYdI6IIVP88e+5sxGw==}
+    dependencies:
+      safari-14-idb-fix: 3.0.0
     dev: false
 
   /idb/6.1.5:
@@ -3568,10 +3591,6 @@ packages:
       call-bind: 1.0.2
     dev: true
 
-  /isomorphic.js/0.2.4:
-    resolution: {integrity: sha512-Y4NjZceAwaPXctwsHgNsmfuPxR8lJ3f8X7QTAkhltrX4oGIv+eTlgHLXn4tWysC9zGTi929gapnPp+8F8cg7nA==}
-    dev: false
-
   /jake/10.8.2:
     resolution: {integrity: sha512-eLpKyrfG3mzvGE2Du8VoPbeSkRry093+tyNjdYaBbJS9v17knImYGNXQCUV0gLxQtF82m3E8iRb/wdSQZLoq7A==}
     hasBin: true
@@ -3697,13 +3716,6 @@ packages:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
     engines: {node: '>=6'}
     dev: true
-
-  /lib0/0.2.43:
-    resolution: {integrity: sha512-MJ1KLoz5p3gljIUBfdjjNuL/wlWHHK6+DrcIRhzSRLvtAu1XNdRtRGATYM51KSTI0P2nxJZFQM8rwCH6ga9KUw==}
-    engines: {node: '>=12'}
-    dependencies:
-      isomorphic.js: 0.2.4
-    dev: false
 
   /lines-and-columns/1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
@@ -3988,6 +4000,17 @@ packages:
       react: 17.0.2
     dev: false
 
+  /react-hotkeys-hook/3.4.4_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-vaORq07rWgmuF3owWRhgFV/3VL8/l2q9lz0WyVEddJnWTtKW+AOgU5YgYKuwN6h6h7bCcLG3MFsJIjCrM/5DvQ==}
+    peerDependencies:
+      react: '>=16.8.1'
+      react-dom: '>=16.8.1'
+    dependencies:
+      hotkeys-js: 3.8.7
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+    dev: false
+
   /react-icons/4.3.1_react@17.0.2:
     resolution: {integrity: sha512-cB10MXLTs3gVuXimblAdI71jrJx8njrJZmNMEMC+sQu5B/BIOmlsAjskdqpn81y8UBVEGuHODd7/ci5DvoSzTQ==}
     peerDependencies:
@@ -4069,7 +4092,7 @@ packages:
       react: '>=16.8'
       react-dom: '>=16.8'
     dependencies:
-      history: 5.2.0
+      history: 5.3.0
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-router: 6.2.1_react@17.0.2
@@ -4080,7 +4103,7 @@ packages:
     peerDependencies:
       react: '>=16.8'
     dependencies:
-      history: 5.2.0
+      history: 5.3.0
       react: 17.0.2
     dev: false
 
@@ -4238,6 +4261,10 @@ packages:
     dependencies:
       queue-microtask: 1.2.3
     dev: true
+
+  /safari-14-idb-fix/3.0.0:
+    resolution: {integrity: sha512-eBNFLob4PMq8JA1dGyFn6G97q3/WzNtFK4RnzT1fnLq+9RyrGknzYiM/9B12MnKAxuj1IXr7UKYtTNtjyKMBog==}
+    dev: false
 
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
@@ -4604,17 +4631,6 @@ packages:
       react: 17.0.2
     dev: false
 
-  /valtio-yjs/0.3.1_valtio@1.3.0+yjs@13.5.27:
-    resolution: {integrity: sha512-g4Tx+MVWMlQz1O2amYDDFE97/f4HEGF/KAnMNXF0BGeSQDImnI4lGAK5L8jlKWZf8fI7SeANiVVWbL0PzoOW5g==}
-    peerDependencies:
-      valtio: ^1.1.0
-      yjs: ^13.5.11
-    dependencies:
-      fast-deep-equal: 3.1.3
-      valtio: 1.3.0_react@17.0.2
-      yjs: 13.5.27
-    dev: false
-
   /valtio/1.3.0_react@17.0.2:
     resolution: {integrity: sha512-wsE6EDIkt+CNZPNHOxNVzoi026Fyt6ZRT750etZCAvrndcdT3N7Z+SSV4kJQdCwl5gNxsnU4BhP1wFS7cu21oA==}
     engines: {node: '>=12.7.0'}
@@ -4862,22 +4878,7 @@ packages:
     resolution: {integrity: sha512-vNOk8iRfhtbl9/RVF6HJWbL+YfsfGLiee1tGm6cuDcPrSStsRvfAhLVxSPoePx5XBlCSYOXaweLStmrpk2rvhA==}
     dev: false
 
-  /y-indexeddb/9.0.7_yjs@13.5.27:
-    resolution: {integrity: sha512-58rDlwtRgXucgR9Kxc49AepAR6uGNGfcvPPAMrmMfSvRBQ/tPnx6NoHNyrRkhbALEAjV9tPEAIP0a/KkVqAIyA==}
-    peerDependencies:
-      yjs: ^13.0.0
-    dependencies:
-      lib0: 0.2.43
-      yjs: 13.5.27
-    dev: false
-
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
-    dev: false
-
-  /yjs/13.5.27:
-    resolution: {integrity: sha512-1cWqmEomMCJTemtKLpEymXU946KZAAS45RxrE3TZAWVjua1wJhUF8192HYnuvOKv3iInxyySDtoMZTPs/afe1w==}
-    dependencies:
-      lib0: 0.2.43
     dev: false

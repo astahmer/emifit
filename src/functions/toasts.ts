@@ -3,7 +3,13 @@ import { getRandomString } from "@pastable/core";
 
 // Toasts
 const toast = createStandaloneToast();
-const baseToastConfig = { duration: 3000, isClosable: true, unique: true };
+const baseToastConfig: UseToastOptions & UniqueToastOptions = {
+    duration: 3000,
+    isClosable: true,
+    unique: true,
+    position: "top",
+    containerStyle: { marginTop: "70px" },
+};
 
 type ToastStatus = Exclude<UseToastOptions["status"], undefined> | "default";
 export const toastConfigs: Record<ToastStatus, UseToastOptions> = {

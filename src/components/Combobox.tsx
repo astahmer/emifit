@@ -35,8 +35,8 @@ function ComboboxBase<Item = any>({
     items,
     renderInput,
     label,
-    getValue,
-    itemToString,
+    getValue = (item) => String(item as any),
+    itemToString = (item) => String(item as any),
     onSelectedItemChange,
     ...props
 }: ComboboxProps<Item>) {
@@ -62,7 +62,7 @@ function ComboboxBase<Item = any>({
                         ...changes,
                         ...(state.highlightedIndex > -1 &&
                             changes.selectedItem && {
-                                inputValue: String(getValue(changes.selectedItem)),
+                                inputValue: String(itemToString(changes.selectedItem)),
                             }),
                     };
                 default:
@@ -165,11 +165,7 @@ function ComboboxBase<Item = any>({
                                         transform: `translateY(${virtualRow.start}px)`,
                                     },
                                 })}
-                                key={
-                                    typeof inputItems[virtualRow.index] === "string"
-                                        ? inputItems[virtualRow.index]
-                                        : itemToString(inputItems[virtualRow.index])
-                                }
+                                key={getValue(inputItems[virtualRow.index])}
                             >
                                 {typeof inputItems[virtualRow.index] === "string"
                                     ? inputItems[virtualRow.index]

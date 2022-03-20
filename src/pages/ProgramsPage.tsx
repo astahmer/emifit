@@ -1,218 +1,97 @@
-import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
-import { Exercise, useExerciseList } from "@/store";
-import { AddIcon, CheckCircleIcon, CheckIcon } from "@chakra-ui/icons";
-import { Alert, AlertIcon, Box, Button, Divider, Heading, IconButton } from "@chakra-ui/react";
+import { onError, successToast } from "@/functions/toasts";
+import { makeId, rmTrailingSlash } from "@/functions/utils";
+import { mergeMeta, printStatesPathValue } from "@/functions/xstate-utils";
+import { orm } from "@/orm";
+import { ProgramInterpretProvider } from "@/Programs/useProgramInterpret";
+import { browserHistory, debugModeAtom, useProgramList } from "@/store";
+import { Box, Heading, Tag } from "@chakra-ui/react";
 import { useMachine } from "@xstate/react";
-import { createContext, useContext, useState } from "react";
-import { InterpreterFrom } from "xstate";
+import confetti from "canvas-confetti";
+import { useAtomValue } from "jotai";
+import { useEffect, useRef } from "react";
+import { useMutation, useQueryClient } from "react-query";
+import { useNavigate } from "react-router-dom";
+import { InitialState } from "../Programs/InitialState";
+import { ProgramForm } from "../Programs/ProgramForm";
 import { programFormMachine } from "../Programs/programFormMachine";
-import { CategoryRadioPicker } from "../Exercises/CategoryRadioPicker";
-import { ExerciseAccordionList } from "../Exercises/ExerciseAccordionList";
-import { Show } from "@/components/Show";
-
-const ProgramContext = createContext(null as InterpreterFrom<typeof programFormMachine>["send"]);
 
 export const ProgramsPage = () => {
-    const [state, send] = useMachine(programFormMachine);
-    console.log(state.value);
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const programs = useProgramList();
+    const mutation = useMutation(
+        async (ctx: typeof programFormMachine["context"]) => {
+            const currentProgram = ctx.programId ? programs.find((p) => p.id === ctx.programId) : null;
+            const isEditing = Boolean(currentProgram);
+
+            navigate("/");
+            confetti();
+            successToast(`Program <${ctx.programName}> ${isEditing ? "updated" : "created"}`);
+
+            const params = {
+                ...currentProgram,
+                name: ctx.programName,
+                category: ctx.categoryId,
+                exerciseList: ctx.exerciseList.map((exo) => ({ id: makeId(), madeFromExerciseId: exo.id, ...exo })),
+            };
+            const now = new Date();
+            if (params.id) {
+                return orm.program.update({ ...params, updatedAt: now });
+            }
+
+            return orm.program.create({ ...params, id: makeId(), createdAt: now, updatedAt: now });
+        },
+        {
+            onSuccess: (data) => {
+                queryClient.invalidateQueries(orm.program.key);
+            },
+            onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+        }
+    );
+
+    const [state, _send, interpret] = useMachine(programFormMachine, {
+        actions: {
+            onDone: (ctx) => void mutation.mutate(ctx),
+            navigateTo: (_ctx, e, actionMeta) => {
+                const meta = mergeMeta(actionMeta.state.meta as { path?: string });
+                if (!meta.path) return;
+
+                const to = rmTrailingSlash("/programs" + meta.path);
+                if (toPathRef.current === to) return;
+
+                navigate(to, { state: interpret.getSnapshot().context });
+                toPathRef.current = to;
+            },
+        },
+    });
+
+    const toPathRef = useRef<string>("/programs");
+
+    // Handle back button, sync url to state = go back to previous state
+    useEffect(() => {
+        return browserHistory.listen((update) => {
+            if (update.action === "POP") {
+                toPathRef.current = rmTrailingSlash(update.location.pathname);
+                interpret.send({ type: "GoBack" });
+            }
+        });
+    }, []);
+
+    const debugMode = useAtomValue(debugModeAtom);
 
     return (
-        <ProgramContext.Provider value={send}>
-            <Box id="ProgramsPage" d="flex" h="100%" p="4" w="100%">
+        <ProgramInterpretProvider value={interpret}>
+            <Box id="ProgramsPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
+                <Heading as="h1">Programs</Heading>
                 {state.matches("initial") && <InitialState />}
-                {state.matches("creating") && <CreateProgramForm />}
+                {state.matches("creating") && <ProgramForm />}
             </Box>
-        </ProgramContext.Provider>
-    );
-};
-
-const InitialState = () => {
-    const programs = [];
-    const send = useContext(ProgramContext);
-
-    return (
-        <Box d="flex" flexDirection="column" m="auto" mt="100%" alignItems="center">
-            {Boolean(!programs.length) && (
-                <>
-                    <Box m="4">
-                        <Alert status="info" rounded="full">
-                            <AlertIcon />
-                            No programs yet !
-                        </Alert>
-                    </Box>
-                    <Divider mb="4" />
-                </>
+            {debugMode && (
+                <Box position="fixed" top="10px" w="100%" textAlign="center">
+                    <Tag wordBreak="break-all">{printStatesPathValue(state)}</Tag>
+                </Box>
             )}
-            {/* TODO programs card */}
-            <Button
-                leftIcon={<AddIcon />}
-                colorScheme="pink"
-                variant="solid"
-                py="4"
-                mb="4"
-                size="lg"
-                onClick={() => send("StartCreatingProgram")}
-            >
-                Add program
-            </Button>
-        </Box>
+        </ProgramInterpretProvider>
     );
 };
-
-const CreateProgramForm = () => {
-    const [category, setCategory] = useState(null as string);
-    const isCategorySelected = Boolean(category);
-    const exercises = useExerciseList();
-
-    const [selectedExercises, setSelectedExercises] = useState([] as string[]);
-    const hasSelectedExercises = Boolean(selectedExercises.length);
-    const send = useContext(ProgramContext);
-
-    const onCreated = (created: Exercise) => send({ type: "SelectExercises", value: [created.id] });
-
-    return (
-        <Box d="flex" flexDirection="column" m="auto" w="100%" h="100%">
-            <Box m="auto">
-                <PickCategoryStep isCategorySelected={isCategorySelected} onChange={setCategory} />
-            </Box>
-            <Show cond={isCategorySelected}>
-                {Boolean(false && exercises.length) && (
-                    <PickExercisesStep hasSelectedExercises={hasSelectedExercises} />
-                )}
-                {Boolean(true || !exercises.length) && isCategorySelected && (
-                    <CreateExerciseStep {...{ hasSelectedExercises, category, onCreated }} />
-                )}
-            </Show>
-        </Box>
-    );
-};
-function CreateExerciseStep({
-    hasSelectedExercises,
-    category,
-    onCreated,
-}: {
-    hasSelectedExercises: boolean;
-    category: string;
-    onCreated: (data: Exercise) => void;
-}) {
-    return (
-        <>
-            <Heading
-                as="h3"
-                size="md"
-                textAlign="center"
-                textDecoration={hasSelectedExercises ? "line-through" : undefined}
-                opacity={hasSelectedExercises ? "0.5" : undefined}
-                color="pink.500"
-            >
-                <IconButton
-                    colorScheme={hasSelectedExercises ? "pink" : "gray"}
-                    aria-label="Step 1 done"
-                    size="md"
-                    icon={hasSelectedExercises ? <CheckCircleIcon fontSize="x-large" /> : undefined}
-                    variant="outline"
-                    rounded="full"
-                    mr="2"
-                    pointerEvents="none"
-                />
-                Create an exercise :
-            </Heading>
-            <CreateExerciseForm
-                catId={category}
-                onCreated={onCreated}
-                renderSubmit={(form) => {
-                    const [name, tags] = form.watch(["name", "tags"]);
-
-                    return (
-                        Boolean(name && tags.length) && (
-                            <>
-                                <Divider />
-                                <div>
-                                    <Button
-                                        mt="4"
-                                        isFullWidth
-                                        leftIcon={<CheckIcon />}
-                                        colorScheme="pink"
-                                        variant="solid"
-                                        type="submit"
-                                        size="lg"
-                                    >
-                                        Create
-                                    </Button>
-                                </div>
-                            </>
-                        )
-                    );
-                }}
-            />
-            {/* TODO Program.name */}
-        </>
-    );
-}
-
-function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercises: boolean }) {
-    return (
-        <>
-            <Heading
-                as="h3"
-                size="md"
-                textAlign="center"
-                textDecoration={hasSelectedExercises ? "line-through" : undefined}
-                opacity={hasSelectedExercises ? "0.5" : undefined}
-                color="pink.500"
-            >
-                <IconButton
-                    colorScheme={hasSelectedExercises ? "pink" : "gray"}
-                    aria-label="Step 1 done"
-                    size="md"
-                    icon={hasSelectedExercises ? <CheckCircleIcon fontSize="x-large" /> : undefined}
-                    variant="outline"
-                    rounded="full"
-                    mr="2"
-                    pointerEvents="none"
-                />
-                Then, select one or more exercises :
-            </Heading>
-            <Box p="4">
-                <ExerciseAccordionList />
-            </Box>
-        </>
-    );
-}
-
-function PickCategoryStep({
-    isCategorySelected,
-    onChange,
-}: {
-    isCategorySelected: boolean;
-    onChange: (value: string) => void;
-}) {
-    return (
-        <>
-            <Heading
-                as="h3"
-                size={isCategorySelected ? "sm" : "md"}
-                textAlign="center"
-                textDecoration={isCategorySelected ? "line-through" : undefined}
-                opacity={isCategorySelected ? "0.5" : undefined}
-                color="pink.500"
-            >
-                <IconButton
-                    colorScheme={isCategorySelected ? "pink" : "gray"}
-                    aria-label="Step 1 done"
-                    size="sm"
-                    icon={isCategorySelected ? <CheckCircleIcon fontSize="xl" /> : undefined}
-                    variant="outline"
-                    rounded="full"
-                    mr="2"
-                    pointerEvents="none"
-                />
-                First, pick a category :
-            </Heading>
-            <Box d="flex" w="100%" p="4">
-                <CategoryRadioPicker onChange={onChange} />
-                {/* (value) => send({ type: "SelectCategory", value }) */}
-            </Box>
-        </>
-    );
-}
