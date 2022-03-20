@@ -1,12 +1,25 @@
 import { TextInput } from "@/components/TextInput";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
-import { Box, Button, ButtonGroup, FormControl, FormLabel, IconButton, Stack, Wrap, WrapItem } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    ButtonGroup,
+    Divider,
+    FormControl,
+    FormLabel,
+    IconButton,
+    Stack,
+    Wrap,
+    WrapItem,
+} from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { useForm } from "react-hook-form";
 import { AddTag, ExerciseName } from "@/Exercises/ExerciseName";
 import { ExerciseListCombobox } from "@/Exercises/ExerciseCombobox";
+import { Link as ReactLink } from "react-router-dom";
 import { useRef } from "react";
+import { RadioCardButton } from "@/components/RadioCard";
 
 export function EditSettingsStep() {
     const interpret = useProgramInterpret();
@@ -15,9 +28,9 @@ export function EditSettingsStep() {
     const selectedExercises = useSelector(interpret, (s) => s.context.exerciseList);
     const programId = useSelector(interpret, (s) => s.context.programId);
     const programName = useSelector(interpret, (s) => s.context.programName);
+    const isEditingProgram = Boolean(programId);
 
     const form = useForm({ defaultValues: { programName } });
-
     const editExerciseList = useRef([]);
 
     return (
@@ -88,8 +101,20 @@ export function EditSettingsStep() {
                         type="submit"
                         size="lg"
                     >
-                        {Boolean(programId) ? "Edit" : "Create"} program
+                        {isEditingProgram ? "Edit" : "Create"} program
                     </Button>
+                    {isEditingProgram && (
+                        <>
+                            <Divider my="4" />
+                            <Box d="flex" justifyContent="center">
+                                <ReactLink to="/programs" state={{}} replace>
+                                    <RadioCardButton as="div" onClick={() => send("Reset")}>
+                                        Cancel & go back to program list
+                                    </RadioCardButton>
+                                </ReactLink>
+                            </Box>
+                        </>
+                    )}
                 </Box>
             </Stack>
         </>
