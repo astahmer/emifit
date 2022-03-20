@@ -65,20 +65,24 @@ export function EditSettingsStep() {
                         initialSelectedItems={selectedExercises}
                         renderRight={() => (
                             <ButtonGroup alignItems="center" size="sm" colorScheme="telegram">
-                                <IconButton
-                                    icon={<CloseIcon />}
+                                <Button
+                                    leftIcon={<CloseIcon />}
                                     variant="outline"
                                     aria-label="close"
                                     onClick={() => send({ type: "CancelEditing" })}
-                                />
-                                <IconButton
-                                    icon={<CheckIcon />}
+                                >
+                                    Cancel editing
+                                </Button>
+                                <Button
+                                    leftIcon={<CheckIcon />}
                                     variant="solid"
                                     aria-label="validate"
                                     onClick={() =>
                                         send({ type: "ConfirmEditing", selection: editExerciseList.current })
                                     }
-                                />
+                                >
+                                    Validate selection
+                                </Button>
                             </ButtonGroup>
                         )}
                     />
