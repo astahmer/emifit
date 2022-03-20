@@ -17,7 +17,11 @@ export const CategoryRadioPicker = ({
                 const radio = getRadioProps({ value });
 
                 return (
-                    <RadioCard key={value} {...radio} isDisabled={radio.disabled || isOptionDisabled?.(option)}>
+                    <RadioCard
+                        key={value}
+                        {...radio}
+                        isDisabled={radio.disabled || isOptionDisabled?.(option) || props.isDisabled}
+                    >
                         {value}
                     </RadioCard>
                 );
