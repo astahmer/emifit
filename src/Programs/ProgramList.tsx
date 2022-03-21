@@ -4,9 +4,9 @@ import { Box, type BoxProps } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
 import { ComponentProps, forwardRef, ForwardRefExoticComponent, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { ProgramCard, ProgramCardProps } from "./ProgramsCard";
+import { EditableProgramCard, EditableProgramCardProps } from "./ProgramsCard";
 
-export function ProgramList({ onEdit }: Pick<ProgramCardProps, "onEdit">) {
+export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">) {
     const programs = useProgramList();
     const programIdList = useMemo(() => programs.map((p) => p.id), [programs]);
     const [items, setItems] = useState(programIdList);
@@ -49,7 +49,7 @@ export const ReorderProgramCardItem = ({
     program,
     onEdit,
     onAnimationComplete,
-}: ProgramCardProps & { onAnimationComplete?: () => void }) => {
+}: EditableProgramCardProps & { onAnimationComplete?: () => void }) => {
     const y = useMotionValue(0);
 
     return (
@@ -62,7 +62,7 @@ export const ReorderProgramCardItem = ({
             whileDrag={{ scale: 1.1, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2)" }}
             onAnimationComplete={(e: any) => e.scale === 1 && onAnimationComplete()}
         >
-            <ProgramCard program={program} onEdit={onEdit} />
+            <EditableProgramCard program={program} onEdit={onEdit} />
         </ReorderItemBox>
     );
 };
