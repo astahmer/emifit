@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { callAll } from "@pastable/core";
 import { useCombobox, UseComboboxProps, UseComboboxReturnValue } from "downshift";
-import { ForwardedRef, forwardRef, ReactNode, Ref, useCallback, useMemo, useRef, useState } from "react";
+import { ForwardedRef, forwardRef, ReactNode, Ref, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";
 
 export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => (
@@ -41,6 +41,8 @@ function ComboboxBase<Item = any>({
     ...props
 }: ComboboxProps<Item>) {
     const [inputItems, setInputItems] = useState(items);
+    useEffect(() => setInputItems(items), [items]);
+
     const parentRef = useRef();
 
     const rowVirtualizer = useVirtual({
