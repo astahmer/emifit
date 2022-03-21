@@ -258,7 +258,6 @@ export const programFormMachine =
                 popHistoryStack: assign((ctx) => {
                     const prev = ctx.stack[ctx.stack.length - 1];
                     const stack = ctx.stack.slice(0, ctx.stack.length - 1);
-                    // console.log(ctx.stack.length, stack.length);
                     return { ...prev, stack };
                 }),
                 assignExistingProgram: assign((_ctx, e) => ({

@@ -115,7 +115,6 @@ function ComboboxBase<Item = any>({
         onChange: callAll(props.onChange, inputProps.onChange),
         onBlur: callAll(props.onBlur, inputProps.onBlur),
     };
-    console.log(selectedItem);
 
     return (
         <>

@@ -48,7 +48,6 @@ export const CreateExerciseForm = ({
     const mutation = useMutation(
         async (params: CreateExerciseParams) => {
             const row = makeExercise({ ...params, category: catId });
-            console.log(row);
             if (shouldPersist) {
                 await orm.exercise.create(row);
             }
