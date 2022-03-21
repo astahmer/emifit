@@ -1,5 +1,6 @@
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, ChevronUpIcon, CloseIcon } from "@chakra-ui/icons";
 import {
+    ButtonGroup,
     Flex,
     IconButton,
     Input,
@@ -85,6 +86,8 @@ function ComboboxBase<Item = any>({
         highlightedIndex,
         getItemProps,
         openMenu,
+        selectItem,
+        selectedItem,
     } = useCombobox({
         stateReducer,
         itemToString,
@@ -112,6 +115,7 @@ function ComboboxBase<Item = any>({
         onChange: callAll(props.onChange, inputProps.onChange),
         onBlur: callAll(props.onBlur, inputProps.onBlur),
     };
+    console.log(selectedItem);
 
     return (
         <>
@@ -129,14 +133,29 @@ function ComboboxBase<Item = any>({
                             ref={inputRef}
                         />
                     )}
-                    <InputRightElement>
-                        <IconButton
-                            {...getToggleButtonProps()}
-                            size="sm"
-                            aria-label={"toggle menu"}
-                            colorScheme={isOpen ? "gray" : "pink"}
-                            icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                        />
+                    <InputRightElement w="auto" mr="2">
+                        <ButtonGroup>
+                            {Boolean(selectedItem) && (
+                                <IconButton
+                                    tabIndex={-1}
+                                    onClick={() => selectItem(null)}
+                                    aria-label="clear selection"
+                                    size="sm"
+                                    colorScheme={isOpen ? "gray" : "pink"}
+                                    variant="outline"
+                                    icon={<CloseIcon />}
+                                    fontSize="xx-small"
+                                />
+                            )}
+                            <IconButton
+                                {...getToggleButtonProps()}
+                                aria-label="toggle menu"
+                                size="sm"
+                                colorScheme={isOpen ? "gray" : "pink"}
+                                icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                fontSize="md"
+                            />
+                        </ButtonGroup>
                     </InputRightElement>
                 </InputGroup>
                 <List

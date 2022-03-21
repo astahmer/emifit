@@ -17,7 +17,7 @@ export const ExerciseCombobox = forwardRef(
                     {...props}
                     ref={ref}
                     getValue={(item: Exercise) => item.id}
-                    itemToString={(item) => `${item.name}`}
+                    itemToString={(item) => (item ? `${item.name}` : "")}
                     items={items}
                     label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise name</FormLabel>}
                 />
