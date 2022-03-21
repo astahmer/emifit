@@ -145,6 +145,10 @@ function ComboboxBase<Item = any>({
                     overflowY="auto"
                     mt={0}
                     maxH="150px"
+                    borderWidth="1px"
+                    borderTopWidth="0"
+                    borderColor="pink.200"
+                    borderBottomRadius="md"
                 >
                     <div
                         style={{
