@@ -82,6 +82,7 @@ function ComboboxBase<Item = any>({
         getComboboxProps,
         highlightedIndex,
         getItemProps,
+        openMenu,
     } = useCombobox({
         stateReducer,
         itemToString,
@@ -97,7 +98,13 @@ function ComboboxBase<Item = any>({
         },
         onSelectedItemChange,
     });
-    const inputProps = getInputProps();
+    const inputProps = getInputProps({
+        onFocus: () => {
+            if (!isOpen) {
+                openMenu();
+            }
+        },
+    });
     const inputRef = useMergeRefs(externalRef, inputProps.ref);
     const mergedProps = {
         onChange: callAll(props.onChange, inputProps.onChange),
