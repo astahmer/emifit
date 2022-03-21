@@ -2,8 +2,8 @@ import { CheckCircleIcon } from "@chakra-ui/icons";
 import { chakra, Icon, Tab, TabList, Tabs } from "@chakra-ui/react";
 import { useRef } from "react";
 import { IoIosAddCircle } from "react-icons/io";
+import { IoListSharp } from "react-icons/io5";
 import { GiProgression } from "react-icons/gi";
-import { GoTasklist } from "react-icons/go";
 import { AiFillHome } from "react-icons/ai";
 import { FiSettings } from "react-icons/fi";
 import { Link as ReactLink, useLocation } from "react-router-dom";
@@ -32,7 +32,7 @@ export const BottomTabs = () => {
                     </Tab>
                     <Tab as={ReactLink} to="/" w="100%" h="58px">
                         <HFlex alignItems="center">
-                            <Icon as={GiProgression} />
+                            <Icon as={GiProgression} fontSize="sm" />
                             <chakra.span fontSize="xs">Progress</chakra.span>
                         </HFlex>
                     </Tab>
@@ -57,7 +57,7 @@ export const BottomTabs = () => {
                     </Tab>
                     <Tab as={ReactLink} to="/programs" w="100%" h="58px">
                         <HFlex alignItems="center">
-                            <Icon as={GoTasklist} fontSize="sm" />
+                            <Icon as={IoListSharp} fontSize="lg" />
                             <chakra.span fontSize="xs">Programs</chakra.span>
                         </HFlex>
                     </Tab>
