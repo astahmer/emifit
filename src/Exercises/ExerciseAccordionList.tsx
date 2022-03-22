@@ -85,7 +85,7 @@ const ExerciseSerie = ({ serie, index }: { serie: Serie; index: number }) => {
     return (
         <StatGroup>
             <Stat alignSelf="center">
-                <StatLabel>Série {index + 1}</StatLabel>
+                <StatLabel>Set {index + 1}</StatLabel>
             </Stat>
             <Stat>
                 <StatLabel>kg</StatLabel>
