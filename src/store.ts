@@ -12,6 +12,7 @@ import { isToday } from "date-fns";
 
 export const browserHistory = createBrowserHistory({ window });
 export const debugModeAtom = atom<boolean>(false);
+export const showSkeletonsAtom = atom<boolean>(false);
 
 const today = new Date();
 export const currentDateAtom = atom<CalendarDate>(today);
