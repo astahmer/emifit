@@ -196,6 +196,13 @@ const WithDaily = () => {
                 isDisabled={!isDailyToday || hasAtLeastOneExercise}
             />
             <Divider mt="4" />
+            {isDailyToday && (
+                <Box pos="relative">
+                    <Text pos="absolute" top="0" p="4" color="gray.400" fontSize="small" fontStyle="italic">
+                        You can update today's category as long as you haven't added any exercises.
+                    </Text>
+                </Box>
+            )}
             <DailyExerciseList />
         </>
     );
