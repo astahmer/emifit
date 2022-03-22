@@ -30,14 +30,14 @@ export const BottomTabs = () => {
                             <chakra.span fontSize="xs">Home</chakra.span>
                         </HFlex>
                     </Tab>
-                    <Tab as={ReactLink} to="/" w="100%" h="58px">
+                    <Tab as={ReactLink} to="/progress" w="100%" h="58px">
                         <HFlex alignItems="center">
                             <Icon as={GiProgression} fontSize="sm" />
                             <chakra.span fontSize="xs">Progress</chakra.span>
                         </HFlex>
                     </Tab>
-                    <Tab as={ReactLink} to="/add-exercise" w="100%" h="58px">
-                        {location.pathname === "/add-exercise" ? (
+                    <Tab as={ReactLink} to="/exercise/add" w="100%" h="58px">
+                        {location.pathname === "/exercise/add" ? (
                             <HFlex alignItems="center">
                                 <CheckCircleIcon
                                     color="pink.400"
@@ -61,7 +61,7 @@ export const BottomTabs = () => {
                             <chakra.span fontSize="xs">Programs</chakra.span>
                         </HFlex>
                     </Tab>
-                    <Tab as={ReactLink} to="/" w="100%" h="58px">
+                    <Tab as={ReactLink} to="/settings" w="100%" h="58px">
                         <HFlex alignItems="center">
                             <Icon as={FiSettings} />
                             <chakra.span fontSize="xs">Settings</chakra.span>

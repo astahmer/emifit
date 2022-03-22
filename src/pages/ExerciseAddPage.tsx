@@ -9,7 +9,7 @@ import { useMutation } from "react-query";
 import { orm } from "@/orm";
 import { Exercise } from "@/orm-types";
 
-export const AddPage = () => {
+export const ExerciseAddPage = () => {
     const [params] = useSearchParams();
     const catId = params.get("category") || Categories[0].id;
 

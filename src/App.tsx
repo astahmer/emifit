@@ -6,10 +6,11 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import "./App.css";
 import { BottomTabs } from "./components/BottomTabs";
-import { AddPage } from "./pages/AddPage";
+import { ExerciseAddPage } from "./pages/ExerciseAddPage";
 import { HomePage } from "./pages/HomePage";
 import { ProgramsPage } from "./pages/ProgramsPage";
 import { ProgressPage } from "./pages/ProgressPage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { debugModeAtom, browserHistory } from "./store";
 
 const queryClient = new QueryClient();
@@ -24,11 +25,13 @@ function App() {
             <ChakraProvider theme={theme}>
                 <HistoryRouter history={browserHistory}>
                     <Flex as="main" direction="column" boxSize="100%">
-                        <Flex as="section" direction="column" h="100%" overflow="hidden">
+                        <Flex as="section" id="View" direction="column" h="100%" overflow="hidden">
                             <Routes>
                                 <Route path="/" element={<HomePage />} />
-                                <Route path="/add-exercise" element={<AddPage />} />
+                                <Route path="/exercise/add" element={<ExerciseAddPage />} />
+                                <Route path="/exercise/edit/:id" element={<ExerciseAddPage />} />
                                 <Route path="/progress" element={<ProgressPage />} />
+                                <Route path="/settings" element={<SettingsPage />} />
                                 <Route path="/programs/*" element={<ProgramsPage />} />
                             </Routes>
                         </Flex>
