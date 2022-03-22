@@ -1,8 +1,16 @@
+import { uniques, uniquesByProp } from "@pastable/core";
+
 const SharedTags = [
-    { id: "Machine", label: "Machine", tag: "Type" },
-    { id: "Freeweight", label: "Freeweight", tag: "Type" },
-    { id: "Bodyweight", label: "Bodyweight", tag: "Type" },
+    { id: "Machine", label: "Machine", group: "Type" },
+    { id: "Freeweight", label: "Freeweight", group: "Type" },
+    { id: "Bodyweight", label: "Bodyweight", group: "Type" },
 ] as const;
+
+export interface CategoryTag {
+    id: string;
+    label: string;
+    group: string;
+}
 
 export const Categories = [
     {
@@ -10,9 +18,9 @@ export const Categories = [
         label: "Push day",
         children: [
             ...SharedTags,
-            { id: "Chest", label: "Chest", tag: "Muscle" },
-            { id: "Triceps", label: "Triceps", tag: "Muscle" },
-            { id: "Shoulders", label: "Shoulders", tag: "Muscle" },
+            { id: "Chest", label: "Chest", group: "Muscle" },
+            { id: "Triceps", label: "Triceps", group: "Muscle" },
+            { id: "Shoulders", label: "Shoulders", group: "Muscle" },
         ],
     },
     {
@@ -20,8 +28,8 @@ export const Categories = [
         label: "Pull day",
         children: [
             ...SharedTags,
-            { id: "Back", label: "Back", tag: "Muscle" },
-            { id: "Biceps", label: "Biceps", tag: "Muscle" },
+            { id: "Back", label: "Back", group: "Muscle" },
+            { id: "Biceps", label: "Biceps", group: "Muscle" },
         ],
     },
     {
@@ -29,8 +37,16 @@ export const Categories = [
         label: "Leg day",
         children: [
             ...SharedTags,
-            { id: "QuadFocus", label: "Quad focus", tag: "Muscle" },
-            { id: "GlutesFocus", label: "Glutes focus", tag: "Muscle" },
+            { id: "QuadFocus", label: "Quad focus", group: "Muscle" },
+            { id: "GlutesFocus", label: "Glutes focus", group: "Muscle" },
         ],
     },
 ] as const;
+
+export const CategoriesTags = uniquesByProp(
+    Categories.reduce((acc, cat) => acc.concat(cat.children), []),
+    "id"
+) as CategoryTag[];
+export const CategoriesTagGroups = uniques(
+    Categories.reduce((acc, cat) => acc.concat(cat.children.flatMap((tag) => tag.group)), [])
+) as string[];
