@@ -33,7 +33,7 @@ export const ProgramsPage = () => {
                 ...currentProgram,
                 name: ctx.programName,
                 category: ctx.categoryId,
-                exerciseList: ctx.exerciseList.map((exo) => ({ id: makeId(), madeFromExerciseId: exo.id, ...exo })),
+                exerciseList: ctx.exerciseList.map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id })),
             };
             const now = new Date();
             if (params.id) {
