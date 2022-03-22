@@ -63,7 +63,8 @@ export const CreateExerciseForm = ({
         }
     );
 
-    const onCreate = (params: typeof defaultValues) => mutation.mutate(makeExercise({ ...params, category: catId }));
+    const onCreate = ({ nbSeries, ...params }: typeof defaultValues) =>
+        mutation.mutate(makeExercise({ ...params, category: catId }));
 
     return (
         <FormProvider {...form}>
