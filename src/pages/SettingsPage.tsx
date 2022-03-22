@@ -7,7 +7,7 @@ import { Box, Button, chakra, Flex, Heading, IconButton, Stack } from "@chakra-u
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from "@chakra-ui/react";
-import { ProgramCardExerciseList } from "@/Programs/ProgramsCard";
+import { ProgramCardExerciseList } from "@/Programs/ProgramCard";
 import { HFlex } from "@/components/HFlex";
 
 export const SettingsPage = () => {

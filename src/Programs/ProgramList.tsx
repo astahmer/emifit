@@ -4,7 +4,7 @@ import { Box, type BoxProps } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
 import { ComponentProps, forwardRef, ForwardRefExoticComponent, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { EditableProgramCard, EditableProgramCardProps } from "./ProgramsCard";
+import { EditableProgramCard, EditableProgramCardProps } from "./ProgramCard";
 
 export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">) {
     const programs = useProgramList();
