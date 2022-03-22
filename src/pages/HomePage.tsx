@@ -3,11 +3,11 @@ import { HFlex } from "@/components/HFlex";
 import { RadioCardButton } from "@/components/RadioCard";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseTag } from "@/Exercises/ExerciseTag";
-import { parseDate } from "@/functions/utils";
+import { makeId, parseDate } from "@/functions/utils";
 import { orm } from "@/orm";
 import { Exercise, Program } from "@/orm-types";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
-import { ProgramCard } from "@/Programs/ProgramsCard";
+import { ProgramCard } from "@/Programs/ProgramCard";
 import {
     currentDailyIdAtom,
     currentDateAtom,
@@ -196,7 +196,7 @@ const WithDaily = () => {
                 isDisabled={!isDailyToday || hasAtLeastOneExercise}
             />
             <Divider mt="4" />
-            {isDailyToday && (
+            {isDailyToday && !hasAtLeastOneExercise && (
                 <Box pos="relative">
                     <Text pos="absolute" top="0" p="4" color="gray.400" fontSize="small" fontStyle="italic">
                         You can update today's category as long as you haven't added any exercises.
@@ -223,8 +223,6 @@ const EmptyExerciseList = () => {
 
 const TodayEmptyExerciseList = () => {
     const [showProgramCombobox, setShowProgramCombobox] = useState(false);
-    const [selectedProgram, setSelectedProgram] = useState<Program>(null);
-    console.log(selectedProgram);
 
     return (
         <HFlex h="100%" justifyContent="center">
@@ -244,31 +242,62 @@ const TodayEmptyExerciseList = () => {
                     </Box>
                 )}
                 <Box alignSelf="center">
-                    <ReactLink to="/add-exercise">
+                    <ReactLink to="/exercise/add">
                         <RadioCardButton as="div" variant="solid">
                             Add exercise
                         </RadioCardButton>
                     </ReactLink>
                 </Box>
             </Stack>
-            {showProgramCombobox && (
-                <Stack alignSelf="center" mt="4" w="100%" px="4">
-                    <ProgramCombobox
-                        onSelectedItemChange={(changes) => setSelectedProgram(changes.selectedItem)}
-                        label={() => null}
-                        placeholder="Search for a program by name"
-                    />
-                    {selectedProgram && (
-                        <>
-                            <ProgramCard program={selectedProgram} defaultIsOpen />
-                            <Button leftIcon={<CheckIcon />} colorScheme="pink" variant="solid" py="4" mb="4" size="lg">
-                                Use this program
-                            </Button>
-                        </>
-                    )}
-                </Stack>
-            )}
+            {showProgramCombobox && <ProgramSearch />}
         </HFlex>
+    );
+};
+
+const ProgramSearch = () => {
+    const [selectedProgram, setSelectedProgram] = useState<Program>(null);
+
+    const dailyId = useAtomValue(currentDailyIdAtom);
+    const invalidate = useDailyInvalidate();
+
+    const useProgramMutation = useMutation(
+        async () => {
+            const program = await orm.program.find(selectedProgram.id);
+            return orm.daily.upsert(dailyId, (current) => ({
+                ...current,
+                programId: program.id,
+                exerciseList: current.exerciseList.concat(
+                    program.exerciseList.map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id }))
+                ),
+            }));
+        },
+        { onSuccess: invalidate }
+    );
+
+    return (
+        <Stack alignSelf="center" mt="4" w="100%" px="4">
+            <ProgramCombobox
+                onSelectedItemChange={(changes) => setSelectedProgram(changes.selectedItem)}
+                label={() => null}
+                placeholder="Search for a program by name"
+            />
+            {selectedProgram && (
+                <>
+                    <ProgramCard program={selectedProgram} defaultIsOpen />
+                    <Button
+                        leftIcon={<CheckIcon />}
+                        colorScheme="pink"
+                        variant="solid"
+                        py="4"
+                        mb="4"
+                        size="lg"
+                        onClick={useProgramMutation.mutate.bind(undefined)}
+                    >
+                        Use this program
+                    </Button>
+                </>
+            )}
+        </Stack>
     );
 };
 
@@ -314,7 +343,7 @@ const ExerciseList = () => {
             {/* bouton cardio done yes/no + confirmation */}
             <Divider my="4" />
             <Box alignSelf="center">
-                <ReactLink to="/add-exercise">
+                <ReactLink to="/exercise/add">
                     <RadioCardButton as="div">Add exercise</RadioCardButton>
                 </ReactLink>
             </Box>
