@@ -50,18 +50,22 @@ export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCard
             </Box>
             <Collapse in={isOpen} animateOpacity>
                 <Stack p="4" pl="2" w="100%" pos="relative">
-                    <UnorderedList color="grey" listStyleType="none">
-                        {program.exerciseList.map((exo) => (
-                            <ListItem key={exo.id}>
-                                - {exo.name} ({exo.series.length} set)
-                            </ListItem>
-                        ))}
-                    </UnorderedList>
+                    <ProgramCardExerciseList program={program} />
                 </Stack>
             </Collapse>
         </HFlex>
     );
 };
+
+export const ProgramCardExerciseList = ({ program }: { program: Program }) => (
+    <UnorderedList color="grey" listStyleType="none">
+        {program.exerciseList.map((exo) => (
+            <ListItem key={exo.id}>
+                - {exo.name} ({exo.series.length} set)
+            </ListItem>
+        ))}
+    </UnorderedList>
+);
 
 export type EditableProgramCardProps = ProgramCardProps & Pick<EditableProgramCardHeaderProps, "onEdit">;
 export const EditableProgramCard = ({ headerRight, ...props }: EditableProgramCardProps) => (
