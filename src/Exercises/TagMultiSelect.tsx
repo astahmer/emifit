@@ -1,5 +1,6 @@
 import { MultiSelect } from "@/components/MultiSelect";
-import { Categories, CategoryTag } from "@/constants";
+import { Categories } from "@/constants";
+import { Tag } from "@/orm-types";
 import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { Controller, ControllerProps } from "react-hook-form";
 
@@ -14,7 +15,7 @@ export function TagMultiSelect({
 }) {
     const isInvalid = Boolean(error);
     const category = Categories.find((cat) => cat.id === (catId as typeof Categories[number]["id"]));
-    const items = category.children as any as Array<CategoryTag>;
+    const items = category.children as any as Array<Tag>;
 
     return (
         <FormControl isInvalid={isInvalid}>

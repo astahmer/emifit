@@ -1,16 +1,11 @@
 import { uniques, uniquesByProp } from "@pastable/core";
+import { Tag } from "./orm-types";
 
 const SharedTags = [
     { id: "Machine", label: "Machine", group: "Type" },
     { id: "Freeweight", label: "Freeweight", group: "Type" },
     { id: "Bodyweight", label: "Bodyweight", group: "Type" },
 ] as const;
-
-export interface CategoryTag {
-    id: string;
-    label: string;
-    group: string;
-}
 
 export const Categories = [
     {
@@ -46,7 +41,7 @@ export const Categories = [
 export const CategoriesTags = uniquesByProp(
     Categories.reduce((acc, cat) => acc.concat(cat.children), []),
     "id"
-) as CategoryTag[];
+) as Tag[];
 export const CategoriesTagGroups = uniques(
     Categories.reduce((acc, cat) => acc.concat(cat.children.flatMap((tag) => tag.group)), [])
 ) as string[];

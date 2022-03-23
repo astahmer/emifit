@@ -16,6 +16,7 @@ export interface Serie {
 export interface Tag {
     id: string;
     label: string;
+    group: string;
 }
 
 export interface Program {
