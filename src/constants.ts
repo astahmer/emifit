@@ -1,4 +1,5 @@
 import { uniques, uniquesByProp } from "@pastable/core";
+import { groupIn } from "./functions/groupBy";
 import { Tag } from "./orm-types";
 
 const SharedTags = [
@@ -42,6 +43,7 @@ export const CategoriesTags = uniquesByProp(
     Categories.reduce((acc, cat) => acc.concat(cat.children), []),
     "id"
 ) as Tag[];
+export const CategoriesTagsById = groupIn(CategoriesTags, "id");
 export const CategoriesTagGroups = uniques(
     Categories.reduce((acc, cat) => acc.concat(cat.children.flatMap((tag) => tag.group)), [])
 ) as string[];
