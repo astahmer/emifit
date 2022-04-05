@@ -158,7 +158,7 @@ function ComboboxBase<Item = any>({
                     </InputRightElement>
                 </InputGroup>
                 <List
-                    display={isOpen ? null : "none"}
+                    display={isOpen && rowVirtualizer.virtualItems.length ? null : "none"}
                     py={2}
                     {...getMenuProps({ ref: parentRef })}
                     flex={1}
