@@ -1,6 +1,7 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { TextInput } from "@/components/TextInput";
+import { serializeExercise } from "@/functions/snapshot";
 import { onError } from "@/functions/toasts";
 import { orm } from "@/orm";
 import { Exercise, Serie } from "@/orm-types";
@@ -49,7 +50,7 @@ export const CreateExerciseForm = ({
         async (params: CreateExerciseParams) => {
             const row = makeExercise({ ...params, category: catId });
             if (shouldPersist) {
-                await orm.exercise.create(row);
+                await orm.exercise.create(serializeExercise(row));
             }
 
             return row;

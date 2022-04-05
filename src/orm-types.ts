@@ -41,3 +41,13 @@ export interface Daily {
     /** ex: cardio done yes/no */
     metadata?: string[];
 }
+
+export interface DailyWithReferences extends Omit<Daily, "exerciseList"> {
+    exerciseList: Exercise["id"][];
+}
+export interface ProgramWithReferences extends Omit<Program, "exerciseList"> {
+    exerciseList: Exercise["id"][];
+}
+export interface ExerciseWithReferences extends Omit<Exercise, "tags"> {
+    tags: Tag["id"][];
+}

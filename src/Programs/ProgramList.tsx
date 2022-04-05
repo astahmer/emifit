@@ -1,5 +1,5 @@
 import { orm } from "@/orm";
-import { setProgramsOrder, useProgramList } from "@/store";
+import { useProgramList } from "@/store";
 import { Box, type BoxProps } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
 import { ComponentProps, forwardRef, ForwardRefExoticComponent, useEffect, useMemo, useState } from "react";
@@ -20,7 +20,7 @@ export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">
     }, [programIdList]);
 
     const queryClient = useQueryClient();
-    const mutation = useMutation((ordered: string[]) => setProgramsOrder(ordered), {
+    const mutation = useMutation((ordered: string[]) => orm.programListOrder.key(ordered), {
         onSuccess: () => queryClient.invalidateQueries(orm.program.key),
     });
 

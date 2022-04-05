@@ -19,7 +19,7 @@ export const ExerciseAddPage = () => {
     const navigate = useNavigate();
     const updateDaily = useMutation(
         (exo: Exercise) =>
-            orm.daily.upsert(dailyId, (current) => ({ ...current, exerciseList: current.exerciseList.concat(exo) })),
+            orm.daily.upsert(dailyId, (current) => ({ ...current, exerciseList: current.exerciseList.concat(exo.id) })),
         {
             onSuccess: () => {
                 invalidate();
@@ -31,7 +31,7 @@ export const ExerciseAddPage = () => {
     return (
         <Box id="CreateExercisePage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
             <Heading as="h1">Add daily exercise</Heading>
-            <Box mt="auto">
+            <Box mt="auto" minH="0">
                 <CreateExerciseForm
                     catId={catId}
                     onSubmit={updateDaily.mutate}

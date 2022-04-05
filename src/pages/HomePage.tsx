@@ -15,6 +15,8 @@ import {
     showSkeletonsAtom,
     useDaily,
     useDailyInvalidate,
+    useHasProgram,
+    useProgramList,
 } from "@/store";
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
@@ -39,6 +41,8 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Fragment, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
+import { serializeDaily } from "@/functions/snapshot";
+import { groupIn } from "@/functions/groupBy";
 
 export const HomePage = () => {
     return (
@@ -223,6 +227,7 @@ const EmptyExerciseList = () => {
 
 const TodayEmptyExerciseList = () => {
     const [showProgramCombobox, setShowProgramCombobox] = useState(false);
+    const hasProgram = useHasProgram();
 
     return (
         <HFlex h="100%" justifyContent="center">
@@ -234,7 +239,7 @@ const TodayEmptyExerciseList = () => {
             </Box>
             <Divider mb="4" />
             <Stack direction="row" alignSelf="center">
-                {!showProgramCombobox && (
+                {!showProgramCombobox && hasProgram && (
                     <Box alignSelf="center">
                         <RadioCardButton as="div" onClick={() => setShowProgramCombobox(true)}>
                             Use program
@@ -263,12 +268,21 @@ const ProgramSearch = () => {
     const useProgramMutation = useMutation(
         async () => {
             const program = await orm.program.find(selectedProgram.id);
+            const exerciseList = await orm.exercise.get();
+            const exerciseListById = groupIn(exerciseList, "id");
+
+            const exerciseCloneList = program.exerciseList
+                .map((id) => exerciseListById[id])
+                .map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id }));
+            await orm.exercise.createMany(exerciseCloneList);
+
             return orm.daily.upsert(dailyId, (current) => ({
-                ...current,
-                programId: program.id,
-                exerciseList: current.exerciseList.concat(
-                    program.exerciseList.map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id }))
-                ),
+                ...serializeDaily({
+                    ...current,
+                    programId: program.id,
+                    exerciseList: [],
+                }),
+                exerciseList: current.exerciseList.concat(exerciseCloneList.map((exo) => exo.id)),
             }));
         },
         { onSuccess: invalidate }

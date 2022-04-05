@@ -1,6 +1,7 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
 import { HFlex } from "@/components/HFlex";
+import { serializeProgram } from "@/functions/snapshot";
 import { onError, successToast } from "@/functions/toasts";
 import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
@@ -75,7 +76,7 @@ export const EditableProgramCard = ({ headerRight, ...props }: EditableProgramCa
 type EditableProgramCardHeaderProps = Pick<ProgramCardProps, "program"> & { onEdit: (program: Program) => void };
 const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeaderProps) => {
     const queryClient = useQueryClient();
-    const deleteMutation = useMutation(async (program: Program) => orm.program.remove(program), {
+    const deleteMutation = useMutation(async (program: Program) => orm.program.remove(program.id), {
         onSuccess: () => {
             queryClient.invalidateQueries(orm.program.key);
             successToast(`Program <${program.name}> deleted`);
@@ -84,7 +85,14 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
     });
 
     const cloneMutation = useMutation(
-        async (program: Program) => orm.program.create({ ...program, id: makeId(), name: program.name + " (clone)" }),
+        async (program: Program) =>
+            orm.program.create(
+                serializeProgram({
+                    ...program,
+                    id: makeId(),
+                    name: program.name + " (clone)",
+                })
+            ),
         {
             onSuccess: () => {
                 queryClient.invalidateQueries(orm.program.key);
