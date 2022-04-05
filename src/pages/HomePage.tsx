@@ -118,8 +118,10 @@ const EmptyTodayDaily = () => {
     const invalidate = useDailyInvalidate();
 
     const createDaily = useMutation(
-        (category: string) =>
-            orm.daily.create(id, { id, category, date: new Date(), exerciseList: [], completedList: [] }),
+        (category: string) => {
+            const now = new Date();
+            return orm.daily.add({ id, category, date: now, time: now.getTime(), exerciseList: [], completedList: [] });
+        },
         { onSuccess: invalidate }
     );
 
@@ -143,18 +145,13 @@ const EmptyPastDay = () => {
     const [currentDate, setCurrentDate] = useAtom(currentDateAtom);
     const keysQuery = useQuery(["daily", "keys"], () => orm.daily.keys());
     const keys = keysQuery.data || [];
+    const lastFilledDaily = keys
+        .map((k) => parseDate(k.toString()))
+        .sort()
+        .reverse()
+        .find((d) => d < currentDate);
 
-    const mutation = useMutation(async () => {
-        const lastFilledDaily = keys
-            .map((k) => parseDate(k.toString()))
-            .sort()
-            .reverse()
-            .find((d) => d < currentDate);
-
-        if (lastFilledDaily) {
-            setCurrentDate(lastFilledDaily);
-        }
-    });
+    const mutation = useMutation(() => void setCurrentDate(lastFilledDaily));
 
     return (
         <>
@@ -166,7 +163,7 @@ const EmptyPastDay = () => {
                     </Alert>
                 </Box>
             </Box>
-            {keys.length ? (
+            {lastFilledDaily ? (
                 <>
                     <Divider mb="4" />
                     <Box alignSelf="center">
@@ -227,7 +224,7 @@ const EmptyExerciseList = () => {
 
 const TodayEmptyExerciseList = () => {
     const [showProgramCombobox, setShowProgramCombobox] = useState(false);
-    const hasProgram = useHasProgram();
+    const hasProgram = useHasProgram(); // TODO with category
 
     return (
         <HFlex h="100%" justifyContent="center">
@@ -265,6 +262,9 @@ const ProgramSearch = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
     const invalidate = useDailyInvalidate();
 
+    const query = useDaily();
+    const daily = query.data;
+
     const useProgramMutation = useMutation(
         async () => {
             const program = await orm.program.find(selectedProgram.id);
@@ -274,16 +274,22 @@ const ProgramSearch = () => {
             const exerciseCloneList = program.exerciseList
                 .map((id) => exerciseListById[id])
                 .map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id }));
-            await orm.exercise.createMany(exerciseCloneList);
 
-            return orm.daily.upsert(dailyId, (current) => ({
-                ...serializeDaily({
-                    ...current,
-                    programId: program.id,
-                    exerciseList: [],
-                }),
-                exerciseList: current.exerciseList.concat(exerciseCloneList.map((exo) => exo.id)),
-            }));
+            const tx = orm.exercise.tx("readwrite");
+            const insertMany = exerciseCloneList.map((exo) => tx.store.add(exo));
+
+            return Promise.all([
+                ...insertMany,
+                orm.daily.upsert(dailyId, (current) => ({
+                    ...serializeDaily({
+                        ...current,
+                        programId: program.id,
+                        exerciseList: [],
+                    }),
+                    exerciseList: current.exerciseList.concat(exerciseCloneList.map((exo) => exo.id)),
+                })),
+                tx.done,
+            ]);
         },
         { onSuccess: invalidate }
     );
@@ -292,6 +298,7 @@ const ProgramSearch = () => {
         <Stack alignSelf="center" mt="4" w="100%" px="4">
             <ProgramCombobox
                 onSelectedItemChange={(changes) => setSelectedProgram(changes.selectedItem)}
+                getItems={(items) => items.filter((prog) => prog.category === daily.category)}
                 label={() => null}
                 placeholder="Search for a program by name"
             />

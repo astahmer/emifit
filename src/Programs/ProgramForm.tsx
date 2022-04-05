@@ -15,14 +15,14 @@ export function ProgramForm() {
     const interpret = useProgramInterpret();
     const send = interpret.send;
 
-    const selectedExercisesId = useSelector(interpret, (s) => s.context.exerciseList);
-    const hasSelectedExercises = Boolean(selectedExercisesId.length);
+    const selectedExerciseList = useSelector(interpret, (s) => s.context.exerciseList);
+    const hasSelectedExercises = Boolean(selectedExerciseList.length);
 
     const category = useSelector(interpret, (s) => s.context.categoryId);
     const isCategorySelected = Boolean(category);
 
     const scopedExercises = exercises.filter((ex) => ex.category === category);
-    const hasExercises = Boolean(scopedExercises.length);
+    const hasExercises = Boolean(selectedExerciseList.length || scopedExercises.length);
 
     const onSubmit = (exercise: Exercise) => send({ type: "CreateExercise", exercise });
 

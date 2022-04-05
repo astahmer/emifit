@@ -31,7 +31,8 @@ export interface Program {
 
 export interface Daily {
     id: string;
-    date: Date | number;
+    date: Date;
+    time: number;
     category: string;
     exerciseList: Exercise[];
     /** Completed exerciseId list */

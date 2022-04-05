@@ -1,6 +1,7 @@
 import { Box, Button, Stack } from "@chakra-ui/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { SwitchInput } from "./components/SwitchInput";
+import { toasts } from "./functions/toasts";
 import { orm } from "./orm";
 import { currentDailyIdAtom, debugModeAtom, showSkeletonsAtom, useDailyInvalidate } from "./store";
 
@@ -13,7 +14,7 @@ export function DevTools() {
             as="footer"
             mt="auto"
             w="100%"
-            flexShrink="0"
+            flexShrink={0}
             position="fixed"
             bottom="0"
             left="0"
@@ -38,11 +39,26 @@ const DevToolsContent = () => {
             <SwitchInput label="With skeletons" onChange={(e) => setShowSkeletons(e.target.checked)} />
             <Button
                 onClick={() => {
-                    orm.daily.remove(dailyId);
+                    orm.daily.delete(dailyId);
                     invalidate();
                 }}
             >
                 Delete today's entry
+            </Button>
+            <Button
+                onClick={async () => {
+                    const info = toasts.info("Clearing DB...");
+                    await Promise.all([
+                        orm.db.clear(orm.daily.name),
+                        orm.db.clear(orm.exercise.name),
+                        orm.db.clear(orm.program.name),
+                    ]);
+                    toasts.success("Database cleared");
+                    toasts.close(info);
+                    invalidate();
+                }}
+            >
+                Reset DB
             </Button>
         </Stack>
     );

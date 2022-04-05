@@ -50,14 +50,14 @@ export const CreateExerciseForm = ({
         async (params: CreateExerciseParams) => {
             const row = makeExercise({ ...params, category: catId });
             if (shouldPersist) {
-                await orm.exercise.create(serializeExercise(row));
+                await orm.exercise.add(serializeExercise(row));
             }
 
             return row;
         },
         {
             onSuccess: (data) => {
-                queryClient.invalidateQueries(orm.exercise.key);
+                queryClient.invalidateQueries(orm.exercise.name);
                 onSubmit?.(data);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),

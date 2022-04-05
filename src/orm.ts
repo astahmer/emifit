@@ -1,47 +1,86 @@
-import { createStore, del, entries, get, keys, update, UseStore, values } from "idb-keyval";
+import { openDB } from "idb";
+import { del, get, update } from "idb-keyval";
 import { DailyWithReferences, ExerciseWithReferences, ProgramWithReferences } from "./orm-types";
+
+// https://www.npmjs.com/package/idb#opendb
+const version = Number(import.meta.env.VITE_APP_VERSION);
+const db = await openDB<EmifitSchema>("emifit-db", version, {
+    upgrade(db, oldVersion, newVersion, transaction) {
+        console.log(db, oldVersion, newVersion, transaction);
+        const daily = db.createObjectStore("daily", { keyPath: "id" });
+        daily.createIndex("by-time", "time");
+
+        const exercise = db.createObjectStore("exercise", { keyPath: "id" });
+        exercise.createIndex("by-name", "name");
+
+        const program = db.createObjectStore("program", { keyPath: "id" });
+        program.createIndex("by-name", "name");
+
+        db.createObjectStore("keyval");
+    },
+});
+
+interface EmifitSchema {
+    daily: {
+        key: DailyWithReferences["id"];
+        value: DailyWithReferences;
+        indexes: { "by-id": DailyWithReferences["id"] };
+    };
+    program: {
+        key: ProgramWithReferences["id"];
+        value: ProgramWithReferences;
+        indexes: { "by-name": ProgramWithReferences["name"] };
+    };
+    exercise: {
+        key: ExerciseWithReferences["id"];
+        value: ExerciseWithReferences;
+        indexes: { "by-name": ExerciseWithReferences["name"] };
+    };
+    keyval: {
+        value: any;
+        key: number;
+    };
+}
 
 interface Entity {
     id: string;
 }
 
-const makeListCrud = <T extends Entity = Entity, Key extends string = string>(key: Key) => {
-    const createFn = (value: T) => update<T[]>(key, (current) => [...(current || []), value]);
-    const updateFn = (value: T) =>
-        update<T[]>(key, (current) => (current || []).map((v) => (v.id === value.id ? value : v)));
-
+const makeStore = <T extends Entity = Entity, Key extends keyof EmifitSchema = keyof EmifitSchema>(name: Key) => {
     return {
-        type: "list" as const,
-        key,
-        get: async () => (await get<T[]>(key)) || [],
-        find: async (id: Entity["id"]) => (await get<T[]>(key)).find((v) => v.id === id),
-        create: createFn,
-        createMany: (values: T[]) => update<T[]>(key, (current) => [...(current || []), ...values]),
-        update: updateFn,
-        upsert: (value: T) => (value.id ? updateFn(value) : createFn(value)),
-        remove: (id: Entity["id"]) => update<T[]>(key, (current) => (current || []).filter((v) => v.id !== id)),
-        // createMany
-        // updateMany
-    };
-};
+        name,
+        tx: (mode?: IDBTransactionMode, options?: IDBTransactionOptions) => db.transaction(name, mode, options),
+        find: (id: T["id"]) => db.get(name, id) as Promise<T>,
+        get: (() => db.getAll(name)) as () => Promise<T[]>,
+        keys: () => db.getAllKeys(name),
+        count: () => db.count(name),
+        getLast: async () => {
+            const tx = db.transaction(name);
+            const index = tx.store.index("by-id");
+            let last;
 
-const makeDynamicCrud = <T extends Entity = Entity>(store: UseStore) => {
-    return {
-        type: "dynamic" as const,
-        get: (key: string) => get<T>(key, store),
-        keys: () => keys(store),
-        values: () => values<T>(store),
-        entries: () => entries<string, T>(store),
-        create: (key: string, value: T) => update<T>(key, () => value, store),
-        upsert: (key: string, setterOrUpdate: Partial<T> | ((current: T) => T)) =>
-            update<T>(
-                key,
-                typeof setterOrUpdate === "function"
-                    ? setterOrUpdate
-                    : (current) => ({ ...current, ...setterOrUpdate }),
-                store
-            ),
-        remove: (key: string) => del(key, store),
+            // TODO
+            for await (const cursor of index.iterate(undefined, "prev")) {
+                console.log(cursor.value);
+                // Skip the next item
+                cursor.advance(2);
+                last = cursor.value;
+                console.log(cursor.value);
+            }
+
+            return last;
+        },
+        add: (value: T) => db.add(name, value),
+        update: (value: T) => db.put(name, value),
+        upsert: async (key: string, setterOrUpdate: Partial<T> | ((current: T) => T)) => {
+            const tx = db.transaction(name, "readwrite");
+            const current = (await tx.store.get(key)) as T;
+            const update =
+                typeof setterOrUpdate === "function" ? setterOrUpdate(current) : { ...current, ...setterOrUpdate };
+            await tx.store.put(update);
+            return tx.done;
+        },
+        delete: (id: T["id"]) => db.delete(name, id),
     };
 };
 
@@ -55,11 +94,23 @@ const makeKeyValue = <T, Key extends string = string>(key: Key) => {
     };
 };
 
-const dailyStore = createStore("emifit", "daily");
-
 export const orm = {
-    exercise: makeListCrud<ExerciseWithReferences, "exerciseList">("exerciseList"),
-    program: makeListCrud<ProgramWithReferences, "programList">("programList"),
+    db,
+    version,
+    exercise: makeStore<ExerciseWithReferences>("exercise"),
+    program: makeStore<ProgramWithReferences>("program"),
+    daily: makeStore<DailyWithReferences>("daily"),
     programListOrder: makeKeyValue<string[], "programListOrder">("programListOrder"),
-    daily: makeDynamicCrud<DailyWithReferences>(dailyStore),
 };
+
+interface IDBTransactionOptions {
+    /**
+     * The durability of the transaction.
+     *
+     * The default is "default". Using "relaxed" provides better performance, but with fewer
+     * guarantees. Web applications are encouraged to use "relaxed" for ephemeral data such as caches
+     * or quickly changing records, and "strict" in cases where reducing the risk of data loss
+     * outweighs the impact to performance and power.
+     */
+    durability?: "default" | "strict" | "relaxed";
+}

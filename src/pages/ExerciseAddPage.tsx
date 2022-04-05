@@ -19,7 +19,10 @@ export const ExerciseAddPage = () => {
     const navigate = useNavigate();
     const updateDaily = useMutation(
         (exo: Exercise) =>
-            orm.daily.upsert(dailyId, (current) => ({ ...current, exerciseList: current.exerciseList.concat(exo.id) })),
+            orm.daily.upsert(dailyId, (current) => ({
+                ...current,
+                exerciseList: (current.exerciseList || []).concat(exo.id),
+            })),
         {
             onSuccess: () => {
                 invalidate();

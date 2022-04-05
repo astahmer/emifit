@@ -20,8 +20,8 @@ export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">
     }, [programIdList]);
 
     const queryClient = useQueryClient();
-    const mutation = useMutation((ordered: string[]) => orm.programListOrder.key(ordered), {
-        onSuccess: () => queryClient.invalidateQueries(orm.program.key),
+    const mutation = useMutation((ordered: string[]) => orm.programListOrder.set(ordered), {
+        onSuccess: () => queryClient.invalidateQueries(orm.program.name),
     });
 
     return (

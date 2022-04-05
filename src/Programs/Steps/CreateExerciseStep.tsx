@@ -30,7 +30,7 @@ export function CreateExerciseStep({
             <CreateExerciseForm
                 catId={category}
                 onSubmit={onSubmit}
-                // shouldPersist={false}
+                shouldPersist={false}
                 renderSubmit={(form) => {
                     const [name, tags] = form.watch(["name", "tags"]);
 

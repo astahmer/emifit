@@ -2,7 +2,6 @@ import { sortArrayOfObjectByPropFromArray, sortBy } from "@pastable/core";
 import { CalendarDate } from "@uselessdev/datepicker";
 import { isToday } from "date-fns";
 import { createBrowserHistory } from "history";
-import { getMany } from "idb-keyval";
 import { atom, useAtomValue } from "jotai";
 import { useQuery, useQueryClient } from "react-query";
 import { groupBy, groupIn } from "./functions/groupBy";
@@ -10,7 +9,6 @@ import { computeExerciseFromExoId, computeExerciseFromIncompleteExo } from "./fu
 import { makeId, printDate } from "./functions/utils";
 import { orm } from "./orm";
 import { Exercise, Program } from "./orm-types";
-import { AwaitFn } from "./types";
 
 export const browserHistory = createBrowserHistory({ window });
 export const debugModeAtom = atom<boolean>(false);
@@ -24,7 +22,7 @@ export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
 export const useDaily = () => {
     const id = useAtomValue(currentDailyIdAtom);
     const query = useQuery(["daily", id], async () => {
-        const daily = await orm.daily.get(id);
+        const daily = await orm.daily.find(id);
         if (!daily) return daily;
 
         const exerciseList = await orm.exercise.get();
@@ -45,7 +43,7 @@ export const useDailyInvalidate = () => {
 
 export const useExercises = () =>
     useQuery<Exercise[]>(
-        orm.exercise.key,
+        orm.exercise.name,
         async () => {
             const list = await orm.exercise.get();
             return list.map(computeExerciseFromIncompleteExo);
@@ -60,31 +58,25 @@ export const useExerciseList = () => {
 };
 
 export const useHasProgram = () =>
-    Boolean(useQuery([orm.program.key, "hasProgram"], async () => (await orm.program.get())?.length).data);
+    Boolean(useQuery([orm.program.name, "hasProgram"], async () => Boolean(await orm.program.count())).data);
 
 export const useProgramList = () => {
     const listQ = useQuery<Program[]>(
-        orm.program.key,
+        orm.program.name,
         async () => {
-            const [programList, exerciseList, order] = await (getMany([
-                orm.program.key,
-                orm.exercise.key,
-                orm.programListOrder.key,
-            ]) as Promise<
-                [
-                    AwaitFn<typeof orm.program.get>,
-                    AwaitFn<typeof orm.exercise.get>,
-                    AwaitFn<typeof orm.programListOrder.get>
-                ]
-            >);
-            const exerciseListById = groupIn(exerciseList, "id");
+            const [programList, exerciseList, programListOrder] = await Promise.all([
+                orm.program.get(),
+                orm.exercise.get(),
+                orm.programListOrder.get(),
+            ]);
+            const exerciseListById = groupIn(exerciseList || [], "id");
             return sortArrayOfObjectByPropFromArray(
                 (programList || []).map((p) => ({
                     ...p,
                     exerciseList: p.exerciseList.map(computeExerciseFromExoId(exerciseListById)),
                 })),
                 "id",
-                order || []
+                programListOrder || []
             );
         },
         { initialData: [] }

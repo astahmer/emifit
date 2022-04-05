@@ -27,7 +27,7 @@ export function makeToast(title: string, options?: ToastOptions): ReturnType<typ
 export function makeToast(options: ToastOptions): ReturnType<typeof toast>;
 export function makeToast(titleOrOptions: string | ToastOptions, options?: ToastOptions): ReturnType<typeof toast> {
     const title = typeof titleOrOptions === "string" ? titleOrOptions : "";
-    const config = (typeof titleOrOptions === "string" ? options : titleOrOptions) || { title };
+    const config = (typeof titleOrOptions === "string" ? { ...options, title } : titleOrOptions) || { title };
 
     if (config.uniqueId) {
         config.id = getRandomString(10);
@@ -48,7 +48,7 @@ export function defaultToast(
     options?: ToastOptions
 ): ReturnType<typeof makeToast> {
     const title = typeof titleOrOptions === "string" ? titleOrOptions : "";
-    const config = (typeof titleOrOptions === "string" ? options : titleOrOptions) || { title };
+    const config = (typeof titleOrOptions === "string" ? { ...options, title } : titleOrOptions) || { title };
     return makeToast({ ...toastConfigs.default, ...config });
 }
 export function successToast(title: string, options?: ToastOptions): ReturnType<typeof makeToast>;
@@ -58,7 +58,7 @@ export function successToast(
     options?: ToastOptions
 ): ReturnType<typeof makeToast> {
     const title = typeof titleOrOptions === "string" ? titleOrOptions : "";
-    const config = (typeof titleOrOptions === "string" ? options : titleOrOptions) || { title };
+    const config = (typeof titleOrOptions === "string" ? { ...options, title } : titleOrOptions) || { title };
     return makeToast({ ...toastConfigs.success, unique: false, ...config });
 }
 export function errorToast(title: string, options?: ToastOptions): ReturnType<typeof makeToast>;
@@ -68,7 +68,7 @@ export function errorToast(
     options?: ToastOptions
 ): ReturnType<typeof makeToast> {
     const title = typeof titleOrOptions === "string" ? titleOrOptions : "";
-    const config = (typeof titleOrOptions === "string" ? options : titleOrOptions) || { title };
+    const config = (typeof titleOrOptions === "string" ? { ...options, title } : titleOrOptions) || { title };
     return makeToast({ title: "Une erreur est survenue", ...toastConfigs.error, ...config });
 }
 
@@ -76,7 +76,7 @@ export function infoToast(title: string, options?: ToastOptions): ReturnType<typ
 export function infoToast(options: ToastOptions): ReturnType<typeof makeToast>;
 export function infoToast(titleOrOptions: string | ToastOptions, options?: ToastOptions): ReturnType<typeof makeToast> {
     const title = typeof titleOrOptions === "string" ? titleOrOptions : "";
-    const config = (typeof titleOrOptions === "string" ? options : titleOrOptions) || { title };
+    const config = (typeof titleOrOptions === "string" ? { ...options, title } : titleOrOptions) || { title };
     return makeToast({ ...toastConfigs.info, ...config });
 }
 
@@ -87,11 +87,12 @@ export function warningToast(
     options?: ToastOptions
 ): ReturnType<typeof makeToast> {
     const title = typeof titleOrOptions === "string" ? titleOrOptions : "";
-    const config = (typeof titleOrOptions === "string" ? options : titleOrOptions) || { title };
+    const config = (typeof titleOrOptions === "string" ? { ...options, title } : titleOrOptions) || { title };
     return makeToast({ ...toastConfigs.warning, ...config });
 }
 
 export const toasts = {
+    close: toast.close,
     default: defaultToast,
     success: successToast,
     error: errorToast,

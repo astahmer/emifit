@@ -1,3 +1,4 @@
+import { serializeExercise } from "@/functions/snapshot";
 import { onError, successToast } from "@/functions/toasts";
 import { makeId, rmTrailingSlash } from "@/functions/utils";
 import { mergeMeta, printStatesPathValue } from "@/functions/xstate-utils";
@@ -29,22 +30,30 @@ export const ProgramsPage = () => {
             confetti();
             successToast(`Program <${ctx.programName}> ${isEditing ? "updated" : "created"}`);
 
+            const tx = orm.exercise.tx("readwrite");
+            const newExos = ctx.exerciseList.map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id }));
+            const insertMany = newExos.map((exo) => tx.store.add(serializeExercise(exo)));
+
             const params = {
                 ...currentProgram,
                 name: ctx.programName,
                 category: ctx.categoryId,
-                exerciseList: ctx.exerciseList.map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id })),
+                exerciseList: newExos.map((exo) => exo.id),
             };
             const now = new Date();
             if (params.id) {
-                return orm.program.update({ ...params, updatedAt: now });
+                return Promise.all([...insertMany, orm.program.update({ ...params, updatedAt: now }), tx.done]);
             }
 
-            return orm.program.create({ ...params, id: makeId(), createdAt: now, updatedAt: now });
+            return Promise.all([
+                ...insertMany,
+                orm.program.update({ ...params, id: makeId(), createdAt: now, updatedAt: now }),
+                tx.done,
+            ]);
         },
         {
             onSuccess: (data) => {
-                queryClient.invalidateQueries(orm.program.key);
+                queryClient.invalidateQueries(orm.program.name);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
         }

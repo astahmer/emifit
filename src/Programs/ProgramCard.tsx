@@ -76,9 +76,9 @@ export const EditableProgramCard = ({ headerRight, ...props }: EditableProgramCa
 type EditableProgramCardHeaderProps = Pick<ProgramCardProps, "program"> & { onEdit: (program: Program) => void };
 const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeaderProps) => {
     const queryClient = useQueryClient();
-    const deleteMutation = useMutation(async (program: Program) => orm.program.remove(program.id), {
+    const deleteMutation = useMutation(async (program: Program) => orm.program.delete(program.id), {
         onSuccess: () => {
-            queryClient.invalidateQueries(orm.program.key);
+            queryClient.invalidateQueries(orm.program.name);
             successToast(`Program <${program.name}> deleted`);
         },
         onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
@@ -86,7 +86,7 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
 
     const cloneMutation = useMutation(
         async (program: Program) =>
-            orm.program.create(
+            orm.program.add(
                 serializeProgram({
                     ...program,
                     id: makeId(),
@@ -95,7 +95,7 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
             ),
         {
             onSuccess: () => {
-                queryClient.invalidateQueries(orm.program.key);
+                queryClient.invalidateQueries(orm.program.name);
                 successToast(`Program <${program.name}> cloned`);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),

@@ -27,12 +27,15 @@ export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[
     const interpret = useProgramInterpret();
     const catId = useSelector(interpret, (s) => s.context.categoryId);
     const exerciseList = useSelector(interpret, (s) => s.context.exerciseList);
+    const names = exerciseList.map((exo) => exo.name);
 
     const { getCheckboxProps } = useCheckboxGroup({ onChange, defaultValue: exerciseList.map((ex) => ex.id) });
 
     return (
         <Accordion allowToggle w="100%">
             {exercises
+                .filter((exo) => !names.includes(exo.name))
+                .concat(exerciseList)
                 .filter((ex) => ex.category === catId)
                 .map((exercise) => (
                     <ExerciseAccordion key={exercise.id} exercise={exercise} getCheckboxProps={getCheckboxProps} />

@@ -5,7 +5,14 @@ import { FormControl, FormErrorMessage, FormLabel, forwardRef } from "@chakra-ui
 
 export const ProgramCombobox = forwardRef(
     (
-        { error, ...props }: Omit<ComboboxProps, "items" | "getValue" | "itemToString" | "label"> & { error?: string },
+        {
+            error,
+            getItems,
+            ...props
+        }: Omit<ComboboxProps, "items" | "getValue" | "itemToString" | "label"> & {
+            error?: string;
+            getItems?: (items: Program[]) => Program[];
+        },
         ref
     ) => {
         const items = useProgramList();
@@ -18,7 +25,7 @@ export const ProgramCombobox = forwardRef(
                     ref={ref}
                     getValue={(item: Program) => item.id}
                     itemToString={(item) => (item ? `${item.name}` : "")}
-                    items={items}
+                    items={getItems?.(items) || items}
                 />
 
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
