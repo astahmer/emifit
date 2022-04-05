@@ -3,6 +3,7 @@ import { CalendarDefaultTheme } from "@uselessdev/datepicker";
 import { useSetAtom } from "jotai";
 import { useHotkeys } from "react-hotkeys-hook";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 import { Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import "./App.css";
 import { BottomTabs } from "./components/BottomTabs";
@@ -36,8 +37,11 @@ function App() {
                                 <Route path="/programs/*" element={<ProgramsPage />} />
                             </Routes>
                         </Flex>
-                        <Box as="footer" mt="auto" w="100%" flexShrink="0">
+                        <Box as="footer" mt="auto" w="100%" flexShrink={0}>
                             <BottomTabs />
+                        </Box>
+                        <Box pos="fixed" bottom="70px">
+                            <ReactQueryDevtools toggleButtonProps={{ style: { position: "absolute" } }} />
                         </Box>
                         <DevTools />
                     </Flex>
