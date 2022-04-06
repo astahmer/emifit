@@ -9,15 +9,15 @@ import { Box, Button, Divider, Heading } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const ExerciseEditPage = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
-    const [params] = useSearchParams();
-    const exerciseId = params.get("exerciseId");
+    const { id: exerciseId } = useParams<{ id: string }>();
 
     const query = useDaily();
     const daily = query.data;
+    const exercise = daily?.exerciseList.find((exo) => exo.id === exerciseId);
 
     const navigate = useNavigate();
     const editExerciseById = useMutation(
@@ -43,10 +43,12 @@ export const ExerciseEditPage = () => {
                 {dailyId} - {daily?.category}
             </Heading>
             <Box mt="auto" minH="0">
-                {daily && (
+                {daily && exercise && (
                     <CreateExerciseForm
                         category={daily.category}
                         onSubmit={editExerciseById.mutate}
+                        defaultValues={{ ...exercise, nbSeries: exercise.series.length }}
+                        shouldPersist={false}
                         renderSubmit={(form) => {
                             const [name, tags] = form.watch(["name", "tags"]);
 

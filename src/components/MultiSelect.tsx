@@ -12,9 +12,9 @@ import {
     Text,
     useMergeRefs,
 } from "@chakra-ui/react";
-import { ObjectLiteral } from "@pastable/core";
+import { isDefined, ObjectLiteral } from "@pastable/core";
 import { useSelect, UseSelectProps, UseSelectReturnValue } from "downshift";
-import React, { ForwardedRef, forwardRef, ReactNode, useCallback, useRef, useState } from "react";
+import { ForwardedRef, forwardRef, ReactNode, useCallback, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";
 
 export const MultiSelect = forwardRef<HTMLSelectElement, MultiSelectProps<any, true>>((props, ref) => (
@@ -39,9 +39,11 @@ interface MultiSelectBaseProps<Item, IsMulti extends boolean = undefined> {
     renderList?: (props: ListComponentProps<IsMulti, Item> & { ListComponent: typeof ListComponent }) => ReactNode;
     isOpen?: boolean;
     groupByKeyGetter?: (item: Item) => string | number;
+    defaultValue?: true extends IsMulti ? Item[] : Item;
+    value?: true extends IsMulti ? Item[] : Item;
 }
 
-type MultiSelectProps<Item, IsMulti extends boolean = undefined> = MultiSelectBaseProps<Item, IsMulti> & {
+export type MultiSelectProps<Item, IsMulti extends boolean = undefined> = MultiSelectBaseProps<Item, IsMulti> & {
     listProps?: ListProps;
 } & Pick<UseSelectProps<Item>, "itemToString"> &
     Pick<ButtonProps, "onBlur">;
@@ -62,8 +64,12 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
     listProps,
     isOpen: isOpenProp,
     groupByKeyGetter,
+    defaultValue,
+    value,
 }: MultiSelectProps<Item, IsMulti>) {
-    const [selection, setSelection] = useState(isMulti ? [] : null);
+    const [innerSelection, setSelection] = useState((value ?? defaultValue ?? (isMulti ? [] : null)) as any[]);
+    const isControlled = isDefined(value);
+    const selection = (isControlled ? value : innerSelection) as any[];
     const parentRef = useRef();
 
     const { isOpen, getToggleButtonProps, getLabelProps, getMenuProps, highlightedIndex, getItemProps } =
@@ -71,10 +77,10 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
             isOpen: isOpenProp,
             ...(isMulti ? { stateReducer } : undefined),
             items,
-            selectedItem: isMulti ? ([] as any) : (null as Item),
+            selectedItem: selection as any,
             onSelectedItemChange: ({ selectedItem }) => {
                 if (!isMulti) return onChange(selectedItem as any);
-                if (!selectedItem) return;
+                if (!selectedItem) return onChange(selectedItem as any);
 
                 const index = selection.findIndex((selected) => getValue(selected) === getValue(selectedItem));
                 let update: Item[];
@@ -86,7 +92,10 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
                     update = [...selection, selectedItem];
                 }
 
-                setSelection(update);
+                if (!isControlled) {
+                    setSelection(update);
+                }
+
                 onChange(update as any);
             },
         });

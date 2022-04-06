@@ -39,6 +39,7 @@ function ComboboxBase<Item = any>({
     getValue = (item) => String(item as any),
     itemToString = (item) => String(item as any),
     onSelectedItemChange,
+    defaultValue,
     ...props
 }: ComboboxProps<Item>) {
     const [inputItems, setInputItems] = useState(items);
@@ -89,6 +90,7 @@ function ComboboxBase<Item = any>({
         selectItem,
         selectedItem,
     } = useCombobox({
+        initialInputValue: defaultValue as string,
         stateReducer,
         itemToString,
         items: inputItems,

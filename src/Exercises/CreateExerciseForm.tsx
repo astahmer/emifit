@@ -21,14 +21,14 @@ import { useMutation, useQueryClient } from "react-query";
 import { ExerciseCombobox } from "./ExerciseCombobox";
 import { TagMultiSelect } from "./TagMultiSelect";
 
-const defaultValues: Pick<Exercise, "name" | "tags" | "series"> & { nbSeries: number } = {
+const formDefaultValues: Pick<Exercise, "name" | "tags" | "series"> & { nbSeries: number } = {
     name: "",
     nbSeries: 1,
     tags: [],
     series: [makeSerie(0)] as Serie[],
 };
 
-type CreateExerciseParams = Omit<typeof defaultValues, "nbSeries"> & { category: string };
+type CreateExerciseParams = Omit<typeof formDefaultValues, "nbSeries"> & { category: string };
 
 const required = { value: true, message: "This field is required" };
 
@@ -36,14 +36,17 @@ export const CreateExerciseForm = ({
     renderSubmit,
     category,
     onSubmit,
+    defaultValues = formDefaultValues,
     shouldPersist = true,
 }: {
     category: string;
     onSubmit?: (data: Exercise) => void;
-    renderSubmit?: (form: UseFormReturn<typeof defaultValues>) => ReactNode;
+    renderSubmit?: (form: UseFormReturn<typeof formDefaultValues>) => ReactNode;
     shouldPersist?: boolean;
+    defaultValues?: typeof formDefaultValues;
 }) => {
     const form = useForm({ defaultValues });
+    console.log(defaultValues, form.getValues());
 
     const queryClient = useQueryClient();
     const mutation = useMutation(
@@ -64,7 +67,7 @@ export const CreateExerciseForm = ({
         }
     );
 
-    const onCreate = ({ nbSeries, ...params }: typeof defaultValues) =>
+    const onCreate = ({ nbSeries, ...params }: typeof formDefaultValues) =>
         mutation.mutate(makeExercise({ ...params, category }));
 
     return (
@@ -126,7 +129,7 @@ export const CreateExerciseForm = ({
     );
 };
 
-const WeightForm = ({ form }: { form: UseFormReturn<typeof defaultValues> }) => {
+const WeightForm = ({ form }: { form: UseFormReturn<typeof formDefaultValues> }) => {
     const [nbSeries] = form.watch(["nbSeries"]);
     const series = useFieldArray({ control: form.control, name: "series" });
 
@@ -168,9 +171,9 @@ const SeriesForm = ({
 }: {
     index: number;
     serie: Serie;
-    series: UseFieldArrayReturn<typeof defaultValues, "series">;
+    series: UseFieldArrayReturn<typeof formDefaultValues, "series">;
 }) => {
-    const form = useFormContext<typeof defaultValues>();
+    const form = useFormContext<typeof formDefaultValues>();
     const getSerie = () => series.fields[index];
     const deleteSerie = () => {
         form.setValue("nbSeries", form.getValues().nbSeries - 1);
