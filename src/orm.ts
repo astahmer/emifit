@@ -1,24 +1,29 @@
-import { openDB } from "idb";
+import { IDBPDatabase, openDB } from "idb";
 import { del, get, update } from "idb-keyval";
 import { DailyWithReferences, ExerciseWithReferences, ProgramWithReferences } from "./orm-types";
 
 // https://www.npmjs.com/package/idb#opendb
 const version = Number(import.meta.env.VITE_APP_VERSION);
-const db = await openDB<EmifitSchema>("emifit-db", version, {
-    upgrade(db, oldVersion, newVersion, transaction) {
-        console.log(db, oldVersion, newVersion, transaction);
-        const daily = db.createObjectStore("daily", { keyPath: "id" });
-        daily.createIndex("by-time", "time");
+let db: IDBPDatabase<EmifitSchema>;
 
-        const exercise = db.createObjectStore("exercise", { keyPath: "id" });
-        exercise.createIndex("by-name", "name");
+export async function makeDb() {
+    db = await openDB<EmifitSchema>("emifit-db", version, {
+        upgrade(db, oldVersion, newVersion, transaction) {
+            console.log(db, oldVersion, newVersion, transaction);
+            const daily = db.createObjectStore("daily", { keyPath: "id" });
+            daily.createIndex("by-time", "time");
 
-        const program = db.createObjectStore("program", { keyPath: "id" });
-        program.createIndex("by-name", "name");
+            const exercise = db.createObjectStore("exercise", { keyPath: "id" });
+            exercise.createIndex("by-name", "name");
 
-        db.createObjectStore("keyval");
-    },
-});
+            const program = db.createObjectStore("program", { keyPath: "id" });
+            program.createIndex("by-name", "name");
+
+            db.createObjectStore("keyval");
+        },
+    });
+    return db;
+}
 
 interface EmifitSchema {
     daily: {
