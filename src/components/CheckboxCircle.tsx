@@ -27,7 +27,6 @@ export function CheckboxCircle({ getIconProps, checkboxRef, ...props }: Checkbox
                 icon={isChecked ? <CheckCircleIcon fontSize="x-large" /> : undefined}
                 variant="outline"
                 rounded="full"
-                mr="2"
                 {...getCheckboxProps()}
                 {...getIconProps?.(state)}
             />
@@ -44,8 +43,8 @@ const getSquareIconProps = (state: CheckboxState) => ({
     rounded: "none",
     icon: state.isChecked ? <CheckIcon fontSize="lg" /> : undefined,
 });
-export const CheckboxSquare = (props: CheckboxCircleProps) => (
-    <CheckboxCircle getIconProps={getSquareIconProps} {...props} />
+export const CheckboxSquare = ({ getIconProps, ...props }: CheckboxCircleProps) => (
+    <CheckboxCircle getIconProps={(s) => ({ ...getIconProps?.(s), ...getSquareIconProps(s) })} {...props} />
 );
 
 export const CheckboxButton = ({ isActive, ...props }: IconButtonProps & { isActive: boolean }) => {

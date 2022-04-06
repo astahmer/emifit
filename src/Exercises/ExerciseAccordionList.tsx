@@ -52,7 +52,7 @@ const ExerciseAccordion = ({
         <AccordionItem w="100%">
             <AccordionButton w="100%">
                 <Stack direction="row" alignItems="center" w="100%">
-                    <CheckboxSquare {...getCheckboxProps({ value: exercise.id })} />
+                    <CheckboxSquare getIconProps={() => ({ mr: "2" })} {...getCheckboxProps({ value: exercise.id })} />
                     <Stack alignItems="flex-start" w="100%">
                         <Text>{exercise.name}</Text>
                         {Boolean(exercise.tags?.length) && (
