@@ -13,6 +13,7 @@ import { orm } from "@/orm";
 import { Exercise, Program } from "@/orm-types";
 import { ProgramCard } from "@/Programs/ProgramCard";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
+import { routeMap } from "@/routes";
 import {
     currentDailyIdAtom,
     currentDateAtom,
@@ -49,7 +50,7 @@ import { addDays, isFuture } from "date-fns";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Fragment, useState } from "react";
 import { useMutation, useQuery } from "react-query";
-import { Link as ReactLink } from "react-router-dom";
+import { Link as ReactLink, useNavigate } from "react-router-dom";
 
 export const HomePage = () => {
     return (
@@ -454,11 +455,15 @@ const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
         }
     );
 
+    const navigate = useNavigate();
+
     return (
         <Menu strategy="fixed">
             <MenuButton as={DotsIconButton} ml="auto" mt="2" aria-label="menu" />
             <MenuList>
-                <MenuItem icon={<EditIcon />}>Edit daily exercise</MenuItem>
+                <MenuItem icon={<EditIcon />} onClick={() => navigate(routeMap.home)}>
+                    Edit daily exercise
+                </MenuItem>
                 <ConfirmationButton
                     renderTrigger={(onOpen) => (
                         <MenuItem icon={<DeleteIcon />} onClick={onOpen}>

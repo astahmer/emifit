@@ -34,11 +34,11 @@ const required = { value: true, message: "This field is required" };
 
 export const CreateExerciseForm = ({
     renderSubmit,
-    catId,
+    category,
     onSubmit,
     shouldPersist = true,
 }: {
-    catId: string;
+    category: string;
     onSubmit?: (data: Exercise) => void;
     renderSubmit?: (form: UseFormReturn<typeof defaultValues>) => ReactNode;
     shouldPersist?: boolean;
@@ -48,7 +48,7 @@ export const CreateExerciseForm = ({
     const queryClient = useQueryClient();
     const mutation = useMutation(
         async (params: CreateExerciseParams) => {
-            const row = makeExercise({ ...params, category: catId });
+            const row = makeExercise({ ...params, category });
             if (shouldPersist) {
                 await orm.exercise.add(serializeExercise(row));
             }
@@ -65,7 +65,7 @@ export const CreateExerciseForm = ({
     );
 
     const onCreate = ({ nbSeries, ...params }: typeof defaultValues) =>
-        mutation.mutate(makeExercise({ ...params, category: catId }));
+        mutation.mutate(makeExercise({ ...params, category }));
 
     return (
         <FormProvider {...form}>
@@ -80,12 +80,15 @@ export const CreateExerciseForm = ({
             >
                 <Box h="100%" minH={0}>
                     <Stack p="8" pt="4" overflow="auto" h="100%" minH={0}>
-                        <ExerciseCombobox {...form.register("name", { required })} />
+                        <ExerciseCombobox
+                            {...form.register("name", { required })}
+                            getItems={(items) => items.filter((exo) => exo.category === category)}
+                        />
                         <TagMultiSelect
                             control={form.control}
                             name="tags"
                             rules={{ required }}
-                            catId={catId}
+                            catId={category}
                             error={(form.formState.errors.tags as any)?.message}
                         />
                         <TextInput

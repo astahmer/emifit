@@ -28,7 +28,7 @@ export function CreateExerciseStep({
                 Create an exercise :
             </Heading>
             <CreateExerciseForm
-                catId={category}
+                category={category}
                 onSubmit={onSubmit}
                 shouldPersist={false}
                 renderSubmit={(form) => {

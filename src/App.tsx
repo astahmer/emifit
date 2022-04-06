@@ -12,10 +12,12 @@ import { BottomTabs } from "./components/BottomTabs";
 import { DevTools } from "./DevTools";
 import { makeDb } from "./orm";
 import { ExerciseAddPage } from "./pages/ExerciseAddPage";
+import { ExerciseEditPage } from "./pages/ExerciseEditPage";
 import { HomePage } from "./pages/HomePage";
 import { ProgramsPage } from "./pages/ProgramsPage";
 import { ProgressPage } from "./pages/ProgressPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { routeMap } from "./routes";
 import { debugModeAtom, browserHistory } from "./store";
 
 const queryClient = new QueryClient();
@@ -33,12 +35,12 @@ function App() {
                         <Flex as="main" direction="column" boxSize="100%">
                             <Flex as="section" id="View" direction="column" h="100%" overflow="hidden">
                                 <Routes>
-                                    <Route path="/" element={<HomePage />} />
-                                    <Route path="/exercise/add" element={<ExerciseAddPage />} />
-                                    <Route path="/exercise/edit/:id" element={<ExerciseAddPage />} />
-                                    <Route path="/progress" element={<ProgressPage />} />
-                                    <Route path="/settings" element={<SettingsPage />} />
-                                    <Route path="/programs/*" element={<ProgramsPage />} />
+                                    <Route path={routeMap.home} element={<HomePage />} />
+                                    <Route path={routeMap.exercise.add} element={<ExerciseAddPage />} />
+                                    <Route path={routeMap.exercise.edit} element={<ExerciseEditPage />} />
+                                    <Route path={routeMap.progress} element={<ProgressPage />} />
+                                    <Route path={routeMap.settings} element={<SettingsPage />} />
+                                    <Route path={routeMap.programs} element={<ProgramsPage />} />
                                 </Routes>
                             </Flex>
                             <Box as="footer" mt="auto" w="100%" flexShrink={0}>

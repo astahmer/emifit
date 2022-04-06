@@ -4,6 +4,7 @@ import { makeId, rmTrailingSlash } from "@/functions/utils";
 import { mergeMeta, printStatesPathValue } from "@/functions/xstate-utils";
 import { orm } from "@/orm";
 import { ProgramInterpretProvider } from "@/Programs/useProgramInterpret";
+import { routeMap } from "@/routes";
 import { browserHistory, debugModeAtom, useProgramQuery } from "@/store";
 import { Box, Heading, Tag } from "@chakra-ui/react";
 import { useMachine } from "@xstate/react";
@@ -28,7 +29,7 @@ export const ProgramsPage = () => {
             const currentProgram = ctx.programId ? programList.find((p) => p.id === ctx.programId) : null;
             const isEditing = Boolean(currentProgram);
 
-            navigate("/");
+            navigate(routeMap.home);
             confetti();
             successToast(`Program <${ctx.programName}> ${isEditing ? "updated" : "created"}`);
 

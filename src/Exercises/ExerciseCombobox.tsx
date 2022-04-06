@@ -6,7 +6,14 @@ import { FormControl, FormErrorMessage, FormLabel, forwardRef } from "@chakra-ui
 
 export const ExerciseCombobox = forwardRef(
     (
-        { error, ...props }: Omit<ComboboxProps, "items" | "getValue" | "itemToString" | "label"> & { error?: string },
+        {
+            error,
+            getItems,
+            ...props
+        }: Omit<ComboboxProps, "items" | "getValue" | "itemToString" | "label"> & {
+            error?: string;
+            getItems?: (items: Exercise[]) => Exercise[];
+        },
         ref
     ) => {
         const items = useExerciseList();
@@ -18,7 +25,7 @@ export const ExerciseCombobox = forwardRef(
                     ref={ref}
                     getValue={(item: Exercise) => item.id}
                     itemToString={(item) => (item ? `${item.name}` : "")}
-                    items={items}
+                    items={getItems?.(items) || items}
                     label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise name</FormLabel>}
                 />
 

@@ -1,4 +1,5 @@
 import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
+import { serializeExercise } from "@/functions/snapshot";
 import { orm } from "@/orm";
 import { Exercise } from "@/orm-types";
 import { routeMap } from "@/routes";
@@ -6,21 +7,21 @@ import { currentDailyIdAtom, useDaily } from "@/store";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Heading } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
+import { useEffect } from "react";
 import { useMutation } from "react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-export const ExerciseAddPage = () => {
+export const ExerciseEditPage = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
+    const [params] = useSearchParams();
+    const exerciseId = params.get("exerciseId");
+
     const query = useDaily();
     const daily = query.data;
 
     const navigate = useNavigate();
-    const addExerciseToDaily = useMutation(
-        (exo: Exercise) =>
-            orm.daily.upsert(dailyId, (current) => ({
-                ...current,
-                exerciseList: (current.exerciseList || []).concat(exo.id),
-            })),
+    const editExerciseById = useMutation(
+        (exo: Exercise) => orm.exercise.upsert(exerciseId, (current) => ({ ...current, ...serializeExercise(exo) })),
         {
             onSuccess: () => {
                 query.invalidate();
@@ -29,9 +30,15 @@ export const ExerciseAddPage = () => {
         }
     );
 
+    useEffect(() => {
+        if (!exerciseId) {
+            navigate(routeMap.home);
+        }
+    }, []);
+
     return (
         <Box id="CreateExercisePage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
-            <Heading as="h1">Add daily exercise </Heading>
+            <Heading as="h1">Edit daily exercise</Heading>
             <Heading as="h2" size="md">
                 {dailyId} - {daily?.category}
             </Heading>
@@ -39,7 +46,7 @@ export const ExerciseAddPage = () => {
                 {daily && (
                     <CreateExerciseForm
                         category={daily.category}
-                        onSubmit={addExerciseToDaily.mutate}
+                        onSubmit={editExerciseById.mutate}
                         renderSubmit={(form) => {
                             const [name, tags] = form.watch(["name", "tags"]);
 
