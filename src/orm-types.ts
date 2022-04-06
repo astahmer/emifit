@@ -4,7 +4,7 @@ export interface Exercise {
     name: string;
     tags: Tag[];
     series: Serie[];
-    createdAt: Date | number;
+    createdAt: Date;
     madeFromExerciseId?: string;
 }
 export interface Serie {
@@ -24,8 +24,8 @@ export interface Program {
     name: string;
     category: string;
     exerciseList: Exercise[];
-    createdAt: Date | number;
-    updatedAt: Date | number;
+    createdAt: Date;
+    updatedAt: Date;
     // TODO exerciseOrderList: string[]
 }
 

@@ -41,7 +41,7 @@ export const useDailyInvalidate = () => {
     return () => void queryClient.invalidateQueries(["daily", id]);
 };
 
-export const useExercises = () =>
+const useExerciseUnsorted = () =>
     useQuery<Exercise[]>(
         orm.exercise.name,
         async () => {
@@ -51,18 +51,22 @@ export const useExercises = () =>
         { initialData: [] }
     );
 export const useExerciseList = () => {
-    const list = useExercises().data || [];
-    const groupByNames = groupBy(list, "name");
-    const mostRecents = Object.keys(groupByNames).map((name) => sortBy(groupByNames[name], "createdAt", "desc")[0]);
+    const list = useExerciseUnsorted().data || [];
+    const mostRecents = getMostRecentsExerciseById(list);
     return mostRecents;
 };
 
 export const useHasProgram = () =>
     Boolean(useQuery([orm.program.name, "hasProgram"], async () => Boolean(await orm.program.count())).data);
 
+// const useProgramReferenceListUnSorted = () =>
+//     useQuery<ProgramWithReferences[]>([orm.program.name, "referenceList"], () => orm.program.get(), {
+//         initialData: [],
+//     });
+
 export const useProgramList = () => {
     const listQ = useQuery<Program[]>(
-        orm.program.name,
+        [orm.program.name, "list"],
         async () => {
             const [programList, exerciseList, programListOrder] = await Promise.all([
                 orm.program.get(),
@@ -93,3 +97,9 @@ export const makeExercise = (params: Pick<Exercise, "name" | "tags" | "series"> 
         series: params.series.map((serie) => ({ ...serie, id: makeId() })),
     } as Exercise);
 export const makeSerie = (index: number, current = []) => ({ id: makeId(), kg: current[index - 1]?.kg ?? 1, reps: 1 });
+
+export function getMostRecentsExerciseById(list: Exercise[]) {
+    const groupByNames = groupBy(list, "name");
+    const mostRecents = Object.keys(groupByNames).map((name) => sortBy(groupByNames[name], "createdAt", "desc")[0]);
+    return mostRecents;
+}
