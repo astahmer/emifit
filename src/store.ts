@@ -8,7 +8,7 @@ import { groupBy, groupIn } from "./functions/groupBy";
 import { computeExerciseFromExoId, computeExerciseFromIncompleteExo } from "./functions/snapshot";
 import { makeId, printDate } from "./functions/utils";
 import { orm } from "./orm";
-import { Exercise, Program } from "./orm-types";
+import { Exercise, Program, ProgramWithReferences } from "./orm-types";
 
 export const browserHistory = createBrowserHistory({ window });
 export const debugModeAtom = atom<boolean>(false);
@@ -59,13 +59,11 @@ export const useExerciseList = () => {
 export const useHasProgram = () =>
     Boolean(useQuery([orm.program.name, "hasProgram"], async () => Boolean(await orm.program.count())).data);
 
-// const useProgramReferenceListUnSorted = () =>
-//     useQuery<ProgramWithReferences[]>([orm.program.name, "referenceList"], () => orm.program.get(), {
-//         initialData: [],
-//     });
+export const useProgramReferenceListUnSorted = () =>
+    useQuery<ProgramWithReferences[]>([orm.program.name], () => orm.program.get());
 
-export const useProgramList = () => {
-    const listQ = useQuery<Program[]>(
+export const useProgramQuery = () => {
+    return useQuery<Program[]>(
         [orm.program.name, "list"],
         async () => {
             const [programList, exerciseList, programListOrder] = await Promise.all([
@@ -85,9 +83,9 @@ export const useProgramList = () => {
         },
         { initialData: [] }
     );
-
-    return listQ.data;
 };
+
+export const useProgramList = () => useProgramQuery().data;
 
 export const makeExercise = (params: Pick<Exercise, "name" | "tags" | "series"> & { category: string }) =>
     ({

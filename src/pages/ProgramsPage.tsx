@@ -4,7 +4,7 @@ import { makeId, rmTrailingSlash } from "@/functions/utils";
 import { mergeMeta, printStatesPathValue } from "@/functions/xstate-utils";
 import { orm } from "@/orm";
 import { ProgramInterpretProvider } from "@/Programs/useProgramInterpret";
-import { browserHistory, debugModeAtom, useProgramList } from "@/store";
+import { browserHistory, debugModeAtom, useProgramQuery } from "@/store";
 import { Box, Heading, Tag } from "@chakra-ui/react";
 import { useMachine } from "@xstate/react";
 import confetti from "canvas-confetti";
@@ -20,10 +20,12 @@ export const ProgramsPage = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const programs = useProgramList();
+    const query = useProgramQuery();
+    const programList = query.data;
+
     const mutation = useMutation(
         async (ctx: typeof programFormMachine["context"]) => {
-            const currentProgram = ctx.programId ? programs.find((p) => p.id === ctx.programId) : null;
+            const currentProgram = ctx.programId ? programList.find((p) => p.id === ctx.programId) : null;
             const isEditing = Boolean(currentProgram);
 
             navigate("/");
@@ -93,8 +95,12 @@ export const ProgramsPage = () => {
         <ProgramInterpretProvider value={interpret}>
             <Box id="ProgramsPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
                 <Heading as="h1">Programs</Heading>
-                {state.matches("initial") && <InitialState />}
-                {state.matches("creating") && <ProgramForm />}
+                {query.isFetched && (
+                    <>
+                        {state.matches("initial") && <InitialState />}
+                        {state.matches("creating") && <ProgramForm />}
+                    </>
+                )}
             </Box>
             {debugMode && (
                 <Box position="fixed" top="10px" w="100%" textAlign="center">
