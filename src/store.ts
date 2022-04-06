@@ -8,7 +8,7 @@ import { groupBy, groupIn } from "./functions/groupBy";
 import { computeExerciseFromExoId, computeExerciseFromIncompleteExo } from "./functions/snapshot";
 import { makeId, printDate } from "./functions/utils";
 import { orm } from "./orm";
-import { Exercise, Program, ProgramWithReferences } from "./orm-types";
+import { Daily, Exercise, Program, ProgramWithReferences } from "./orm-types";
 
 export const browserHistory = createBrowserHistory({ window });
 export const debugModeAtom = atom<boolean>(false);
@@ -23,11 +23,11 @@ export const useDaily = () => {
     const id = useAtomValue(currentDailyIdAtom);
     const query = useQuery(["daily", id], async () => {
         const daily = await orm.daily.find(id);
-        if (!daily) return daily;
+        if (!daily) return null;
 
         const exerciseList = await orm.exercise.get();
         const exerciseListById = groupIn(exerciseList, "id");
-        return { ...daily, exerciseList: daily.exerciseList.map(computeExerciseFromExoId(exerciseListById)) };
+        return { ...daily, exerciseList: daily.exerciseList.map(computeExerciseFromExoId(exerciseListById)) } as Daily;
     });
     const invalidate = useDailyInvalidate();
 
