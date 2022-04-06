@@ -1,13 +1,18 @@
 import { CalendarButton } from "@/components/CalendarButton";
+import { CheckboxSquare } from "@/components/CheckboxCircle";
+import { ConfirmationButton } from "@/components/ConfirmationButton";
+import { DotsIconButton } from "@/components/DotsIconButton";
 import { HFlex } from "@/components/HFlex";
 import { RadioCardButton } from "@/components/RadioCard";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseTag } from "@/Exercises/ExerciseTag";
+import { groupIn } from "@/functions/groupBy";
+import { serializeDaily } from "@/functions/snapshot";
 import { makeId, parseDate } from "@/functions/utils";
 import { orm } from "@/orm";
 import { Exercise, Program } from "@/orm-types";
-import { ProgramCombobox } from "@/Programs/ProgramCombobox";
 import { ProgramCard } from "@/Programs/ProgramCard";
+import { ProgramCombobox } from "@/Programs/ProgramCombobox";
 import {
     currentDailyIdAtom,
     currentDateAtom,
@@ -16,7 +21,6 @@ import {
     useDaily,
     useDailyInvalidate,
     useHasProgram,
-    useProgramList,
 } from "@/store";
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
@@ -26,10 +30,15 @@ import {
     Button,
     Divider,
     Flex,
+    forwardRef,
     Heading,
-    HStack,
+    Icon,
     IconButton,
     ListItem,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
     Skeleton,
     SkeletonCircle,
     Stack,
@@ -41,8 +50,6 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { Fragment, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
-import { serializeDaily } from "@/functions/snapshot";
-import { groupIn } from "@/functions/groupBy";
 
 export const HomePage = () => {
     return (
@@ -185,7 +192,7 @@ const WithDaily = () => {
     const daily = query.data;
     const hasAtLeastOneExercise = daily.exerciseList.length > 0;
 
-    const updateDaily = useMutation((category: string) => orm.daily.upsert(daily.id, { category }), {
+    const updateDailyCategory = useMutation((category: string) => orm.daily.upsert(daily.id, { category }), {
         onSuccess: query.invalidate,
     });
 
@@ -193,7 +200,7 @@ const WithDaily = () => {
         <>
             <CategoryRadioPicker
                 defaultValue={daily.category}
-                onChange={updateDaily.mutate}
+                onChange={updateDailyCategory.mutate}
                 isDisabled={!isDailyToday || hasAtLeastOneExercise}
             />
             <Divider mt="4" />
@@ -371,59 +378,99 @@ const ExerciseList = () => {
         </Flex>
     );
 };
-
 function ExerciseItem({ exo }: { exo: Exercise }) {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
     return (
-        <Flex flexDirection="column" px="8">
-            <Flex w="100%" alignItems="flex-end">
-                <Heading as="h4" size="md">
-                    {exo.name}
-                </Heading>
-                {/* TODO checkbox done yes/no */}
-                {/* TODO triple dots menu ? (edit/delete/...) */}
-                {isDailyToday && (
-                    <HStack ml="auto" mt="2">
-                        {/* TODO link to add-exo-like (/edit-exercise/:id) page avec valeurs préfill */}
-                        <IconButton
-                            rounded="full"
-                            variant="solid"
-                            size="sm"
-                            colorScheme="purple"
-                            aria-label="Edit"
-                            icon={<EditIcon />}
-                        />
-                        {/* Confirmation on click */}
-                        <IconButton
-                            rounded="full"
-                            variant="solid"
-                            size="sm"
-                            colorScheme="red"
-                            aria-label="Delete"
-                            icon={<DeleteIcon />}
-                        />
-                    </HStack>
-                )}
+        <Flex>
+            <Flex h="100%" alignItems="center" px="8">
+                <ExerciseCheckbox exo={exo} />
             </Flex>
-            <Text fontWeight="normal" fontSize="sm" color="gray.500">
-                {exo.series.length} sets of {exo.series.map((set) => set.reps).join("/")} reps
-            </Text>
-            <Stack direction="row" mt="2">
-                {exo.tags.map((tag) => (
-                    <ExerciseTag key={tag.id} tag={tag} />
-                ))}
-            </Stack>
-            <UnorderedList mt="2">
-                {exo.series.map((serie) => (
-                    <ListItem key={serie.id}>
-                        {serie.kg} kg / {serie.reps} reps
-                    </ListItem>
-                ))}
-            </UnorderedList>
+            <Flex flexDirection="column" pr="8" w="100%">
+                <Flex w="100%" alignItems="flex-end">
+                    <Heading as="h4" size="md">
+                        {exo.name}
+                    </Heading>
+                    {isDailyToday && <ExerciseMenu exo={exo} />}
+                </Flex>
+                <Text fontWeight="normal" fontSize="sm" color="gray.500">
+                    {exo.series.length} sets of {exo.series.map((set) => set.reps).join("/")} reps
+                </Text>
+                <Stack direction="row" mt="2">
+                    {exo.tags.map((tag) => (
+                        <ExerciseTag key={tag.id} tag={tag} />
+                    ))}
+                </Stack>
+                <UnorderedList mt="2">
+                    {exo.series.map((serie) => (
+                        <ListItem key={serie.id}>
+                            {serie.kg} kg / {serie.reps} reps
+                        </ListItem>
+                    ))}
+                </UnorderedList>
+            </Flex>
         </Flex>
     );
 }
+
+const ExerciseCheckbox = ({ exo }: { exo: Exercise }) => {
+    const query = useDaily();
+    const daily = query.data;
+
+    const addExerciseToDailyCompletedList = useMutation(
+        (checked: boolean) =>
+            orm.daily.upsert(daily.id, (current) => ({
+                ...current,
+                completedList: checked
+                    ? current.completedList.concat(exo.id)
+                    : current.completedList.filter((completed) => exo.id !== completed),
+            })),
+        {
+            onSuccess: query.invalidate,
+        }
+    );
+
+    return (
+        <CheckboxSquare
+            getIconProps={() => ({ size: "sm" })}
+            onChange={(e) => addExerciseToDailyCompletedList.mutate(e.target.checked)}
+        />
+    );
+};
+
+const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
+    const query = useDaily();
+    const daily = query.data;
+
+    const removeExerciseFromDaily = useMutation(
+        () =>
+            orm.daily.upsert(daily.id, (current) => ({
+                ...current,
+                completedList: current.exerciseList.filter((completed) => exo.id !== completed),
+                exerciseList: current.completedList.filter((exercise) => exo.id !== exercise),
+            })),
+        {
+            onSuccess: query.invalidate,
+        }
+    );
+
+    return (
+        <Menu strategy="fixed">
+            <MenuButton as={DotsIconButton} ml="auto" mt="2" aria-label="menu" />
+            <MenuList>
+                <MenuItem icon={<EditIcon />}>Edit daily exercise</MenuItem>
+                <ConfirmationButton
+                    renderTrigger={(onOpen) => (
+                        <MenuItem icon={<DeleteIcon />} onClick={onOpen}>
+                            Remove exercise from daily
+                        </MenuItem>
+                    )}
+                    onConfirm={() => removeExerciseFromDaily.mutate()}
+                />
+            </MenuList>
+        </Menu>
+    );
+};
 
 const ExerciseListSkeleton = () => (
     <Stack mt="4">
