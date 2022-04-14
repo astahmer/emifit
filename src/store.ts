@@ -19,7 +19,7 @@ export const currentDateAtom = atom<CalendarDate>(today);
 export const currentDailyIdAtom = atom((get) => printDate(get(currentDateAtom)));
 export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
 
-export const useDaily = () => {
+export const useDailyQuery = () => {
     const id = useAtomValue(currentDailyIdAtom);
     const query = useQuery(["daily", id], async () => {
         const daily = await orm.daily.find(id);
@@ -29,10 +29,10 @@ export const useDaily = () => {
         const exerciseListById = groupIn(exerciseList, "id");
         return { ...daily, exerciseList: daily.exerciseList.map(computeExerciseFromExoId(exerciseListById)) } as Daily;
     });
-    const invalidate = useDailyInvalidate();
 
-    return { ...query, invalidate };
+    return query;
 };
+export const useDaily = () => ({ ...useDailyQuery().data, invalidate: useDailyInvalidate() });
 
 export const useDailyInvalidate = () => {
     const id = useAtomValue(currentDailyIdAtom);
@@ -64,6 +64,7 @@ export const useDailyListQuery = () => {
     return query;
 };
 export const useDailyList = () => useDailyListQuery().data;
+
 const useExerciseUnsorted = () =>
     useQuery<Exercise[]>(
         orm.exercise.name,

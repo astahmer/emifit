@@ -11,8 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 export const ExerciseAddPage = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
-    const query = useDaily();
-    const daily = query.data;
+    const daily = useDaily();
 
     const navigate = useNavigate();
     const addExerciseToDaily = useMutation(
@@ -23,7 +22,7 @@ export const ExerciseAddPage = () => {
             })),
         {
             onSuccess: () => {
-                query.invalidate();
+                daily.invalidate();
                 navigate(routeMap.home);
             },
         }

@@ -15,16 +15,16 @@ export const ExerciseEditPage = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
     const { id: exerciseId } = useParams<{ id: string }>();
 
-    const query = useDaily();
-    const daily = query.data;
+    const daily = useDaily();
     const exercise = daily?.exerciseList.find((exo) => exo.id === exerciseId);
 
     const navigate = useNavigate();
     const editExerciseById = useMutation(
-        (exo: Exercise) => orm.exercise.upsert(exerciseId, (current) => ({ ...current, ...serializeExercise(exo) })),
+        (exo: Exercise) =>
+            orm.exercise.upsert(exerciseId, (current) => ({ ...current, ...serializeExercise(exo), id: exerciseId })),
         {
             onSuccess: () => {
-                query.invalidate();
+                daily.invalidate();
                 navigate(routeMap.home);
             },
         }
@@ -66,7 +66,7 @@ export const ExerciseEditPage = () => {
                                                 type="submit"
                                                 size="lg"
                                             >
-                                                Create
+                                                Update exercise
                                             </Button>
                                         </Box>
                                     </Box>

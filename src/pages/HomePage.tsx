@@ -21,6 +21,7 @@ import {
     showSkeletonsAtom,
     useDaily,
     useDailyInvalidate,
+    useDailyQuery,
     useHasProgram,
 } from "@/store";
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
@@ -31,9 +32,7 @@ import {
     Button,
     Divider,
     Flex,
-    forwardRef,
     Heading,
-    Icon,
     IconButton,
     ListItem,
     Menu,
@@ -86,7 +85,7 @@ const Header = () => {
 };
 
 const DailyEntry = () => {
-    const query = useDaily();
+    const query = useDailyQuery();
     const daily = query.data;
     const showSkeletons = useAtomValue(showSkeletonsAtom);
 
@@ -189,12 +188,11 @@ const EmptyPastDay = () => {
 const WithDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
-    const query = useDaily();
-    const daily = query.data;
+    const daily = useDaily();
     const hasAtLeastOneExercise = daily.exerciseList.length > 0;
 
     const updateDailyCategory = useMutation((category: string) => orm.daily.upsert(daily.id, { category }), {
-        onSuccess: query.invalidate,
+        onSuccess: daily.invalidate,
     });
 
     return (
@@ -218,8 +216,8 @@ const WithDaily = () => {
 };
 
 const DailyExerciseList = () => {
-    const query = useDaily();
-    const hasAtLeastOneExercise = query.data?.exerciseList.length > 0;
+    const daily = useDaily();
+    const hasAtLeastOneExercise = daily?.exerciseList.length > 0;
 
     return hasAtLeastOneExercise ? <ExerciseList /> : <EmptyExerciseList />;
 };
@@ -268,10 +266,7 @@ const ProgramSearch = () => {
     const [selectedProgram, setSelectedProgram] = useState<Program>(null);
 
     const dailyId = useAtomValue(currentDailyIdAtom);
-    const invalidate = useDailyInvalidate();
-
-    const query = useDaily();
-    const daily = query.data;
+    const daily = useDaily();
 
     const useProgramMutation = useMutation(
         async () => {
@@ -299,7 +294,7 @@ const ProgramSearch = () => {
                 tx.done,
             ]);
         },
-        { onSuccess: invalidate }
+        { onSuccess: daily.invalidate }
     );
 
     return (
@@ -353,11 +348,11 @@ const PastEmptyExerciseList = () => {
 };
 
 const ExerciseList = () => {
-    const query = useDaily();
+    const daily = useDaily();
 
     return (
         <Flex flexDir="column" overflow="auto" h="100%" pt="2" pb="8">
-            {query.data.exerciseList.map((exo, index) => {
+            {daily.exerciseList.map((exo, index) => {
                 return (
                     <Fragment key={index}>
                         {index > 0 && (
@@ -415,8 +410,7 @@ function ExerciseItem({ exo }: { exo: Exercise }) {
 }
 
 const ExerciseCheckbox = ({ exo }: { exo: Exercise }) => {
-    const query = useDaily();
-    const daily = query.data;
+    const daily = useDaily();
 
     const addExerciseToDailyCompletedList = useMutation(
         (checked: boolean) =>
@@ -427,7 +421,7 @@ const ExerciseCheckbox = ({ exo }: { exo: Exercise }) => {
                     : current.completedList.filter((completed) => exo.id !== completed),
             })),
         {
-            onSuccess: query.invalidate,
+            onSuccess: daily.invalidate,
         }
     );
 
@@ -440,8 +434,7 @@ const ExerciseCheckbox = ({ exo }: { exo: Exercise }) => {
 };
 
 const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
-    const query = useDaily();
-    const daily = query.data;
+    const daily = useDaily();
 
     const removeExerciseFromDaily = useMutation(
         async () => {
@@ -453,7 +446,7 @@ const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
             return orm.exercise.delete(exo.id);
         },
         {
-            onSuccess: query.invalidate,
+            onSuccess: daily.invalidate,
         }
     );
 

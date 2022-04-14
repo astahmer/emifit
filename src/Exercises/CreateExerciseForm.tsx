@@ -46,7 +46,6 @@ export const CreateExerciseForm = ({
     defaultValues?: typeof formDefaultValues;
 }) => {
     const form = useForm({ defaultValues });
-    console.log(defaultValues, form.getValues());
 
     const queryClient = useQueryClient();
     const mutation = useMutation(
