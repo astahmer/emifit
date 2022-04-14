@@ -22,6 +22,7 @@ export async function makeDb() {
             db.createObjectStore("keyval");
         },
     });
+    orm.db = db;
     return db;
 }
 
