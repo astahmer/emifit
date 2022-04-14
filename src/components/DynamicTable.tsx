@@ -12,6 +12,7 @@ import {
     TableColumnHeaderProps,
     TableCellProps,
 } from "@chakra-ui/react";
+import { isDefined } from "@pastable/core";
 import { Fragment, ReactNode } from "react";
 import { Cell, Column, Row, TableOptions, UseExpandedOptions, useExpanded, useSortBy, useTable } from "react-table";
 
@@ -26,7 +27,7 @@ export function DynamicTable({
     getRowProps,
 }: DynamicTableProps) {
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, visibleColumns } = useTable(
-        { columns, data, autoResetExpanded: false } as TableOptions<UseExpandedOptions<{}>>,
+        { columns, data, autoResetExpanded: false, defaultColumn } as TableOptions<UseExpandedOptions<{}>>,
         useSortBy,
         useExpanded
     );
@@ -100,3 +101,5 @@ export interface DynamicTableProps extends Pick<TableProps, "size"> {
     renderSubRow?: ({ row }: { row: Row }) => ReactNode;
     isHeaderSticky?: boolean;
 }
+
+const defaultColumn = { Cell: ({ cell: { value } }) => (isDefined(value) ? String(value) : "--") };
