@@ -444,12 +444,14 @@ const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
     const daily = query.data;
 
     const removeExerciseFromDaily = useMutation(
-        () =>
-            orm.daily.upsert(daily.id, (current) => ({
+        async () => {
+            await orm.daily.upsert(daily.id, (current) => ({
                 ...current,
                 completedList: current.exerciseList.filter((completed) => exo.id !== completed),
                 exerciseList: current.completedList.filter((exercise) => exo.id !== exercise),
-            })),
+            }));
+            return orm.exercise.delete(exo.id);
+        },
         {
             onSuccess: query.invalidate,
         }
