@@ -6,9 +6,9 @@ import { loadFromJSON, saveAsJSON } from "@/functions/json";
 import { computeSnapshotFromExport, ExportedData, getDatabaseSnapshot } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
 import { orm } from "@/orm";
-import { Exercise, Program } from "@/orm-types";
+import { Daily, Exercise, Program } from "@/orm-types";
 import { ProgramCardExerciseList } from "@/Programs/ProgramCard";
-import { debugModeAtom, getMostRecentsExerciseById, useExerciseList, useProgramList } from "@/store";
+import { debugModeAtom, getMostRecentsExerciseById, useDailyList, useExerciseList, useProgramList } from "@/store";
 import { AwaitFn } from "@/types";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
@@ -133,7 +133,7 @@ const ExportImportData = () => {
                     <DataAccordions
                         exerciseList={getMostRecentsExerciseById(loadMutation.data.exerciseList)}
                         programList={loadMutation.data.programList}
-                        // dailyList={loadMutation.data.dailyList}
+                        dailyList={loadMutation.data.dailyList}
                     />
                     <Button
                         leftIcon={<Icon as={CheckIcon} />}
@@ -152,14 +152,11 @@ const ExportImportData = () => {
 const DebugModeOnly = () => {
     const exerciseList = useExerciseList();
     const programList = useProgramList();
+    const dailyList = useDailyList();
 
     return (
         <>
-            <DataAccordions
-                exerciseList={exerciseList}
-                programList={programList}
-                // dailyList={loadMutation.data.dailyList}
-            >
+            <DataAccordions exerciseList={exerciseList} programList={programList} dailyList={dailyList}>
                 <AccordionItem>
                     <h2>
                         <AccordionButton>
@@ -181,11 +178,12 @@ const DebugModeOnly = () => {
 const DataAccordions = ({
     exerciseList,
     programList,
+    dailyList,
     children,
 }: {
     exerciseList: Exercise[];
     programList: Program[];
-    // dailyList: Program[]; // TODO
+    dailyList: Daily[];
     children?: ReactNode;
 }) => {
     return (
@@ -231,6 +229,32 @@ const DataAccordions = ({
                     </Box>
                 </AccordionPanel>
             </AccordionItem>
+            <AccordionItem>
+                <h2>
+                    <AccordionButton>
+                        <Box flex="1" textAlign="left" fontSize="md">
+                            Show daily list ({dailyList.length})
+                        </Box>
+                        <AccordionIcon />
+                    </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                    <Box overflow="auto" maxH="600px">
+                        <DynamicTable
+                            columns={dailyColumns}
+                            data={dailyList}
+                            isHeaderSticky
+                            getRowProps={(row) => ({ ...row.getToggleRowExpandedProps() })}
+                            renderSubRow={({ row }) => (
+                                <HFlex pb="4">
+                                    <Box>Exercise list:</Box>
+                                    <ProgramCardExerciseList program={row.original} />
+                                </HFlex>
+                            )}
+                        />
+                    </Box>
+                </AccordionPanel>
+            </AccordionItem>
             {children}
             {/* TODO daily entries table */}
         </Accordion>
@@ -253,6 +277,18 @@ const programColumns = [
     { Header: "name", accessor: "name" },
     { Header: "category", accessor: "category" },
     { Header: "exo", accessor: "exerciseList", Cell: (props) => props.value.length },
+    {
+        Header: "",
+        accessor: "__openRow",
+        Cell: ({ row }) => (row.isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />),
+    },
+];
+
+const dailyColumns = [
+    { Header: "id", accessor: "id" },
+    { Header: "category", accessor: "category" },
+    { Header: "exo", accessor: "exerciseList", Cell: (props) => props.value.length },
+    { Header: "program", accessor: "programId" },
     {
         Header: "",
         accessor: "__openRow",

@@ -41,6 +41,29 @@ export const useDailyInvalidate = () => {
     return () => void queryClient.invalidateQueries(["daily", id]);
 };
 
+export const useDailyListQuery = () => {
+    const query = useQuery(
+        ["dailyList"],
+        async () => {
+            const list = await orm.daily.get();
+            const exerciseList = await orm.exercise.get();
+            const exerciseListById = groupIn(exerciseList, "id");
+            console.log(list, exerciseList, exerciseListById);
+
+            return list.map(
+                (daily) =>
+                    ({
+                        ...daily,
+                        exerciseList: daily.exerciseList.map(computeExerciseFromExoId(exerciseListById)),
+                    } as Daily)
+            );
+        },
+        { initialData: [] }
+    );
+
+    return query;
+};
+export const useDailyList = () => useDailyListQuery().data;
 const useExerciseUnsorted = () =>
     useQuery<Exercise[]>(
         orm.exercise.name,
