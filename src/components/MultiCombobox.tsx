@@ -185,7 +185,7 @@ function MultiComboboxBase<Item = any>({
                                 renderInput({ ...inputProps, ref: inputRef })
                             ) : (
                                 <Input
-                                    placeholder="Search..."
+                                    placeholder={items.length ? "Search or create a new one..." : "Create a new one..."}
                                     disabled={isDisabled}
                                     {...inputProps}
                                     {...props}
@@ -193,16 +193,18 @@ function MultiComboboxBase<Item = any>({
                                     ref={inputRef}
                                 />
                             )}
-                            <InputRightElement>
-                                <IconButton
-                                    disabled={isDisabled}
-                                    {...getToggleButtonProps()}
-                                    size="sm"
-                                    aria-label={"toggle menu"}
-                                    colorScheme={isOpen ? "gray" : "pink"}
-                                    icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                                />
-                            </InputRightElement>
+                            {items.length && (
+                                <InputRightElement>
+                                    <IconButton
+                                        disabled={isDisabled}
+                                        {...getToggleButtonProps()}
+                                        size="sm"
+                                        aria-label={"toggle menu"}
+                                        colorScheme={isOpen ? "gray" : "pink"}
+                                        icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                    />
+                                </InputRightElement>
+                            )}
                         </InputGroup>
                         <List
                             display={isOpen ? null : "none"}

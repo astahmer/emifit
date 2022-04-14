@@ -127,37 +127,39 @@ function ComboboxBase<Item = any>({
                         renderInput({ ...inputProps, ref: inputRef })
                     ) : (
                         <Input
-                            placeholder="Search or create a new one..."
+                            placeholder={items.length ? "Search or create a new one..." : "Create a new one..."}
                             {...inputProps}
                             {...props}
                             {...mergedProps}
                             ref={inputRef}
                         />
                     )}
-                    <InputRightElement w="auto" mr="2">
-                        <ButtonGroup>
-                            {Boolean(selectedItem) && (
+                    {items.length && (
+                        <InputRightElement w="auto" mr="2">
+                            <ButtonGroup>
+                                {Boolean(selectedItem) && (
+                                    <IconButton
+                                        tabIndex={-1}
+                                        onClick={() => selectItem(null)}
+                                        aria-label="clear selection"
+                                        size="sm"
+                                        colorScheme={isOpen ? "gray" : "pink"}
+                                        variant="outline"
+                                        icon={<CloseIcon />}
+                                        fontSize="xx-small"
+                                    />
+                                )}
                                 <IconButton
-                                    tabIndex={-1}
-                                    onClick={() => selectItem(null)}
-                                    aria-label="clear selection"
+                                    {...getToggleButtonProps()}
+                                    aria-label="toggle menu"
                                     size="sm"
                                     colorScheme={isOpen ? "gray" : "pink"}
-                                    variant="outline"
-                                    icon={<CloseIcon />}
-                                    fontSize="xx-small"
+                                    icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                    fontSize="md"
                                 />
-                            )}
-                            <IconButton
-                                {...getToggleButtonProps()}
-                                aria-label="toggle menu"
-                                size="sm"
-                                colorScheme={isOpen ? "gray" : "pink"}
-                                icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                                fontSize="md"
-                            />
-                        </ButtonGroup>
-                    </InputRightElement>
+                            </ButtonGroup>
+                        </InputRightElement>
+                    )}
                 </InputGroup>
                 <List
                     display={isOpen && rowVirtualizer.virtualItems.length ? null : "none"}
