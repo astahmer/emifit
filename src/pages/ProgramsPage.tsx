@@ -45,12 +45,12 @@ export const ProgramsPage = () => {
             };
             const now = new Date();
             if (params.id) {
-                return Promise.all([...insertMany, orm.program.update({ ...params, updatedAt: now }), tx.done]);
+                return Promise.all([...insertMany, orm.program.put({ ...params, updatedAt: now }), tx.done]);
             }
 
             return Promise.all([
                 ...insertMany,
-                orm.program.update({ ...params, id: makeId(), createdAt: now, updatedAt: now }),
+                orm.program.put({ ...params, id: makeId(), createdAt: now, updatedAt: now }),
                 tx.done,
             ]);
         },
@@ -78,6 +78,7 @@ export const ProgramsPage = () => {
         },
     });
 
+    // TODO update search param instead of path ?
     const toPathRef = useRef<string>("/programs");
 
     // Handle back button, sync url to state = go back to previous state

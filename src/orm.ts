@@ -76,7 +76,7 @@ const makeStore = <T extends Entity = Entity, Key extends keyof EmifitSchema = k
             return last;
         },
         add: (value: T) => db.add(name, value),
-        update: (value: T) => db.put(name, value),
+        put: (value: T) => db.put(name, value),
         upsert: async (key: string, setterOrUpdate: Partial<T> | ((current: T) => T)) => {
             const tx = db.transaction(name, "readwrite");
             const current = (await tx.store.get(key)) as T;
