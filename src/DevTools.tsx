@@ -52,11 +52,11 @@ const DevToolsContent = () => {
                         orm.db.clear(orm.daily.name),
                         orm.db.clear(orm.exercise.name),
                         orm.db.clear(orm.program.name),
-                        window.location.reload(),
                     ]);
                     toasts.success("Database cleared");
                     toasts.close(info);
                     invalidate();
+                    window.location.reload();
                 }}
             >
                 Reset DB
