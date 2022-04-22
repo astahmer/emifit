@@ -1,4 +1,4 @@
-import { IDBPDatabase, openDB } from "idb";
+import { IDBPDatabase, IndexKey, IndexNames, openDB, StoreKey } from "idb";
 import { del, get, update } from "idb-keyval";
 import { DailyWithReferences, ExerciseWithReferences, ProgramWithReferences } from "./orm-types";
 
@@ -12,12 +12,18 @@ export async function makeDb() {
             console.log(db, oldVersion, newVersion, transaction);
             const daily = db.createObjectStore("daily", { keyPath: "id" });
             daily.createIndex("by-time", "time");
+            daily.createIndex("by-category", "category");
+            daily.createIndex("by-program", "programId");
 
             const exercise = db.createObjectStore("exercise", { keyPath: "id" });
             exercise.createIndex("by-name", "name");
+            exercise.createIndex("by-category", "category");
+            exercise.createIndex("by-tags", "tags", { multiEntry: true });
+            exercise.createIndex("by-parent", "madeFromExerciseId");
 
             const program = db.createObjectStore("program", { keyPath: "id" });
             program.createIndex("by-name", "name");
+            program.createIndex("by-category", "category");
 
             db.createObjectStore("keyval");
         },
@@ -26,67 +32,93 @@ export async function makeDb() {
     return db;
 }
 
-interface EmifitSchema {
+type EmifitSchema = {
     daily: {
         key: DailyWithReferences["id"];
         value: DailyWithReferences;
-        indexes: { "by-id": DailyWithReferences["id"] };
-    };
-    program: {
-        key: ProgramWithReferences["id"];
-        value: ProgramWithReferences;
-        indexes: { "by-name": ProgramWithReferences["name"] };
+        indexes: {
+            "by-time": DailyWithReferences["time"];
+            "by-category": DailyWithReferences["category"];
+            "by-program": DailyWithReferences["programId"];
+        };
     };
     exercise: {
         key: ExerciseWithReferences["id"];
         value: ExerciseWithReferences;
-        indexes: { "by-name": ExerciseWithReferences["name"] };
+        indexes: {
+            "by-name": ExerciseWithReferences["name"];
+            "by-category": ExerciseWithReferences["category"];
+            "by-tags": ExerciseWithReferences["tags"];
+            "by-parent": ExerciseWithReferences["madeFromExerciseId"];
+        };
+    };
+    program: {
+        key: ProgramWithReferences["id"];
+        value: ProgramWithReferences;
+        indexes: {
+            "by-name": ProgramWithReferences["name"];
+            "by-category": ProgramWithReferences["category"];
+        };
     };
     keyval: {
         value: any;
         key: number;
+        indexes: never;
     };
-}
+};
 
 interface Entity {
     id: string;
 }
 
-const makeStore = <T extends Entity = Entity, Key extends keyof EmifitSchema = keyof EmifitSchema>(name: Key) => {
+type StoreName = keyof EmifitSchema;
+export type StoreIndex<Key extends StoreName> = IndexNames<EmifitSchema, Key>;
+
+type StoreQuery<
+    Key extends StoreName,
+    Index extends IndexNames<EmifitSchema, Key> = undefined
+> = Index extends undefined ? StoreKey<EmifitSchema, Key> | IDBKeyRange | null : IndexKey<EmifitSchema, Key, Index>;
+
+export type StoreQueryParams<
+    Key extends StoreName,
+    Index extends IndexNames<EmifitSchema, Key> = IndexNames<EmifitSchema, Key>
+> = {
+    index?: Index;
+    query?: StoreQuery<Key, Index>;
+    count?: number;
+};
+
+// const makeParams = <Index extends StoreIndex<"exercise">>(params: StoreQueryParams<"exercise", Index>) => params;
+// makeParams({index: "by-category",query})
+
+const makeStore = <Key extends StoreName, StoreEntity extends Entity = EmifitSchema[Key]["value"]>(name: Key) => {
     return {
         name,
         tx: (mode?: IDBTransactionMode, options?: IDBTransactionOptions) => db.transaction(name, mode, options),
-        find: (id: T["id"]) => db.get(name, id) as Promise<T>,
-        get: (() => db.getAll(name)) as () => Promise<T[]>,
-        keys: () => db.getAllKeys(name),
-        count: () => db.count(name),
-        getLast: async () => {
-            const tx = db.transaction(name);
-            const index = tx.store.index("by-id");
-            let last;
-
-            // TODO
-            for await (const cursor of index.iterate(undefined, "prev")) {
-                console.log(cursor.value);
-                // Skip the next item
-                cursor.advance(2);
-                last = cursor.value;
-                console.log(cursor.value);
-            }
-
-            return last;
-        },
-        add: (value: T) => db.add(name, value),
-        put: (value: T) => db.put(name, value),
-        upsert: async (key: string, setterOrUpdate: Partial<T> | ((current: T) => T)) => {
+        find: (id: StoreEntity["id"]) => db.get(name, id) as Promise<StoreEntity>,
+        get: <Index extends StoreIndex<Key> = undefined>(params: StoreQueryParams<Key, Index> = {}) =>
+            params.index
+                ? db.getAllFromIndex(name, params.index, params.query as any, params.count)
+                : db.getAll(name, params.query as string, params.count),
+        keys: <Index extends StoreIndex<Key> = undefined>(params: StoreQueryParams<Key, Index> = {}) =>
+            params.index
+                ? db.getAllKeysFromIndex(name, params.index, params.query as any, params.count)
+                : db.getAllKeys(name, params.query as string, params.count),
+        count: <Index extends StoreIndex<Key> = undefined>(params: StoreQueryParams<Key, Index> = {}) =>
+            params.index
+                ? db.countFromIndex(name, params.index, params.query as any)
+                : db.count(name, params.query as string),
+        add: (value: StoreEntity) => db.add(name, value),
+        put: (value: StoreEntity) => db.put(name, value),
+        upsert: async (key: string, setterOrUpdate: Partial<StoreEntity> | ((current: StoreEntity) => StoreEntity)) => {
             const tx = db.transaction(name, "readwrite");
-            const current = (await tx.store.get(key)) as T;
+            const current = (await tx.store.get(key)) as StoreEntity;
             const update =
                 typeof setterOrUpdate === "function" ? setterOrUpdate(current) : { ...current, ...setterOrUpdate };
             await tx.store.put(update);
             return tx.done;
         },
-        delete: (id: T["id"]) => db.delete(name, id),
+        delete: (id: StoreEntity["id"]) => db.delete(name, id),
     };
 };
 
@@ -103,9 +135,9 @@ const makeKeyValue = <T, Key extends string = string>(key: Key) => {
 export const orm = {
     db,
     version,
-    exercise: makeStore<ExerciseWithReferences>("exercise"),
-    program: makeStore<ProgramWithReferences>("program"),
-    daily: makeStore<DailyWithReferences>("daily"),
+    exercise: makeStore("exercise"),
+    program: makeStore("program"),
+    daily: makeStore("daily"),
     programListOrder: makeKeyValue<string[], "programListOrder">("programListOrder"),
 };
 
