@@ -27,6 +27,7 @@ export const ExerciseCombobox = forwardRef(
                     itemToString={(item) => (item ? `${item.name}` : "")}
                     items={getItems?.(items) || items}
                     label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise name</FormLabel>}
+                    maxLength={30}
                 />
 
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
@@ -61,6 +62,7 @@ export const ExerciseListCombobox = forwardRef(
                         );
                     }}
                     placeholder="Search exercise list..."
+                    maxLength={30}
                 />
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
             </FormControl>

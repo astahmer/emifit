@@ -26,6 +26,7 @@ export const ProgramCombobox = forwardRef(
                     getValue={(item: Program) => item.id}
                     itemToString={(item) => (item ? `${item.name}` : "")}
                     items={getItems?.(items) || items}
+                    maxLength={30}
                 />
 
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
