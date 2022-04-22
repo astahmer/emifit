@@ -1,6 +1,7 @@
 import { uniques, uniquesByProp } from "@pastable/core";
 import { groupIn } from "./functions/groupBy";
 import { Tag } from "./orm-types";
+import { LiteralUnion } from "./types";
 
 const SharedTags = [
     { id: "Machine", label: "Machine", group: "Type" },
@@ -47,3 +48,5 @@ export const CategoriesTagsById = groupIn(CategoriesTags, "id");
 export const CategoriesTagGroups = uniques(
     Categories.reduce((acc, cat) => acc.concat(cat.children.flatMap((tag) => tag.group)), [])
 ) as string[];
+
+export type Category = LiteralUnion<typeof Categories[number]["id"]>;

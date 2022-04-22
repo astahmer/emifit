@@ -1,6 +1,8 @@
+import type { Category } from "./constants";
+
 export interface Exercise {
     id: string;
-    category: string;
+    category: Category;
     name: string;
     tags: Tag[];
     series: Serie[];
@@ -22,24 +24,24 @@ export interface Tag {
 export interface Program {
     id: string;
     name: string;
-    category: string;
+    category: Category;
     exerciseList: Exercise[];
     createdAt: Date;
     updatedAt: Date;
-    // TODO exerciseOrderList: string[]
+    // TODO exerciseOrderList: Array<Exercise["id"]>
 }
 
 export interface Daily {
     id: string;
     date: Date;
     time: number;
-    category: string;
+    category: Category;
     exerciseList: Exercise[];
     /** Completed exerciseId list */
     completedList: Array<Exercise["id"]>;
     /** if made from X program */
     programId?: Program["id"] | null;
-    /** ex: cardio done yes/no */
+    hasDoneCardio?: boolean;
     metadata?: string[];
 }
 
