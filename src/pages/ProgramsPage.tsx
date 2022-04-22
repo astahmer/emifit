@@ -80,6 +80,7 @@ export const ProgramsPage = () => {
 
     // TODO update search param instead of path ?
     const toPathRef = useRef<string>("/programs");
+    // TOOD console.log(useNavigationType()) ?
 
     // Handle back button, sync url to state = go back to previous state
     useEffect(() => {

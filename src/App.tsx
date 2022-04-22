@@ -6,14 +6,15 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
-import { Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
+import { Outlet, Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import "./App.css";
 import { BottomTabs } from "./components/BottomTabs";
+import { DailyEntry } from "./Daily/DailyEntry";
 import { DevTools } from "./DevTools";
 import { makeDb } from "./orm";
 import { ExerciseAddPage } from "./pages/ExerciseAddPage";
 import { ExerciseEditPage } from "./pages/ExerciseEditPage";
-import { HomePage } from "./pages/HomePage";
+import { HomePage, HomePageLayout } from "./pages/HomePage";
 import { ProgramsPage } from "./pages/ProgramsPage";
 import { ProgressPage } from "./pages/ProgressPage";
 import { SettingsPage } from "./pages/SettingsPage";
@@ -32,31 +33,42 @@ function App() {
             <QueryClientProvider client={queryClient}>
                 <ChakraProvider theme={theme}>
                     <HistoryRouter history={browserHistory}>
-                        <Flex as="main" direction="column" boxSize="100%">
-                            <Flex as="section" id="View" direction="column" h="100%" overflow="hidden">
-                                <Routes>
-                                    <Route path={routeMap.home} element={<HomePage />} />
-                                    <Route path={routeMap.exercise.add} element={<ExerciseAddPage />} />
-                                    <Route path={routeMap.exercise.edit} element={<ExerciseEditPage />} />
-                                    <Route path={routeMap.progress} element={<ProgressPage />} />
-                                    <Route path={routeMap.settings} element={<SettingsPage />} />
-                                    <Route path={routeMap.programs} element={<ProgramsPage />} />
-                                </Routes>
-                            </Flex>
-                            <Box as="footer" mt="auto" w="100%" flexShrink={0}>
-                                <BottomTabs />
-                            </Box>
-                            <Box pos="fixed" bottom="70px">
-                                <ReactQueryDevtools toggleButtonProps={{ style: { position: "absolute" } }} />
-                            </Box>
-                            <DevTools />
-                        </Flex>
+                        <Routes>
+                            <Route path="/*" element={<Layout />}>
+                                <Route index element={<HomePage />} />
+                                <Route path="daily/:dailyId" element={<HomePageLayout />}>
+                                    <Route index element={<DailyEntry />} />
+                                </Route>
+                                <Route path={routeMap.exercise.add} element={<ExerciseAddPage />} />
+                                <Route path={routeMap.exercise.edit} element={<ExerciseEditPage />} />
+                                <Route path={routeMap.progress} element={<ProgressPage />} />
+                                <Route path={routeMap.settings} element={<SettingsPage />} />
+                                <Route path={routeMap.programs} element={<ProgramsPage />} />
+                            </Route>
+                        </Routes>
                     </HistoryRouter>
                 </ChakraProvider>
             </QueryClientProvider>
         </DbProvider>
     );
 }
+
+const Layout = () => {
+    return (
+        <Flex as="main" direction="column" boxSize="100%">
+            <Flex as="section" id="View" direction="column" h="100%" overflow="hidden">
+                <Outlet />
+            </Flex>
+            <Box as="footer" mt="auto" w="100%" flexShrink={0}>
+                <BottomTabs />
+            </Box>
+            <Box pos="fixed" bottom="70px">
+                <ReactQueryDevtools toggleButtonProps={{ style: { position: "absolute" } }} />
+            </Box>
+            <DevTools />
+        </Flex>
+    );
+};
 
 const DbProvider = (props: WithChildren) => {
     const [isDatabaseReady, setIsDatabaseReady] = useState(false);

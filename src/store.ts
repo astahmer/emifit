@@ -7,7 +7,7 @@ import { useQuery, useQueryClient } from "react-query";
 import { groupBy, groupIn } from "./functions/groupBy";
 import { computeExerciseFromExoId, computeExerciseFromIncompleteExo } from "./functions/snapshot";
 import { makeId, printDate } from "./functions/utils";
-import { orm } from "./orm";
+import { orm, StoreIndex, StoreQueryParams } from "./orm";
 import { Daily, Exercise, Program, ProgramWithReferences } from "./orm-types";
 
 export const browserHistory = createBrowserHistory({ window });
@@ -18,6 +18,8 @@ const today = new Date();
 export const currentDateAtom = atom<CalendarDate>(today);
 export const currentDailyIdAtom = atom((get) => printDate(get(currentDateAtom)));
 export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
+
+export const gridCondensedViewAtom = atom(true);
 
 export const useDailyQuery = () => {
     const id = useAtomValue(currentDailyIdAtom);
@@ -65,23 +67,34 @@ export const useDailyListQuery = () => {
 };
 export const useDailyList = () => useDailyListQuery().data;
 
-const useExerciseUnsorted = () =>
-    useQuery<Exercise[]>(
-        orm.exercise.name,
+function useExerciseUnsorted<Index extends StoreIndex<"exercise"> = undefined>(
+    params: StoreQueryParams<"exercise", Index> = {}
+) {
+    return useQuery<Exercise[]>(
+        [orm.exercise.name, params],
         async () => {
-            const list = await orm.exercise.get();
+            const list = await orm.exercise.get(params);
             return list.map(computeExerciseFromIncompleteExo);
         },
         { initialData: [] }
     );
-export const useExerciseList = () => {
-    const list = useExerciseUnsorted().data || [];
+}
+
+export function useExerciseList<Index extends StoreIndex<"exercise"> = undefined>(
+    params: StoreQueryParams<"exercise", Index> = {}
+) {
+    const list = useExerciseUnsorted(params).data || [];
     const mostRecents = getMostRecentsExerciseById(list);
     return mostRecents;
-};
+}
 
-export const useHasProgram = () =>
-    Boolean(useQuery([orm.program.name, "hasProgram"], async () => Boolean(await orm.program.count())).data);
+export function useHasProgram<Index extends StoreIndex<"program"> = undefined>(
+    params: StoreQueryParams<"program", Index> = {}
+) {
+    return Boolean(
+        useQuery([orm.program.name, "hasProgram"], async () => Boolean(await orm.program.count(params))).data
+    );
+}
 
 export const useProgramReferenceListUnSorted = () =>
     useQuery<ProgramWithReferences[]>([orm.program.name], () => orm.program.get());
