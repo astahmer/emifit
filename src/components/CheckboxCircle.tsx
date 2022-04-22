@@ -2,6 +2,7 @@ import { TextInputProps } from "@/components/TextInput";
 import { CheckCircleIcon, CheckIcon } from "@chakra-ui/icons";
 import {
     Box,
+    BoxProps,
     CheckboxState,
     FormControl,
     FormLabel,
@@ -11,13 +12,20 @@ import {
     useCheckbox,
     UseCheckboxProps,
 } from "@chakra-ui/react";
+import { ReactNode } from "react";
 
-export function CheckboxCircle({ getIconProps, checkboxRef, ...props }: CheckboxCircleProps) {
+export function CheckboxCircle({
+    getIconProps,
+    checkboxRef,
+    renderLabel,
+    getWrapperProps,
+    ...props
+}: CheckboxCircleProps & { renderLabel?: () => ReactNode; getWrapperProps?: () => BoxProps }) {
     const { state, getInputProps, getCheckboxProps } = useCheckbox(props);
     const isChecked = state.isChecked;
 
     return (
-        <Box as="label">
+        <Box as="label" {...getWrapperProps?.()}>
             <input {...getInputProps()} hidden ref={checkboxRef} />
             <IconButton
                 as="div"
@@ -30,7 +38,30 @@ export function CheckboxCircle({ getIconProps, checkboxRef, ...props }: Checkbox
                 {...getCheckboxProps()}
                 {...getIconProps?.(state)}
             />
+            {renderLabel?.()}
         </Box>
+    );
+}
+
+export function CheckboxCircleInFragment({ getIconProps, checkboxRef, ...props }: CheckboxCircleProps) {
+    const { state, getInputProps, getCheckboxProps } = useCheckbox(props);
+    const isChecked = state.isChecked;
+
+    return (
+        <>
+            <input {...getInputProps()} hidden ref={checkboxRef} />
+            <IconButton
+                as="div"
+                colorScheme={isChecked ? "pink" : "gray"}
+                aria-label="checkbox" // TODO
+                size="xs"
+                icon={isChecked ? <CheckCircleIcon fontSize="x-large" /> : undefined}
+                variant="outline"
+                rounded="full"
+                {...getCheckboxProps()}
+                {...getIconProps?.(state)}
+            />
+        </>
     );
 }
 
