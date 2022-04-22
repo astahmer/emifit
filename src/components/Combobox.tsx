@@ -90,7 +90,7 @@ function ComboboxBase<Item = any>({
         selectItem,
         selectedItem,
     } = useCombobox({
-        initialInputValue: defaultValue as string,
+        initialInputValue: (defaultValue as string) || "",
         stateReducer,
         itemToString,
         items: inputItems,
@@ -113,10 +113,11 @@ function ComboboxBase<Item = any>({
         },
     });
     const inputRef = useMergeRefs(externalRef, inputProps.ref);
-    const mergedProps = {
+    const wrappedProps = {
         onChange: callAll(props.onChange, inputProps.onChange),
         onBlur: callAll(props.onBlur, inputProps.onBlur),
     };
+    const mergedProps = { ...inputProps, ...props, ...wrappedProps };
 
     return (
         <>
@@ -128,8 +129,6 @@ function ComboboxBase<Item = any>({
                     ) : (
                         <Input
                             placeholder={items.length ? "Search or create a new one..." : "Create a new one..."}
-                            {...inputProps}
-                            {...props}
                             {...mergedProps}
                             ref={inputRef}
                         />
