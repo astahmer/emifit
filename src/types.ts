@@ -11,3 +11,5 @@ export type AwaitFn<T extends tb.Function.Function<any, P>, P = unknown> = tb.Fu
 >
     ? R
     : T;
+
+export type LiteralUnion<T extends U, U = string> = T | (U & {});
