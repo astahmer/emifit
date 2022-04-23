@@ -1,16 +1,32 @@
-import { sortArrayOfObjectByPropFromArray, sortBy } from "@pastable/core";
 import { CalendarDate } from "@uselessdev/datepicker";
 import { isToday } from "date-fns";
 import { createBrowserHistory } from "history";
-import { atom, useAtomValue } from "jotai";
-import { useQuery, useQueryClient } from "react-query";
-import { groupBy, groupIn } from "./functions/groupBy";
-import { computeExerciseFromExoId, computeExerciseFromIncompleteExo } from "./functions/snapshot";
-import { makeId, printDate } from "./functions/utils";
-import { orm, StoreIndex, StoreQueryParams } from "./orm";
-import { Daily, Exercise, Program, ProgramWithReferences } from "./orm-types";
+import { atom, unstable_createStore } from "jotai";
+import { parseDate, printDate } from "./functions/utils";
 
+export const store = unstable_createStore();
 export const browserHistory = createBrowserHistory({ window });
+
+let wasUpdatedFromBackButton = false;
+browserHistory.listen((update) => {
+    // When navigating to the homepage, sets the location.pathname so the currentDate daily entry id
+    // (from: "/[anything]" to "/daily/entry/:id")
+    if (update.action === "PUSH" && update.location.pathname === "/") {
+        const dailyId = printDate(store.get(currentDateAtom)).replaceAll("/", "-");
+        return browserHistory.replace(`/daily/entry/${dailyId}`);
+    }
+
+    // When navigating using the browser back button, sets currentDate to the date of the previous (now current) location.pathname
+    // (from: "/[anything]" to "/daily/entry/:id")
+    if (update.action === "POP" && update.location.pathname.startsWith("/daily/entry/")) {
+        wasUpdatedFromBackButton = true;
+        store.set(
+            currentDateAtom,
+            parseDate(update.location.pathname.replace("/daily/entry/", "").replaceAll("-", "/"))
+        );
+    }
+});
+
 export const debugModeAtom = atom<boolean>(false);
 export const showSkeletonsAtom = atom<boolean>(false);
 
@@ -21,120 +37,26 @@ export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
 
 export const gridCondensedViewAtom = atom(true);
 
-export const useDailyQuery = () => {
-    const id = useAtomValue(currentDailyIdAtom);
-    const query = useQuery(["daily", id], async () => {
-        const daily = await orm.daily.find(id);
-        if (!daily) return null;
+store.sub(currentDateAtom, () => {
+    // Only ever update the location.pahtname if the user is on the homepage either as "/" or from "/daily/entry/:id"
+    const shouldUpdateLocation =
+        browserHistory.location.pathname === "/" || browserHistory.location.pathname.startsWith("/daily/entry/");
+    if (!shouldUpdateLocation) return;
 
-        const exerciseList = await orm.exercise.get();
-        const exerciseListById = groupIn(exerciseList, "id");
-        return { ...daily, exerciseList: daily.exerciseList.map(computeExerciseFromExoId(exerciseListById)) } as Daily;
-    });
+    const dailyId = printDate(store.get(currentDateAtom)).replaceAll("/", "-");
 
-    return query;
-};
-export const useDaily = () => ({ ...useDailyQuery().data, invalidate: useDailyInvalidate() });
+    // Updates the location.pathname to the current daily entry id
+    // (from: "/" to "/daily/entry/:id")
+    if (browserHistory.location.pathname === "/") {
+        return browserHistory.replace(`/daily/entry/${dailyId}`);
+    }
 
-export const useDailyInvalidate = () => {
-    const id = useAtomValue(currentDailyIdAtom);
-    const queryClient = useQueryClient();
+    if (wasUpdatedFromBackButton) {
+        wasUpdatedFromBackButton = false;
+        return;
+    }
 
-    return () => void queryClient.invalidateQueries(["daily", id]);
-};
-
-export const useDailyListQuery = () => {
-    const query = useQuery(
-        ["dailyList"],
-        async () => {
-            const list = await orm.daily.get();
-            const exerciseList = await orm.exercise.get();
-            const exerciseListById = groupIn(exerciseList, "id");
-            console.log(list, exerciseList, exerciseListById);
-
-            return list.map(
-                (daily) =>
-                    ({
-                        ...daily,
-                        exerciseList: daily.exerciseList.map(computeExerciseFromExoId(exerciseListById)),
-                    } as Daily)
-            );
-        },
-        { initialData: [] }
-    );
-
-    return query;
-};
-export const useDailyList = () => useDailyListQuery().data;
-
-function useExerciseUnsorted<Index extends StoreIndex<"exercise"> = undefined>(
-    params: StoreQueryParams<"exercise", Index> = {}
-) {
-    return useQuery<Exercise[]>(
-        [orm.exercise.name, params],
-        async () => {
-            const list = await orm.exercise.get(params);
-            return list.map(computeExerciseFromIncompleteExo);
-        },
-        { initialData: [] }
-    );
-}
-
-export function useExerciseList<Index extends StoreIndex<"exercise"> = undefined>(
-    params: StoreQueryParams<"exercise", Index> = {}
-) {
-    const list = useExerciseUnsorted(params).data || [];
-    const mostRecents = getMostRecentsExerciseById(list);
-    return mostRecents;
-}
-
-export function useHasProgram<Index extends StoreIndex<"program"> = undefined>(
-    params: StoreQueryParams<"program", Index> = {}
-) {
-    return Boolean(
-        useQuery([orm.program.name, "hasProgram"], async () => Boolean(await orm.program.count(params))).data
-    );
-}
-
-export const useProgramReferenceListUnSorted = () =>
-    useQuery<ProgramWithReferences[]>([orm.program.name], () => orm.program.get());
-
-export const useProgramQuery = () => {
-    return useQuery<Program[]>(
-        [orm.program.name, "list"],
-        async () => {
-            const [programList, exerciseList, programListOrder] = await Promise.all([
-                orm.program.get(),
-                orm.exercise.get(),
-                orm.programListOrder.get(),
-            ]);
-            const exerciseListById = groupIn(exerciseList || [], "id");
-            return sortArrayOfObjectByPropFromArray(
-                (programList || []).map((p) => ({
-                    ...p,
-                    exerciseList: p.exerciseList.map(computeExerciseFromExoId(exerciseListById)),
-                })),
-                "id",
-                programListOrder || []
-            );
-        },
-        { initialData: [] }
-    );
-};
-
-export const useProgramList = () => useProgramQuery().data;
-
-export const makeExercise = (params: Pick<Exercise, "name" | "tags" | "series"> & { category: string }) =>
-    ({
-        ...params,
-        id: makeId(),
-        createdAt: new Date(),
-        series: params.series.map((serie) => ({ ...serie, id: makeId() })),
-    } as Exercise);
-export const makeSerie = (index: number, current = []) => ({ id: makeId(), kg: current[index - 1]?.kg ?? 1, reps: 1 });
-
-export function getMostRecentsExerciseById(list: Exercise[]) {
-    const groupByNames = groupBy(list, "name");
-    const mostRecents = Object.keys(groupByNames).map((name) => sortBy(groupByNames[name], "createdAt", "desc")[0]);
-    return mostRecents;
-}
+    // Updates the location.pathname to the current daily entry id
+    // (from: "/daily/entry/:someId" to "/daily/entry/:anotherId")
+    browserHistory.push(`/daily/entry/${dailyId}`);
+});

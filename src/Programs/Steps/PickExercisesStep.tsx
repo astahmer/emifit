@@ -1,6 +1,6 @@
 import { CheckboxButton } from "@/components/CheckboxCircle";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
-import { useExerciseList } from "@/store";
+import { useExerciseList } from "@/orm-hooks";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import { Box, Button, Heading } from "@chakra-ui/react";
 import { ExerciseAccordionList } from "@/Exercises/ExerciseAccordionList";

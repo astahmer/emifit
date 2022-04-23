@@ -1,0 +1,84 @@
+import { HFlex } from "@/components/HFlex";
+import { RadioCardButton } from "@/components/RadioCard";
+import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
+import { orm } from "@/orm";
+import { currentDailyIdAtom, currentDateAtom, isDailyTodayAtom } from "@/store";
+import { useDailyInvalidate } from "@/orm-hooks";
+import { ChevronLeftIcon } from "@chakra-ui/icons";
+import { Alert, AlertIcon, Box, Divider, Text } from "@chakra-ui/react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { useMutation } from "react-query";
+import { useLastFilledDaily, useLastFilledDailyDate } from "./useLastFilledDailyDate";
+
+export const NoDaily = () => {
+    const isDailyToday = useAtomValue(isDailyTodayAtom);
+
+    return (
+        <HFlex h="100%" justifyContent="center">
+            {isDailyToday ? <EmptyTodayDaily /> : <EmptyPastDay />}
+        </HFlex>
+    );
+};
+const EmptyTodayDaily = () => {
+    const id = useAtomValue(currentDailyIdAtom);
+    const invalidate = useDailyInvalidate();
+
+    const createDaily = useMutation(
+        (category: string) => {
+            const now = new Date();
+            return orm.daily.add({ id, category, date: now, time: now.getTime(), exerciseList: [], completedList: [] });
+        },
+        { onSuccess: invalidate }
+    );
+    const lastFilledDaily = useLastFilledDaily();
+
+    return (
+        <>
+            <Box m="4">
+                <Alert status="info" rounded="full" justifyContent="center">
+                    <AlertIcon />
+                    <Text>No category picked yet !</Text>
+                </Alert>
+                {lastFilledDaily && (
+                    <Text fontSize="xs" textAlign="center" mt="1" opacity="0.6">
+                        (Last entry's category was {lastFilledDaily.category} on {lastFilledDaily.id})
+                    </Text>
+                )}
+            </Box>
+            <Divider mb="4" />
+            <Box alignSelf="center">
+                <CategoryRadioPicker onChange={createDaily.mutate} />
+            </Box>
+        </>
+    );
+};
+const EmptyPastDay = () => {
+    const setCurrentDate = useSetAtom(currentDateAtom);
+    const lastFilledDaily = useLastFilledDailyDate();
+
+    const mutation = useMutation(() => void setCurrentDate(lastFilledDaily));
+
+    return (
+        <>
+            <Box m="4">
+                <Box m="4">
+                    <Alert status="warning" rounded="full" justifyContent="center">
+                        <AlertIcon />
+                        Nothing to see here !
+                    </Alert>
+                </Box>
+            </Box>
+            {lastFilledDaily ? (
+                <>
+                    <Divider mb="4" />
+                    <Box alignSelf="center">
+                        <RadioCardButton onClick={mutation.mutate.bind(undefined)}>
+                            <ChevronLeftIcon />
+                            Go to the closest previous daily entry
+                        </RadioCardButton>
+                    </Box>
+                </>
+            ) : null}
+        </>
+    );
+};

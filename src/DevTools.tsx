@@ -3,7 +3,8 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { SwitchInput } from "./components/SwitchInput";
 import { toasts } from "./functions/toasts";
 import { orm } from "./orm";
-import { currentDailyIdAtom, debugModeAtom, showSkeletonsAtom, useDailyInvalidate } from "./store";
+import { currentDailyIdAtom, debugModeAtom, showSkeletonsAtom } from "./store";
+import { useDailyInvalidate } from "./orm-hooks";
 
 export function DevTools() {
     const debugMode = useAtomValue(debugModeAtom);

@@ -1,15 +1,17 @@
 import { Box, ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { WithChildren } from "@pastable/core";
 import { CalendarDefaultTheme } from "@uselessdev/datepicker";
-import { useSetAtom } from "jotai";
+import { Provider, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
-import { Outlet, Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
+import { Outlet, Route, Routes, unstable_HistoryRouter as HistoryRouter, useNavigate } from "react-router-dom";
 import "./App.css";
 import { BottomTabs } from "./components/BottomTabs";
 import { DailyEntry } from "./Daily/DailyEntry";
+import { ExerciseGridView } from "./Daily/ExerciseGridView";
+import { ExerciseListView } from "./Daily/ExerciseListView";
 import { DevTools } from "./DevTools";
 import { makeDb } from "./orm";
 import { ExerciseAddPage } from "./pages/ExerciseAddPage";
@@ -19,7 +21,7 @@ import { ProgramsPage } from "./pages/ProgramsPage";
 import { ProgressPage } from "./pages/ProgressPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { routeMap } from "./routes";
-import { debugModeAtom, browserHistory } from "./store";
+import { debugModeAtom, browserHistory, store } from "./store";
 
 const queryClient = new QueryClient();
 const theme = extendTheme(CalendarDefaultTheme, { config: { initialColorMode: "light" } });
@@ -30,25 +32,30 @@ function App() {
 
     return (
         <DbProvider>
-            <QueryClientProvider client={queryClient}>
-                <ChakraProvider theme={theme}>
-                    <HistoryRouter history={browserHistory}>
-                        <Routes>
-                            <Route path="/*" element={<Layout />}>
-                                <Route index element={<HomePage />} />
-                                <Route path="daily/:dailyId" element={<HomePageLayout />}>
-                                    <Route index element={<DailyEntry />} />
+            <Provider unstable_createStore={() => store}>
+                <QueryClientProvider client={queryClient}>
+                    <ChakraProvider theme={theme}>
+                        <HistoryRouter history={browserHistory}>
+                            <Routes>
+                                <Route path="/" element={<Layout />}>
+                                    <Route index element={<HomePage />} />
+                                    <Route path="daily" element={<HomePageLayout />}>
+                                        <Route index element={<DailyEntry />} />
+                                        <Route path="entry/:dailyId" element={<DailyEntry />} />
+                                        <Route path="list" element={<ExerciseListView />} />
+                                    </Route>
+                                    <Route path="exercise/grid" element={<ExerciseGridView />} />
+                                    <Route path={routeMap.exercise.add} element={<ExerciseAddPage />} />
+                                    <Route path={routeMap.exercise.edit} element={<ExerciseEditPage />} />
+                                    <Route path={routeMap.progress} element={<ProgressPage />} />
+                                    <Route path={routeMap.settings} element={<SettingsPage />} />
+                                    <Route path={routeMap.programs} element={<ProgramsPage />} />
                                 </Route>
-                                <Route path={routeMap.exercise.add} element={<ExerciseAddPage />} />
-                                <Route path={routeMap.exercise.edit} element={<ExerciseEditPage />} />
-                                <Route path={routeMap.progress} element={<ProgressPage />} />
-                                <Route path={routeMap.settings} element={<SettingsPage />} />
-                                <Route path={routeMap.programs} element={<ProgramsPage />} />
-                            </Route>
-                        </Routes>
-                    </HistoryRouter>
-                </ChakraProvider>
-            </QueryClientProvider>
+                            </Routes>
+                        </HistoryRouter>
+                    </ChakraProvider>
+                </QueryClientProvider>
+            </Provider>
         </DbProvider>
     );
 }

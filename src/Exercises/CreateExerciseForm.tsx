@@ -5,7 +5,7 @@ import { serializeExercise } from "@/functions/snapshot";
 import { onError } from "@/functions/toasts";
 import { orm } from "@/orm";
 import { Exercise, Serie } from "@/orm-types";
-import { makeExercise, makeSerie } from "@/store";
+import { makeExercise, makeSerie } from "@/orm-utils";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
 import { Fragment, ReactNode, useEffect } from "react";

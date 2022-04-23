@@ -8,7 +8,9 @@ import { toasts } from "@/functions/toasts";
 import { orm } from "@/orm";
 import { Daily, Exercise, Program } from "@/orm-types";
 import { ProgramCardExerciseList } from "@/Programs/ProgramCard";
-import { debugModeAtom, getMostRecentsExerciseById, useDailyList, useExerciseList, useProgramList } from "@/store";
+import { debugModeAtom } from "@/store";
+import { useDailyList, useExerciseList, useProgramList } from "@/orm-hooks";
+import { getMostRecentsExerciseById } from "@/orm-utils";
 import { AwaitFn } from "@/types";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {

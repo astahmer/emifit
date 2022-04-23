@@ -8,7 +8,7 @@ import { AiFillHome } from "react-icons/ai";
 import { FiSettings } from "react-icons/fi";
 import { Link as ReactLink, useLocation } from "react-router-dom";
 import { HFlex } from "./HFlex";
-import { useDaily } from "@/store";
+import { useDaily } from "@/orm-hooks";
 
 export const BottomTabs = () => {
     const location = useLocation();

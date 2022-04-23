@@ -2,7 +2,7 @@ import { CheckboxButton } from "@/components/CheckboxCircle";
 import { Box, Heading } from "@chakra-ui/react";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { useProgramInterpret } from "../useProgramInterpret";
-import { useExerciseList } from "@/store";
+import { useExerciseList } from "@/orm-hooks";
 import { useSelector } from "@xstate/react";
 
 export function PickCategoryStep() {

@@ -1,6 +1,6 @@
 import { HFlex } from "@/components/HFlex";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
-import { useProgramList } from "@/store";
+import { useProgramList } from "@/orm-hooks";
 import { AddIcon } from "@chakra-ui/icons";
 import { Alert, AlertIcon, Box, Button, Divider } from "@chakra-ui/react";
 import { ProgramList } from "./ProgramList";

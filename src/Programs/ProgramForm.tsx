@@ -1,7 +1,7 @@
 import { RadioCard, RadioCardPicker } from "@/components/RadioCard";
 import { Exercise } from "@/orm-types";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
-import { useExerciseList } from "@/store";
+import { useExerciseList } from "@/orm-hooks";
 import { Box, Divider } from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { CreateExerciseStep } from "./Steps/CreateExerciseStep";

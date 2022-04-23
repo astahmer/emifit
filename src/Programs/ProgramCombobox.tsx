@@ -1,6 +1,6 @@
 import { Combobox, ComboboxProps } from "@/components/Combobox";
 import { Program } from "@/orm-types";
-import { useProgramList } from "@/store";
+import { useProgramList } from "@/orm-hooks";
 import { FormControl, FormErrorMessage, FormLabel, forwardRef } from "@chakra-ui/react";
 
 export const ProgramCombobox = forwardRef(
