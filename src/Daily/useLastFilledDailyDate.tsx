@@ -1,13 +1,20 @@
 import { parseDate, printDate } from "@/functions/utils";
 import { orm } from "@/orm";
+import { currentDateAtom } from "@/store";
+import { useAtomValue } from "jotai";
 import { useQuery } from "react-query";
 
 export const useLastFilledDailyDate = () => {
-    const query = useQuery(["daily", "keys"], () => orm.daily.keys({ count: 1 }));
+    const currentDate = useAtomValue(currentDateAtom);
+    const query = useQuery(["daily", "keys"], () => orm.daily.keys({ count: 1 })); // TODO index by-time + query lowerbound ?
     const keys = query.data || [];
 
-    return keys[0] ? parseDate(keys[0]) : null;
+    if (!keys[0]) return null;
+
+    const date = parseDate(keys[0]);
+    return date < currentDate ? date : null;
 };
+
 export const useLastFilledDaily = () => {
     const lastFilledDailyDate = useLastFilledDailyDate();
     const dailyId = lastFilledDailyDate && printDate(lastFilledDailyDate);
