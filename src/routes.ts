@@ -1,10 +1,10 @@
 export const routeMap = {
-    home: "*",
+    home: "/",
     exercise: {
-        add: "exercise/add",
-        edit: "exercise/edit/:id",
+        add: "/exercise/add",
+        edit: "/exercise/edit/:id",
     },
-    progress: "progress",
-    settings: "settings",
-    programs: "programs/*",
+    progress: "/progress",
+    settings: "/settings",
+    programs: "/programs/*",
 } as const;

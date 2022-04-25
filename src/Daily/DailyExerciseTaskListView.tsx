@@ -32,10 +32,10 @@ import { useNavigate } from "react-router-dom";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
 import { WithChildren } from "@pastable/core";
 import { Scrollable } from "@/components/Scrollable";
+import { Link as ReactLink } from "react-router-dom";
 
 export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
-    const navigate = useNavigate();
 
     return (
         <ExerciseTaskListView exerciseList={exerciseList}>
@@ -44,7 +44,9 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
             <Divider my="4" />
             <Box alignSelf="center">
                 {isDailyToday ? (
-                    <RadioCardButton onClick={() => navigate("/exercise/grid")}>Add exercise</RadioCardButton>
+                    <ReactLink to="/exercise/add">
+                        <RadioCardButton>Add exercise</RadioCardButton>
+                    </ReactLink>
                 ) : (
                     <GoBackToTodayEntryButton />
                 )}
@@ -148,7 +150,7 @@ const CardioCheckbox = () => {
     const daily = useDaily();
 
     const toggleDailyCardio = useMutation(
-        (checked: boolean) => orm.daily.upsert(daily.id, (current) => ({ ...current, hasDoneCardio: checked })),
+        (hasDoneCardio: boolean) => orm.daily.upsert(daily.id, (current) => ({ ...current, hasDoneCardio })),
         { onSuccess: daily.invalidate }
     );
     const isDailyToday = useAtomValue(isDailyTodayAtom);
@@ -177,8 +179,8 @@ const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
         async () => {
             await orm.daily.upsert(daily.id, (current) => ({
                 ...current,
-                completedList: current.exerciseList.filter((completed) => exo.id !== completed),
-                exerciseList: current.completedList.filter((exercise) => exo.id !== exercise),
+                completedList: current.completedList.filter((completed) => exo.id !== completed),
+                exerciseList: current.exerciseList.filter((exercise) => exo.id !== exercise),
             }));
             return orm.exercise.delete(exo.id);
         },
