@@ -214,19 +214,14 @@ const ProgramSearch = () => {
 
             return Promise.all([
                 ...insertMany,
-                orm.daily.upsert(dailyId, (current) => {
-                    const updatedExerciseList = current.exerciseList.concat(exerciseCloneList.map((exo) => exo.id));
-
-                    return {
-                        ...serializeDaily({
-                            ...current,
-                            programId: program.id,
-                            exerciseList: [],
-                        }),
-                        exerciseList: updatedExerciseList,
-                        exerciseListOrder: updatedExerciseList,
-                    };
-                }),
+                orm.daily.upsert(dailyId, (current) => ({
+                    ...serializeDaily({
+                        ...current,
+                        programId: program.id,
+                        exerciseList: [],
+                    }),
+                    exerciseList: current.exerciseList.concat(exerciseCloneList.map((exo) => exo.id)),
+                })),
                 tx.done,
             ]);
         },

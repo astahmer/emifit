@@ -5,12 +5,12 @@ import { useDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
 import { Box, Flex } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "react-query";
 
 export const DailyExerciseListView = ({ exerciseList }: WithExerciseList) => {
     const daily = useDaily();
-    const exerciseIdList = daily.exerciseListOrder;
+    const exerciseIdList = useMemo(() => daily.exerciseList.map((e) => e.id), [daily.exerciseList]);
     const [items, setItems] = useState(exerciseIdList);
 
     // Keep items up to date with daily.exerciseIdList whenever a exercise is created/deleted
@@ -21,7 +21,7 @@ export const DailyExerciseListView = ({ exerciseList }: WithExerciseList) => {
         setItems(exerciseIdList);
     }, [exerciseIdList]);
 
-    const mutation = useMutation((exerciseListOrder: string[]) => orm.daily.upsert(daily.id, { exerciseListOrder }), {
+    const mutation = useMutation((exerciseList: string[]) => orm.daily.upsert(daily.id, { exerciseList }), {
         onSuccess: () => daily.invalidate(),
     });
 
@@ -39,15 +39,13 @@ export const DailyExerciseListView = ({ exerciseList }: WithExerciseList) => {
             layoutScroll
             overflowY="auto"
         >
-            {items
-                .filter((id) => exerciseList.some((p) => p.id === id))
-                .map((item) => (
-                    <ReorderExerciseItem
-                        key={item}
-                        exercise={exerciseList.find((p) => p.id === item)}
-                        onAnimationComplete={() => mutation.mutate(items)}
-                    />
-                ))}
+            {items.map((item) => (
+                <ReorderExerciseItem
+                    key={item}
+                    exercise={exerciseList.find((p) => p.id === item)}
+                    onAnimationComplete={() => mutation.mutate(items)}
+                />
+            ))}
         </Box>
     );
 };

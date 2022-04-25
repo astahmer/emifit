@@ -32,7 +32,6 @@ const EmptyTodayDaily = () => {
                 time: now.getTime(),
                 exerciseList: [],
                 completedList: [],
-                exerciseListOrder: [],
             });
         },
         { onSuccess: invalidate }
