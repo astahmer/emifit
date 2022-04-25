@@ -74,6 +74,11 @@ export function useExerciseList<Index extends StoreIndex<"exercise"> = undefined
     return mostRecents;
 }
 
+export const useExerciseListInDailyCategory = () => {
+    const daily = useDaily();
+    return useExerciseList({ index: "by-category", query: daily.category });
+};
+
 export function useHasProgram<Index extends StoreIndex<"program"> = undefined>(
     params: StoreQueryParams<"program", Index> = {}
 ) {

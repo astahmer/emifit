@@ -2,7 +2,7 @@ import { showSkeletonsAtom } from "@/store";
 import { useDailyQuery } from "@/orm-hooks";
 import { Divider, Flex, Skeleton } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
-import { ExerciseListSkeleton } from "./ExerciseListSkeleton";
+import { DailyExerciseTaskListSkeleton } from "./DailyExerciseTaskListSkeleton";
 import { NoDaily } from "./NoDaily";
 import { WithDaily } from "./WithDaily";
 
@@ -20,7 +20,7 @@ export const DailyEntry = () => {
                     <Skeleton w="100px" h="40px" />
                 </Flex>
                 <Divider mt="4" />
-                <ExerciseListSkeleton />
+                <DailyExerciseTaskListSkeleton />
             </Flex>
         );
     }

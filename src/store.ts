@@ -35,7 +35,7 @@ export const currentDateAtom = atom<CalendarDate>(today);
 export const currentDailyIdAtom = atom((get) => printDate(get(currentDateAtom)));
 export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
 
-export const gridCondensedViewAtom = atom(true);
+export const isCompactViewAtom = atom(true);
 
 store.sub(currentDateAtom, () => {
     // Only ever update the location.pahtname if the user is on the homepage either as "/" or from "/daily/entry/:id"

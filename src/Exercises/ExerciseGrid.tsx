@@ -1,6 +1,7 @@
+import { Scrollable } from "@/components/Scrollable";
 import { ExerciseTag } from "@/Exercises/ExerciseTag";
-import { Exercise } from "@/orm-types";
-import { gridCondensedViewAtom } from "@/store";
+import { Exercise, WithExerciseList } from "@/orm-types";
+import { isCompactViewAtom } from "@/store";
 import {
     Box,
     Divider,
@@ -14,9 +15,18 @@ import {
     Wrap,
     WrapItem,
 } from "@chakra-ui/react";
-import { chunk } from "@pastable/core";
+import { chunk, WithChildren } from "@pastable/core";
 import { useAtomValue } from "jotai";
 import { Fragment } from "react";
+
+export const ExerciseGridView = ({ exerciseList, children }: WithExerciseList & Partial<WithChildren>) => {
+    return (
+        <Scrollable pt="2" pb="8">
+            {children}
+            <ExerciseGrid exerciseList={exerciseList} />
+        </Scrollable>
+    );
+};
 
 export function ExerciseGrid({ exerciseList }: { exerciseList: Exercise[] }) {
     return (
@@ -45,7 +55,7 @@ export function ExerciseGrid({ exerciseList }: { exerciseList: Exercise[] }) {
 }
 
 function ExerciseGridItem({ exo }: { exo: Exercise }) {
-    const isCondensed = useAtomValue(gridCondensedViewAtom);
+    const isCompact = useAtomValue(isCompactViewAtom);
 
     return (
         <Flex>
@@ -59,18 +69,18 @@ function ExerciseGridItem({ exo }: { exo: Exercise }) {
                     {exo.series.length} sets of {exo.series.map((set) => set.reps).join("/")} reps
                 </Text>
                 <Wrap mt="2">
-                    {exo.tags.slice(0, isCondensed ? 2 : undefined).map((tag) => (
+                    {exo.tags.slice(0, isCompact ? 2 : undefined).map((tag) => (
                         <WrapItem key={tag.id}>
                             <ExerciseTag tag={tag} />
                         </WrapItem>
                     ))}
-                    {isCondensed && exo.tags.length > 2 ? (
+                    {isCompact && exo.tags.length > 2 ? (
                         <WrapItem>
                             <ExerciseTag tag={{ id: "...", label: "...", group: "none" }} />
                         </WrapItem>
                     ) : null}
                 </Wrap>
-                {isCondensed ? null : (
+                {isCompact ? null : (
                     <UnorderedList mt="2" fontSize="xs">
                         {exo.series.map((serie) => (
                             <ListItem key={serie.id}>

@@ -1,19 +1,20 @@
 import { Box, Divider, Flex, Skeleton, SkeletonCircle, Stack } from "@chakra-ui/react";
 
-export const ExerciseListSkeleton = () => (
+export const DailyExerciseTaskListSkeleton = () => (
     <Stack mt="4">
-        <ExerciseItemSkeleton />
+        <ExerciseTaskItemSkeleton />
         <Box px="8">
             <Divider my="2" />
         </Box>
-        <ExerciseItemSkeleton />
+        <ExerciseTaskItemSkeleton />
         <Box px="8">
             <Divider my="2" />
         </Box>
-        <ExerciseItemSkeleton />
+        <ExerciseTaskItemSkeleton />
     </Stack>
 );
-const ExerciseItemSkeleton = () => {
+
+const ExerciseTaskItemSkeleton = () => {
     return (
         <Box>
             <Flex flexDirection="column" px="8">

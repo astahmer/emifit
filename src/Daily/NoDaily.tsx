@@ -1,14 +1,13 @@
 import { HFlex } from "@/components/HFlex";
-import { RadioCardButton } from "@/components/RadioCard";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { orm } from "@/orm";
-import { currentDailyIdAtom, currentDateAtom, isDailyTodayAtom } from "@/store";
+import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
 import { useDailyInvalidate } from "@/orm-hooks";
-import { ChevronLeftIcon } from "@chakra-ui/icons";
 import { Alert, AlertIcon, Box, Divider, Text } from "@chakra-ui/react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import { useMutation } from "react-query";
 import { useLastFilledDaily, useLastFilledDailyDate } from "./useLastFilledDailyDate";
+import { GoToClosestPreviousDailyEntryButton } from "./GoToClosestPreviousDailyEntryButton";
 
 export const NoDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
@@ -53,10 +52,7 @@ const EmptyTodayDaily = () => {
     );
 };
 const EmptyPastDay = () => {
-    const setCurrentDate = useSetAtom(currentDateAtom);
     const lastFilledDaily = useLastFilledDailyDate();
-
-    const mutation = useMutation(() => void setCurrentDate(lastFilledDaily));
 
     return (
         <>
@@ -72,10 +68,7 @@ const EmptyPastDay = () => {
                 <>
                     <Divider mb="4" />
                     <Box alignSelf="center">
-                        <RadioCardButton onClick={mutation.mutate.bind(undefined)}>
-                            <ChevronLeftIcon />
-                            Go to the closest previous daily entry
-                        </RadioCardButton>
+                        <GoToClosestPreviousDailyEntryButton />
                     </Box>
                 </>
             ) : null}

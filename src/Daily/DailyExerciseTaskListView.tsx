@@ -4,7 +4,7 @@ import { DotsIconButton } from "@/components/DotsIconButton";
 import { RadioCardButton } from "@/components/RadioCard";
 import { ExerciseTag } from "@/Exercises/ExerciseTag";
 import { orm } from "@/orm";
-import { Exercise } from "@/orm-types";
+import { Exercise, WithExerciseList } from "@/orm-types";
 import { routeMap } from "@/routes";
 import { isDailyTodayAtom } from "@/store";
 import { useDaily } from "@/orm-hooks";
@@ -30,15 +30,15 @@ import { Fragment } from "react";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
+import { WithChildren } from "@pastable/core";
+import { Scrollable } from "@/components/Scrollable";
 
-export const ExerciseListView = () => {
-    const daily = useDaily();
+export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
     const navigate = useNavigate();
 
     return (
-        <Flex flexDir="column" overflow="auto" h="100%" pt="2" pb="8">
-            <ExerciseList exerciseList={daily.exerciseList} />
+        <ExerciseTaskListView exerciseList={exerciseList}>
             <Divider my="4" />
             <CardioLine />
             <Divider my="4" />
@@ -49,11 +49,20 @@ export const ExerciseListView = () => {
                     <GoBackToTodayEntryButton />
                 )}
             </Box>
-        </Flex>
+        </ExerciseTaskListView>
     );
 };
 
-const ExerciseList = ({ exerciseList }: { exerciseList: Exercise[] }) => (
+const ExerciseTaskListView = ({ children, exerciseList }: { exerciseList: Exercise[] } & Partial<WithChildren>) => {
+    return (
+        <Scrollable pt="2" pb="8">
+            <ExerciseTaskList exerciseList={exerciseList} />
+            {children}
+        </Scrollable>
+    );
+};
+
+const ExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => (
     <>
         {exerciseList.map((exo, index) => {
             return (
@@ -63,14 +72,14 @@ const ExerciseList = ({ exerciseList }: { exerciseList: Exercise[] }) => (
                             <Divider my="2" />
                         </Box>
                     )}
-                    <ExerciseItem exo={exo} />
+                    <ExerciseTaskItem exo={exo} />
                 </Fragment>
             );
         })}
     </>
 );
 
-function ExerciseItem({ exo }: { exo: Exercise }) {
+function ExerciseTaskItem({ exo }: { exo: Exercise }) {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
     return (

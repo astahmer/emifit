@@ -54,3 +54,7 @@ export interface ProgramWithReferences extends Omit<Program, "exerciseList"> {
 export interface ExerciseWithReferences extends Omit<Exercise, "tags"> {
     tags: Tag["id"][];
 }
+
+export interface WithExerciseList {
+    exerciseList: Exercise[];
+}

@@ -38,6 +38,7 @@
         "react-table": "^7.7.0",
         "react-virtual": "^2.10.4",
         "redaxios": "^0.4.1",
+        "ts-pattern": "^4.0.2",
         "valtio": "^1.5.1",
         "xstate": "^4.30.6"
     },
