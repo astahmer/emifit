@@ -17,10 +17,14 @@ export const ExerciseAddPage = () => {
     const navigate = useNavigate();
     const addExerciseToDaily = useMutation(
         (exo: Exercise) =>
-            orm.daily.upsert(dailyId, (current) => ({
-                ...current,
-                exerciseList: (current.exerciseList || []).concat(exo.id),
-            })),
+            orm.daily.upsert(dailyId, (current) => {
+                const exerciseList = (current.exerciseList || []).concat(exo.id);
+                return {
+                    ...current,
+                    exerciseList,
+                    exerciseListOrder: exerciseList,
+                };
+            }),
         {
             onSuccess: () => {
                 daily.invalidate();

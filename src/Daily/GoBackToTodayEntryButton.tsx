@@ -6,7 +6,7 @@ import { useSetAtom } from "jotai";
 export const GoBackToTodayEntryButton = () => {
     const setCurrentDate = useSetAtom(currentDateAtom);
     return (
-        <RadioCardButton onClick={() => setCurrentDate(new Date())}>
+        <RadioCardButton onClick={() => setCurrentDate(new Date())} variant="solid">
             Go back to today's entry
             <ChevronRightIcon />
         </RadioCardButton>

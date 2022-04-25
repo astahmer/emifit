@@ -3,29 +3,42 @@ import { ExerciseTag } from "@/Exercises/ExerciseTag";
 import { Exercise } from "@/orm-types";
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { Box, Divider, Flex, Heading, Icon, Text, Wrap, WrapItem } from "@chakra-ui/react";
-import { Fragment } from "react";
+import { Fragment, ReactNode } from "react";
 
-export const ExerciseList = ({ exerciseList }: { exerciseList: Exercise[] }) => (
+export const FlexExerciseList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
+    return <ExerciseList exerciseList={exerciseList} render={FlexExercise} />;
+};
+
+const FlexExercise = ({ exercise }: { exercise: Exercise }) => <ExerciseListItem exo={exercise} />;
+
+export const ExerciseList = ({
+    exerciseList,
+    render,
+}: {
+    exerciseList: Exercise[];
+    render: ({ exercise, index }: { exercise: Exercise; index: number }) => ReactNode;
+}) => (
     <>
-        {exerciseList.map((exo, index) => {
+        {exerciseList.map((exercise, index) => {
             return (
-                <Fragment key={index}>
-                    {index > 0 && (
-                        <Box px="8">
-                            <Divider my="2" />
-                        </Box>
-                    )}
-                    <ExerciseListItem exo={exo} />
-                </Fragment>
+                // <Fragment key={index}>
+                //     {index > 0 && (
+                //         <Box px="4">
+                //             <Divider my="2" />
+                //         </Box>
+                //     )}
+                //     {render({ exercise, index })}
+                // </Fragment>
+                render({ exercise, index })
             );
         })}
     </>
 );
 
-function ExerciseListItem({ exo }: { exo: Exercise }) {
+export function ExerciseListItem({ exo }: { exo: Exercise }) {
     return (
-        <Flex>
-            <Flex flexDirection="column" pr="8" w="100%">
+        <>
+            <Flex flexDirection="column" w="100%">
                 <Flex w="100%" alignItems="flex-end">
                     <Heading as="h4" size="md">
                         {exo.name}
@@ -45,6 +58,6 @@ function ExerciseListItem({ exo }: { exo: Exercise }) {
             <HFlex justifyContent="space-around" p="4" ml="auto">
                 <Icon as={DragHandleIcon} size="24px" />
             </HFlex>
-        </Flex>
+        </>
     );
 }

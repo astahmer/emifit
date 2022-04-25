@@ -29,6 +29,8 @@ export const ExerciseGridView = ({ exerciseList, children }: WithExerciseList & 
 };
 
 export function ExerciseGrid({ exerciseList }: { exerciseList: Exercise[] }) {
+    const isCompact = useAtomValue(isCompactViewAtom);
+
     return (
         <Stack p="4">
             {chunk(exerciseList, 2).map((chunk, index) => {
@@ -36,7 +38,7 @@ export function ExerciseGrid({ exerciseList }: { exerciseList: Exercise[] }) {
                     <Fragment key={index}>
                         {index > 0 && (
                             <Box px="8">
-                                <Divider my="2" />
+                                <Divider my={isCompact ? "1" : "2"} />
                             </Box>
                         )}
                         <Grid gridTemplateColumns="4fr 1fr 4fr">

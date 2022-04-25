@@ -1,10 +1,11 @@
 import { orm } from "@/orm";
 import { useProgramList } from "@/orm-hooks";
-import { Box, type BoxProps } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
-import { ComponentProps, forwardRef, ForwardRefExoticComponent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { EditableProgramCard, EditableProgramCardProps } from "./ProgramCard";
+import { ReorderItemBox } from "../components/ReorderItemBox";
 
 export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">) {
     const programs = useProgramList();
@@ -25,7 +26,15 @@ export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">
     });
 
     return (
-        <Box as={Reorder.Group} axis="y" values={items} onReorder={setItems} listStyleType="none" mb="6">
+        <Box
+            as={Reorder.Group}
+            axis="y"
+            values={items}
+            // TODO react 18 transition
+            onReorder={(newOrder) => setItems((current) => (newOrder.join() === current.join() ? current : newOrder))}
+            listStyleType="none"
+            mb="6"
+        >
             {items
                 .filter((id) => programs.some((p) => p.id === id))
                 .map((item) => (
@@ -40,22 +49,16 @@ export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">
     );
 }
 
-type ReorderItemBoxComponent = ForwardRefExoticComponent<ComponentProps<typeof Reorder.Item> & Omit<BoxProps, "style">>;
-const ReorderItemBox = forwardRef<HTMLDivElement, BoxProps & ComponentProps<typeof Reorder.Item>>((props, ref) => (
-    <Box ref={ref} {...props} as={Reorder.Item} />
-)) as ReorderItemBoxComponent;
-
 export const ReorderProgramCardItem = ({
     program,
     onEdit,
     onAnimationComplete,
-}: EditableProgramCardProps & { onAnimationComplete?: () => void }) => {
+}: EditableProgramCardProps & { onAnimationComplete: () => void }) => {
     const y = useMotionValue(0);
 
     return (
         <ReorderItemBox
             value={program.id}
-            id={program.id}
             my="15px"
             boxShadow="0 4px 6px -1px rgba(0, 0, 0, 0.1)"
             style={{ position: "relative", y }}

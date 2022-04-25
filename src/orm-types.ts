@@ -28,7 +28,7 @@ export interface Program {
     exerciseList: Exercise[];
     createdAt: Date;
     updatedAt: Date;
-    // TODO exerciseOrderList: Array<Exercise["id"]>
+    // TODO exerciseListOrder: Array<Exercise["id"]>
 }
 
 export interface Daily {
@@ -37,6 +37,8 @@ export interface Daily {
     time: number;
     category: Category;
     exerciseList: Exercise[];
+    /** order in which exercise should be displayed */
+    exerciseListOrder: Array<Exercise["id"]>;
     /** Completed exerciseId list */
     completedList: Array<Exercise["id"]>;
     /** if made from X program */

@@ -25,7 +25,15 @@ const EmptyTodayDaily = () => {
     const createDaily = useMutation(
         (category: string) => {
             const now = new Date();
-            return orm.daily.add({ id, category, date: now, time: now.getTime(), exerciseList: [], completedList: [] });
+            return orm.daily.add({
+                id,
+                category,
+                date: now,
+                time: now.getTime(),
+                exerciseList: [],
+                completedList: [],
+                exerciseListOrder: [],
+            });
         },
         { onSuccess: invalidate }
     );
