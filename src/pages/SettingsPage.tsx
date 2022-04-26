@@ -258,7 +258,6 @@ const DataAccordions = ({
                 </AccordionPanel>
             </AccordionItem>
             {children}
-            {/* TODO daily entries table */}
         </Accordion>
     );
 };

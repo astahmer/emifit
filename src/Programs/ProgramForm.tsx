@@ -28,7 +28,7 @@ export function ProgramForm() {
 
     return (
         <Box d="flex" flexDirection="column" m="auto" w="100%" h="100%" minH={0}>
-            <Box d="flex" flexDirection="column" m="auto" maxH="100%">
+            <Box d="flex" flexDirection="column" m="auto" w="100%" maxH="100%">
                 <PickCategoryStep />
                 {interpret.state.matches("creating.maybeCreatingExercise.shouldCreateChoice") && (
                     <>

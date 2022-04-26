@@ -74,7 +74,7 @@ export const WithDaily = () => {
 const ListToolbar = () => {
     const viewType = useAtomValue(viewTypeAtom);
     return (
-        <Flex mr="auto" p="2" w="100%" alignItems="center" minH="42px">
+        <Flex mx="auto" p="2" w="100%" alignItems="center" minH="42px">
             <SwitchViewType />
             {viewType === "grid" && (
                 <Box ml="auto">

@@ -2,7 +2,7 @@ import { CheckboxCircleInFragment, CheckboxSquare } from "@/components/CheckboxC
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
 import { RadioCardButton } from "@/components/RadioCard";
-import { ExerciseTag } from "@/Exercises/ExerciseTag";
+import { ExerciseTag, ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { orm } from "@/orm";
 import { Exercise, WithExerciseList } from "@/orm-types";
 import { routeMap } from "@/routes";
@@ -103,13 +103,7 @@ function ExerciseTaskItem({ exo }: { exo: Exercise }) {
                 <Text fontWeight="normal" fontSize="sm" color="gray.500">
                     {exo.series.length} sets of {exo.series.map((set) => set.reps).join("/")} reps
                 </Text>
-                <Wrap mt="2">
-                    {exo.tags.map((tag) => (
-                        <WrapItem key={tag.id}>
-                            <ExerciseTag tag={tag} />
-                        </WrapItem>
-                    ))}
-                </Wrap>
+                <ExerciseTagList mt="2" tagList={exo.tags} />
                 <UnorderedList mt="2">
                     {exo.series.map((serie) => (
                         <ListItem key={serie.id}>

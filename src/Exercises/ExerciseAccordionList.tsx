@@ -17,10 +17,12 @@ import {
     Text,
     useCheckboxGroup,
     UseCheckboxGroupReturn,
+    Wrap,
+    WrapItem,
 } from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { CheckboxSquare } from "../components/CheckboxCircle";
-import { ExerciseTag } from "./ExerciseTag";
+import { ExerciseTag, ExerciseTagList } from "./ExerciseTag";
 
 export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[]>) => {
     const exercises = useExerciseList();
@@ -55,13 +57,7 @@ const ExerciseAccordion = ({
                     <CheckboxSquare getIconProps={() => ({ mr: "2" })} {...getCheckboxProps({ value: exercise.id })} />
                     <Stack alignItems="flex-start" w="100%">
                         <Text>{exercise.name}</Text>
-                        {Boolean(exercise.tags?.length) && (
-                            <Stack direction="row">
-                                {exercise.tags.map((tag) => (
-                                    <ExerciseTag key={tag.id} tag={tag} />
-                                ))}
-                            </Stack>
-                        )}
+                        {Boolean(exercise.tags?.length) && <ExerciseTagList tagList={exercise.tags} />}
                     </Stack>
                 </Stack>
                 <AccordionIcon ml="auto" />

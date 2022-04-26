@@ -1,5 +1,5 @@
 import { HFlex } from "@/components/HFlex";
-import { ExerciseTag } from "@/Exercises/ExerciseTag";
+import { ExerciseTag, ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { Exercise } from "@/orm-types";
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { Box, Divider, Flex, Heading, Icon, Text, Wrap, WrapItem } from "@chakra-ui/react";
@@ -47,13 +47,7 @@ export function ExerciseListItem({ exo }: { exo: Exercise }) {
                 <Text fontWeight="normal" fontSize="sm" color="gray.500">
                     {exo.series.length} sets of {exo.series.map((set) => set.reps).join("/")} reps
                 </Text>
-                <Wrap mt="2">
-                    {exo.tags.map((tag) => (
-                        <WrapItem key={tag.id}>
-                            <ExerciseTag tag={tag} />
-                        </WrapItem>
-                    ))}
-                </Wrap>
+                <ExerciseTagList mt="2" tagList={exo.tags} />
             </Flex>
             <HFlex justifyContent="space-around" p="4" ml="auto">
                 <Icon as={DragHandleIcon} size="24px" />
