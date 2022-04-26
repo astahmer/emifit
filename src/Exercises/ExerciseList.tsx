@@ -4,6 +4,7 @@ import { Exercise } from "@/orm-types";
 import { DragHandleIcon } from "@chakra-ui/icons";
 import { Box, Divider, Flex, Heading, Icon, Text, Wrap, WrapItem } from "@chakra-ui/react";
 import { Fragment, ReactNode } from "react";
+import { ExerciseSetListOverview } from "./ExerciseSetList";
 
 export const FlexExerciseList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
     return <ExerciseList exerciseList={exerciseList} render={FlexExercise} />;
@@ -44,9 +45,7 @@ export function ExerciseListItem({ exo }: { exo: Exercise }) {
                         {exo.name}
                     </Heading>
                 </Flex>
-                <Text fontWeight="normal" fontSize="sm" color="gray.500">
-                    {exo.series.length} sets of {exo.series.map((set) => set.reps).join("/")} reps
-                </Text>
+                <ExerciseSetListOverview setList={exo.series} />
                 <ExerciseTagList mt="2" tagList={exo.tags} />
             </Flex>
             <HFlex justifyContent="space-around" p="4" ml="auto">

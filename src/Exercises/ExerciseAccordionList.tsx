@@ -23,6 +23,7 @@ import {
 import { useSelector } from "@xstate/react";
 import { CheckboxSquare } from "../components/CheckboxCircle";
 import { ExerciseTag, ExerciseTagList } from "./ExerciseTag";
+import { ExerciseSetList } from "./ExerciseSetList";
 
 export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[]>) => {
     const exercises = useExerciseList();

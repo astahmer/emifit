@@ -18,6 +18,7 @@ import {
 import { chunk, WithChildren } from "@pastable/core";
 import { useAtomValue } from "jotai";
 import { Fragment } from "react";
+import { ExerciseSetList, ExerciseSetListOverview } from "./ExerciseSetList";
 
 export const ExerciseGridView = ({ exerciseList, children }: WithExerciseList & Partial<WithChildren>) => {
     return (
@@ -67,9 +68,7 @@ function ExerciseGridItem({ exo }: { exo: Exercise }) {
                         {exo.name}
                     </Heading>
                 </Flex>
-                <Text fontWeight="normal" fontSize="xs" color="gray.500">
-                    {exo.series.length} sets of {exo.series.map((set) => set.reps).join("/")} reps
-                </Text>
+                <ExerciseSetListOverview setList={exo.series} />
                 <Wrap mt="2">
                     {exo.tags.slice(0, isCompact ? 2 : undefined).map((tag) => (
                         <WrapItem key={tag.id}>
@@ -82,15 +81,7 @@ function ExerciseGridItem({ exo }: { exo: Exercise }) {
                         </WrapItem>
                     ) : null}
                 </Wrap>
-                {isCompact ? null : (
-                    <UnorderedList mt="2" fontSize="xs">
-                        {exo.series.map((serie) => (
-                            <ListItem key={serie.id}>
-                                {serie.kg} kg / {serie.reps} reps
-                            </ListItem>
-                        ))}
-                    </UnorderedList>
-                )}
+                {isCompact ? null : <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />}
             </Flex>
         </Flex>
     );

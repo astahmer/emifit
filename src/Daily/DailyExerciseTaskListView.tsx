@@ -2,12 +2,14 @@ import { CheckboxCircleInFragment, CheckboxSquare } from "@/components/CheckboxC
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
 import { RadioCardButton } from "@/components/RadioCard";
-import { ExerciseTag, ExerciseTagList } from "@/Exercises/ExerciseTag";
+import { Scrollable } from "@/components/Scrollable";
+import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
+import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { orm } from "@/orm";
+import { useDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
 import { routeMap } from "@/routes";
 import { isDailyTodayAtom } from "@/store";
-import { useDaily } from "@/orm-hooks";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
     Box,
@@ -19,20 +21,16 @@ import {
     MenuButton,
     MenuItem,
     MenuList,
+    OrderedList,
     Spacer,
     Text,
-    UnorderedList,
-    Wrap,
-    WrapItem,
 } from "@chakra-ui/react";
+import { WithChildren } from "@pastable/core";
 import { useAtomValue } from "jotai";
 import { Fragment } from "react";
 import { useMutation } from "react-query";
-import { useNavigate } from "react-router-dom";
+import { Link as ReactLink, useNavigate } from "react-router-dom";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
-import { WithChildren } from "@pastable/core";
-import { Scrollable } from "@/components/Scrollable";
-import { Link as ReactLink } from "react-router-dom";
 
 export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
@@ -100,17 +98,9 @@ function ExerciseTaskItem({ exo }: { exo: Exercise }) {
                     </Heading>
                     {isDailyToday && <ExerciseMenu exo={exo} />}
                 </Flex>
-                <Text fontWeight="normal" fontSize="sm" color="gray.500">
-                    {exo.series.length} sets of {exo.series.map((set) => set.reps).join("/")} reps
-                </Text>
+                <ExerciseSetListOverview setList={exo.series} />
                 <ExerciseTagList mt="2" tagList={exo.tags} />
-                <UnorderedList mt="2">
-                    {exo.series.map((serie) => (
-                        <ListItem key={serie.id}>
-                            {serie.kg} kg / {serie.reps} reps
-                        </ListItem>
-                    ))}
-                </UnorderedList>
+                <ExerciseSetList mt="2" fontSize="sm" setList={exo.series} />
             </Flex>
         </Flex>
     );
