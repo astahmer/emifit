@@ -1,4 +1,4 @@
-import { parseDate, printDate } from "@/functions/utils";
+import { printDate } from "@/functions/utils";
 import { orm } from "@/orm";
 import { currentDateAtom } from "@/store";
 import { useAtomValue } from "jotai";
@@ -6,19 +6,37 @@ import { useQuery } from "react-query";
 
 export const useLastFilledDailyDate = () => {
     const currentDate = useAtomValue(currentDateAtom);
-    const query = useQuery(["daily", "keys"], () => orm.daily.keys({ count: 1 })); // TODO index by-time + query lowerbound ?
-    const keys = query.data || [];
+    const query = useQuery(["daily", "closestPreviousDailyEntry", currentDate], async () => {
+        const tx = orm.db.transaction("daily");
 
-    if (!keys[0]) return null;
+        let cursor = await tx.store
+            .index("by-time")
+            // looking for the first (x) entry before the current date
+            // (x) < currentDate
+            .openCursor(IDBKeyRange.upperBound(new Date(currentDate).getTime()), "prev");
 
-    const date = parseDate(keys[0]);
-    return date < currentDate ? date : null;
+        let lastDate: Date | undefined;
+        while (cursor) {
+            if (cursor.value.date < currentDate && cursor.value.exerciseList.length) {
+                lastDate = cursor.value.date;
+                break;
+            }
+
+            cursor = await cursor.continue();
+        }
+
+        return lastDate;
+    });
+
+    return query.data;
 };
 
 export const useLastFilledDaily = () => {
     const lastFilledDailyDate = useLastFilledDailyDate();
     const dailyId = lastFilledDailyDate && printDate(lastFilledDailyDate);
-    const query = useQuery(["lastFilledDaily"], () => orm.daily.find(dailyId), { enabled: Boolean(dailyId) });
+    const query = useQuery(["lastFilledDaily", lastFilledDailyDate], () => orm.daily.find(dailyId), {
+        enabled: Boolean(dailyId),
+    });
 
     return query.data;
 };
