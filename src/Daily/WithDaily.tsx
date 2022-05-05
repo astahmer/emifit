@@ -181,7 +181,7 @@ const TodayEmptyExerciseList = () => {
                     </Box>
                 )}
                 <Box alignSelf="center">
-                    <ReactLink to="/exercise/add">
+                    <ReactLink to="exercise/add">
                         <RadioCardButton as="div" variant="solid">
                             Add exercise
                         </RadioCardButton>

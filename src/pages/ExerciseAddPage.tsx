@@ -2,19 +2,22 @@ import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
 import { orm } from "@/orm";
 import { Exercise } from "@/orm-types";
 import { routeMap } from "@/routes";
-import { currentDailyIdAtom } from "@/store";
-import { useDaily } from "@/orm-hooks";
+import { currentDailyIdAtom, showSkeletonsAtom } from "@/store";
+import { useDaily, useDailyInvalidate, useDailyQuery } from "@/orm-hooks";
 import { CheckIcon } from "@chakra-ui/icons";
-import { Box, Button, Divider, Heading } from "@chakra-ui/react";
+import { Box, Button, Divider, Flex, Heading, Skeleton } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { DailyExerciseTaskListSkeleton } from "@/Daily/DailyExerciseTaskListSkeleton";
 
 export const ExerciseAddPage = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
-    const daily = useDaily();
+    const query = useDailyQuery();
+    const daily = query.data;
 
     const navigate = useNavigate();
+    const invalidate = useDailyInvalidate();
     const addExerciseToDaily = useMutation(
         (exo: Exercise) =>
             orm.daily.upsert(dailyId, (current) => ({
@@ -23,11 +26,27 @@ export const ExerciseAddPage = () => {
             })),
         {
             onSuccess: () => {
-                daily.invalidate();
+                invalidate();
                 navigate(routeMap.home);
             },
         }
     );
+
+    const showSkeletons = useAtomValue(showSkeletonsAtom);
+
+    if (showSkeletons || query.isLoading) {
+        return (
+            <Flex as="section" flexDirection="column" h="100%" minH={0}>
+                <Flex justifyContent="space-around">
+                    <Skeleton w="100px" h="40px" />
+                    <Skeleton w="100px" h="40px" />
+                    <Skeleton w="100px" h="40px" />
+                </Flex>
+                <Divider mt="4" />
+                <DailyExerciseTaskListSkeleton />
+            </Flex>
+        );
+    }
 
     return (
         <Box id="CreateExercisePage" d="flex" flexDirection="column" h="100%" p="4" w="100%">

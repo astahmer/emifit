@@ -41,8 +41,13 @@ function App() {
                                         <Route index element={<DailyEntry />} />
                                         <Route path="entry/:dailyId" element={<DailyEntry />} />
                                     </Route>
-                                    <Route path={routeMap.exercise.add} element={<ExerciseAddPage />} />
-                                    <Route path={routeMap.exercise.edit} element={<ExerciseEditPage />} />
+                                    {/* TODO ExoLayout et mettre en children ces 3 là */}
+                                    <Route path="daily/entry/:dailyId/exercise/add" element={<ExerciseAddPage />} />
+                                    <Route
+                                        path="daily/entry/:dailyId/exercise/edit/:exoId"
+                                        element={<ExerciseEditPage />}
+                                    />
+                                    <Route path="daily/entry/:dailyId/exercise/select" element={<ExerciseAddPage />} />
                                     <Route path={routeMap.progress} element={<ProgressPage />} />
                                     <Route path={routeMap.settings} element={<SettingsPage />} />
                                     <Route path={routeMap.programs} element={<ProgramsPage />} />

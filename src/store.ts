@@ -2,7 +2,8 @@ import { CalendarDate } from "@uselessdev/datepicker";
 import { isToday } from "date-fns";
 import { createBrowserHistory } from "history";
 import { atom, unstable_createStore } from "jotai";
-import { parseDate, printDate } from "./functions/utils";
+import { printDate } from "./functions/utils";
+import { parseDailyDateFromUrl, printDailyDate } from "./orm-utils";
 
 export const store = unstable_createStore();
 export const browserHistory = createBrowserHistory({ window });
@@ -12,7 +13,7 @@ browserHistory.listen((update) => {
     // When navigating to the homepage, sets the location.pathname so the currentDate daily entry id
     // (from: "/[anything]" to "/daily/entry/:id")
     if (update.action === "PUSH" && update.location.pathname === "/") {
-        const dailyId = printDate(store.get(currentDateAtom)).replaceAll("/", "-");
+        const dailyId = printDailyDate(store.get(currentDateAtom));
         return browserHistory.replace(`/daily/entry/${dailyId}`);
     }
 
@@ -20,17 +21,14 @@ browserHistory.listen((update) => {
     // (from: "/[anything]" to "/daily/entry/:id")
     if (update.action === "POP" && update.location.pathname.startsWith("/daily/entry/")) {
         wasUpdatedFromBackButton = true;
-        store.set(
-            currentDateAtom,
-            parseDate(update.location.pathname.replace("/daily/entry/", "").replaceAll("-", "/"))
-        );
+        return store.set(currentDateAtom, parseDailyDateFromUrl(window.location.href));
     }
 });
 
 export const debugModeAtom = atom<boolean>(false);
 export const showSkeletonsAtom = atom<boolean>(false);
 
-const today = new Date();
+const today = parseDailyDateFromUrl(window.location.href) || new Date();
 export const currentDateAtom = atom<CalendarDate>(today);
 export const currentDailyIdAtom = atom((get) => printDate(get(currentDateAtom)));
 export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
@@ -43,12 +41,14 @@ store.sub(currentDateAtom, () => {
         browserHistory.location.pathname === "/" || browserHistory.location.pathname.startsWith("/daily/entry/");
     if (!shouldUpdateLocation) return;
 
-    const dailyId = printDate(store.get(currentDateAtom)).replaceAll("/", "-");
+    const dailyId = printDailyDate(store.get(currentDateAtom));
+    const dailyEntryPath = `/daily/entry/${dailyId}`;
 
     // Updates the location.pathname to the current daily entry id
     // (from: "/" to "/daily/entry/:id")
+    // -> when initial navigation is on the homepage
     if (browserHistory.location.pathname === "/") {
-        return browserHistory.replace(`/daily/entry/${dailyId}`);
+        return browserHistory.replace(dailyEntryPath);
     }
 
     if (wasUpdatedFromBackButton) {
@@ -56,7 +56,21 @@ store.sub(currentDateAtom, () => {
         return;
     }
 
+    if (browserHistory.location.pathname.startsWith(dailyEntryPath)) {
+        // Nothing to do, the location.pathname is already correct (= in sync with currentDateAtom & is today's daily entry)
+        if (store.get(isDailyTodayAtom)) return;
+
+        // -> when initial navigation is on "/daily/entry/:id/exercise/[anything]"
+        // but we shouldn't be there since it's not today's daily entry so we can't update it anymore
+        if (browserHistory.location.pathname.replace(dailyEntryPath, "").startsWith("/exercise/")) {
+            return browserHistory.replace(dailyEntryPath);
+        }
+
+        return;
+    }
+
     // Updates the location.pathname to the current daily entry id
     // (from: "/daily/entry/:someId" to "/daily/entry/:anotherId")
-    browserHistory.push(`/daily/entry/${dailyId}`);
+    // -> when navigating using Header.Calendar Prev/Next buttons
+    browserHistory.push(dailyEntryPath);
 });

@@ -42,7 +42,7 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
             <Divider my="4" />
             <Box alignSelf="center">
                 {isDailyToday ? (
-                    <ReactLink to="/exercise/add">
+                    <ReactLink to="exercise/add">
                         <RadioCardButton>Add exercise</RadioCardButton>
                     </ReactLink>
                 ) : (
