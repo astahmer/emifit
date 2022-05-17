@@ -29,7 +29,7 @@ export type ComboboxProps<Item = any> = {
     label?: (getLabelProps: UseComboboxReturnValue<Item>["getLabelProps"]) => ReactNode;
     getValue?: (item: Item) => string | number;
 } & InputProps &
-    Pick<UseComboboxProps<Item>, "itemToString" | "onSelectedItemChange">;
+    Pick<UseComboboxProps<Item>, "itemToString" | "onSelectedItemChange" | "initialSelectedItem">;
 
 function ComboboxBase<Item = any>({
     externalRef,
@@ -40,6 +40,7 @@ function ComboboxBase<Item = any>({
     itemToString = (item) => String(item as any),
     onSelectedItemChange,
     defaultValue,
+    initialSelectedItem,
     ...props
 }: ComboboxProps<Item>) {
     const [inputItems, setInputItems] = useState(items);
@@ -91,6 +92,7 @@ function ComboboxBase<Item = any>({
         selectedItem,
     } = useCombobox({
         initialInputValue: (defaultValue as string) || "",
+        initialSelectedItem,
         stateReducer,
         itemToString,
         items: inputItems,
