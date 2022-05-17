@@ -84,6 +84,8 @@ export const CreateExerciseForm = ({
                     <Stack p="8" pt="4" overflow="auto" h="100%" minH={0}>
                         <ExerciseCombobox
                             {...form.register("name", { required })}
+                            defaultValue={defaultValues.name}
+                            initialSelectedItem={defaultValues as any as Exercise}
                             onSelectedItemChange={(changes) => {
                                 if (changes.selectedItem) {
                                     form.reset({
