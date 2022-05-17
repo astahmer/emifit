@@ -14,7 +14,6 @@ const log = (...args: any[]) => withLogs && console.log(...args);
 let wasUpdatedFromBackButton = false;
 browserHistory.listen((update) => {
     log("browserHistory.listen update", update);
-    console.trace();
     if (update.action === "PUSH") {
         // When navigating to the homepage, sets the location.pathname to the currentDate daily entry id
         // (from: "/[anything]" to "/daily/entry/:id")

@@ -8,23 +8,10 @@ import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
-import { routeMap } from "@/routes";
+import { printDailyDate } from "@/orm-utils";
 import { isDailyTodayAtom } from "@/store";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import {
-    Box,
-    Divider,
-    Flex,
-    Heading,
-    ListItem,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
-    OrderedList,
-    Spacer,
-    Text,
-} from "@chakra-ui/react";
+import { Box, Divider, Flex, Heading, Menu, MenuButton, MenuItem, MenuList, Spacer, Text } from "@chakra-ui/react";
 import { WithChildren } from "@pastable/core";
 import { useAtomValue } from "jotai";
 import { Fragment } from "react";
@@ -177,7 +164,10 @@ const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
         <Menu strategy="fixed">
             <MenuButton as={DotsIconButton} ml="auto" mt="2" aria-label="menu" />
             <MenuList>
-                <MenuItem icon={<EditIcon />} onClick={() => navigate(`exercise/edit/${exo.id}`)}>
+                <MenuItem
+                    icon={<EditIcon />}
+                    onClick={() => navigate(`/daily/entry/${printDailyDate(daily.date)}/exercise/edit/${exo.id}`)}
+                >
                     Edit daily exercise
                 </MenuItem>
                 <ConfirmationButton
