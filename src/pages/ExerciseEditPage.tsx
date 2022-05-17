@@ -14,10 +14,11 @@ import { useNavigate, useParams } from "react-router-dom";
 
 export const ExerciseEditPage = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
-    const { id: exerciseId } = useParams<{ id: string }>();
+    const params = useParams<{ dailyId: string; exoId: string }>();
+    const exerciseId = params.exoId;
 
     const daily = useCurrentDaily();
-    const exercise = daily?.exerciseList.find((exo) => exo.id === exerciseId);
+    const exercise = daily?.exerciseList?.find((exo) => exo.id === exerciseId);
 
     const navigate = useNavigate();
     const editExerciseById = useMutation(
