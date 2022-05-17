@@ -177,7 +177,7 @@ const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
         <Menu strategy="fixed">
             <MenuButton as={DotsIconButton} ml="auto" mt="2" aria-label="menu" />
             <MenuList>
-                <MenuItem icon={<EditIcon />} onClick={() => navigate(routeMap.exercise.edit.replace(":id", exo.id))}>
+                <MenuItem icon={<EditIcon />} onClick={() => navigate(`exercise/edit/${exo.id}`)}>
                     Edit daily exercise
                 </MenuItem>
                 <ConfirmationButton
