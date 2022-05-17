@@ -8,6 +8,7 @@ import { useAtomValue } from "jotai";
 import { useMutation } from "react-query";
 import { useLastFilledDaily, useLastFilledDailyDate } from "./useLastFilledDailyDate";
 import { GoToClosestPreviousDailyEntryButton } from "./GoToClosestPreviousDailyEntryButton";
+import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
 
 export const NoDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
@@ -79,6 +80,10 @@ const EmptyPastDay = () => {
                     </Box>
                 </>
             ) : null}
+            <Divider mb="4" />
+            <Box alignSelf="center">
+                <GoBackToTodayEntryButton />
+            </Box>
         </>
     );
 };
