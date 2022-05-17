@@ -5,7 +5,7 @@ import { CategoriesTags } from "@/constants";
 import { loadFromJSON, saveAsJSON } from "@/functions/json";
 import { computeSnapshotFromExport, ExportedData, getDatabaseSnapshot } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
-import { orm } from "@/orm";
+import { makeDb, orm } from "@/orm";
 import { Daily, Exercise, Program } from "@/orm-types";
 import { ProgramCardExerciseList } from "@/Programs/ProgramCard";
 import { debugModeAtom } from "@/store";
@@ -31,6 +31,7 @@ import { useAtom } from "jotai";
 import { ReactNode, useRef } from "react";
 import { BiExport, BiImport } from "react-icons/bi";
 import { useMutation } from "react-query";
+import { runMigrations } from "@/orm-migrations";
 
 export const SettingsPage = () => {
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
@@ -90,18 +91,26 @@ const ExportImportData = () => {
     const importMutation = useMutation(
         async () => {
             const snapshot = snapshotRef.current;
+            console.log(orm.version, snapshot.version);
+            await Promise.all([
+                orm.db.clear(orm.daily.name),
+                orm.db.clear(orm.exercise.name),
+                orm.db.clear(orm.program.name),
+            ]);
+
             const tx = orm.db.transaction(orm.db.objectStoreNames, "readwrite");
+            await runMigrations(orm.db, snapshot.version, orm.version, tx, async () => {
+                const exoStore = tx.objectStore(orm.exercise.name);
+                const dailyStore = tx.objectStore(orm.daily.name);
+                const programStore = tx.objectStore(orm.program.name);
 
-            const exoStore = tx.objectStore(orm.exercise.name);
-            const dailyStore = tx.objectStore(orm.daily.name);
-            const programStore = tx.objectStore(orm.program.name);
-
-            const exerciseList = snapshot.exerciseList.map((exo) => exoStore.add(exo));
-            const dailyList = snapshot.dailyList.map((daily) => dailyStore.add(daily));
-            const programList = snapshot.programList.map((daily) => programStore.add(daily));
-
-            // TODO programListOrder
-            return Promise.all([...exerciseList, ...dailyList, ...programList, tx.done]);
+                const exerciseList = snapshot.exerciseList.map((exo) => exoStore.add(exo));
+                const dailyList = snapshot.dailyList.map((daily) => dailyStore.add(daily));
+                const programList = snapshot.programList.map((program) => programStore.add(program));
+                // TODO programListOrder
+                await Promise.all([...exerciseList, ...dailyList, ...programList]);
+            });
+            await tx.done;
         },
         {
             onSuccess: () => {

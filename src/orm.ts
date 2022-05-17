@@ -1,5 +1,6 @@
 import { IDBPDatabase, IndexKey, IndexNames, openDB, StoreKey } from "idb";
 import { del, get, update } from "idb-keyval";
+import { runMigrations } from "./orm-migrations";
 import { DailyWithReferences, ExerciseWithReferences, ProgramWithReferences } from "./orm-types";
 
 // https://javascript.info/indexeddb
@@ -9,55 +10,13 @@ let db: IDBPDatabase<EmifitSchema>;
 
 export async function makeDb() {
     db = await openDB<EmifitSchema>("emifit-db", version, {
-        async upgrade(db, oldVersion, newVersion, transaction) {
-            console.log({ db, oldVersion, newVersion, transaction });
-            let migrationVersion = oldVersion;
-
-            console.log("start migrating");
-            if (oldVersion === 0) {
-                const daily = db.createObjectStore("daily", { keyPath: "id" });
-                daily.createIndex("by-time", "time");
-                daily.createIndex("by-category", "category");
-                daily.createIndex("by-program", "programId");
-
-                const exercise = db.createObjectStore("exercise", { keyPath: "id" });
-                exercise.createIndex("by-name", "name");
-                exercise.createIndex("by-category", "category");
-                exercise.createIndex("by-tags", "tags", { multiEntry: true });
-                exercise.createIndex("by-parent", "madeFromExerciseId");
-
-                const program = db.createObjectStore("program", { keyPath: "id" });
-                program.createIndex("by-name", "name");
-                program.createIndex("by-category", "category");
-
-                db.createObjectStore("keyval");
-                migrationVersion++;
-                console.log("migrated to version", migrationVersion);
-            }
-            if (oldVersion === 1) {
-                const tx = transaction;
-
-                let cursor = await tx.objectStore("daily").index("by-time").openCursor();
-
-                while (cursor) {
-                    if (typeof cursor.value.date === "string") {
-                        cursor.update({ ...cursor.value, date: new Date(cursor.value.date) });
-                    }
-
-                    cursor = await cursor.continue();
-                }
-                migrationVersion++;
-                console.log("migrated to version", migrationVersion);
-            }
-
-            console.log("done migrating");
-        },
+        upgrade: runMigrations,
     });
     orm.db = db;
     return db;
 }
 
-type EmifitSchema = {
+export type EmifitSchema = {
     daily: {
         key: DailyWithReferences["id"];
         value: DailyWithReferences;
@@ -112,9 +71,6 @@ export type StoreQueryParams<
     query?: StoreQuery<Key, Index>;
     count?: number;
 };
-
-// const makeParams = <Index extends StoreIndex<"exercise">>(params: StoreQueryParams<"exercise", Index>) => params;
-// makeParams({index: "by-category",query})
 
 const makeStore = <Key extends StoreName, StoreEntity extends Entity = EmifitSchema[Key]["value"]>(name: Key) => {
     return {
