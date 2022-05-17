@@ -2,30 +2,55 @@ import { IDBPDatabase, IndexKey, IndexNames, openDB, StoreKey } from "idb";
 import { del, get, update } from "idb-keyval";
 import { DailyWithReferences, ExerciseWithReferences, ProgramWithReferences } from "./orm-types";
 
+// https://javascript.info/indexeddb
 // https://www.npmjs.com/package/idb#opendb
 const version = Number(import.meta.env.VITE_APP_VERSION);
 let db: IDBPDatabase<EmifitSchema>;
 
 export async function makeDb() {
     db = await openDB<EmifitSchema>("emifit-db", version, {
-        upgrade(db, oldVersion, newVersion, transaction) {
-            console.log(db, oldVersion, newVersion, transaction);
-            const daily = db.createObjectStore("daily", { keyPath: "id" });
-            daily.createIndex("by-time", "time");
-            daily.createIndex("by-category", "category");
-            daily.createIndex("by-program", "programId");
+        async upgrade(db, oldVersion, newVersion, transaction) {
+            console.log({ db, oldVersion, newVersion, transaction });
+            let migrationVersion = oldVersion;
 
-            const exercise = db.createObjectStore("exercise", { keyPath: "id" });
-            exercise.createIndex("by-name", "name");
-            exercise.createIndex("by-category", "category");
-            exercise.createIndex("by-tags", "tags", { multiEntry: true });
-            exercise.createIndex("by-parent", "madeFromExerciseId");
+            console.log("start migrating");
+            if (oldVersion === 0) {
+                const daily = db.createObjectStore("daily", { keyPath: "id" });
+                daily.createIndex("by-time", "time");
+                daily.createIndex("by-category", "category");
+                daily.createIndex("by-program", "programId");
 
-            const program = db.createObjectStore("program", { keyPath: "id" });
-            program.createIndex("by-name", "name");
-            program.createIndex("by-category", "category");
+                const exercise = db.createObjectStore("exercise", { keyPath: "id" });
+                exercise.createIndex("by-name", "name");
+                exercise.createIndex("by-category", "category");
+                exercise.createIndex("by-tags", "tags", { multiEntry: true });
+                exercise.createIndex("by-parent", "madeFromExerciseId");
 
-            db.createObjectStore("keyval");
+                const program = db.createObjectStore("program", { keyPath: "id" });
+                program.createIndex("by-name", "name");
+                program.createIndex("by-category", "category");
+
+                db.createObjectStore("keyval");
+                migrationVersion++;
+                console.log("migrated to version", migrationVersion);
+            }
+            if (oldVersion === 1) {
+                const tx = transaction;
+
+                let cursor = await tx.objectStore("daily").index("by-time").openCursor();
+
+                while (cursor) {
+                    if (typeof cursor.value.date === "string") {
+                        cursor.update({ ...cursor.value, date: new Date(cursor.value.date) });
+                    }
+
+                    cursor = await cursor.continue();
+                }
+                migrationVersion++;
+                console.log("migrated to version", migrationVersion);
+            }
+
+            console.log("done migrating");
         },
     });
     orm.db = db;

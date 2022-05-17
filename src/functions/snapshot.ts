@@ -12,7 +12,7 @@ export const getDatabaseSnapshot = async () => {
         orm.programListOrder.get(),
     ]);
 
-    return { dailyList, programList, exerciseList, programListOrder };
+    return { dailyList, programList, exerciseList, programListOrder, version: orm.version };
 };
 
 export function computeSnapshotFromExport(data: ExportedData): DatabaseSnapshot {
@@ -55,6 +55,7 @@ export interface ExportedData {
     programList: ProgramWithReferences[];
     exerciseList: ExerciseWithReferences[];
     programListOrder: Program["id"][];
+    version: number;
 }
 
 export interface DatabaseSnapshot {

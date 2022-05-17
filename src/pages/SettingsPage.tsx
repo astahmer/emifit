@@ -67,7 +67,8 @@ const ExportImportData = () => {
         },
         {
             onSuccess: () => void toasts.success("Data exported successfully"),
-            onError: () => void toasts.error("Something unexpected happened while exporting data"),
+            onError: (err) =>
+                void toasts.error((err as Error)?.message || "Something unexpected happened while exporting data"),
         }
     );
 
@@ -103,7 +104,10 @@ const ExportImportData = () => {
             return Promise.all([...exerciseList, ...dailyList, ...programList, tx.done]);
         },
         {
-            onSuccess: () => void toasts.success("Data imported successfully"),
+            onSuccess: () => {
+                void toasts.success("Data imported successfully");
+                window.location.reload();
+            },
             onError: () => void toasts.error("Something unexpected happened while importing data"),
         }
     );
