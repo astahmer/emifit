@@ -8,12 +8,16 @@ import { AiFillHome } from "react-icons/ai";
 import { FiSettings } from "react-icons/fi";
 import { Link as ReactLink, useLocation } from "react-router-dom";
 import { HFlex } from "./HFlex";
-import { useDaily } from "@/orm-hooks";
+import { useDailyQuery } from "@/orm-hooks";
+import { printDailyDate } from "@/orm-utils";
+import { printDate } from "@/functions/utils";
 
 export const BottomTabs = () => {
     const location = useLocation();
     const submitBtnRef = useRef<HTMLButtonElement>(null);
-    const daily = useDaily();
+    const todaysDaily = useDailyQuery(printDate(new Date()));
+    const hasCreatedTodaysDaily = Boolean(todaysDaily.data?.id);
+    const addExerciseLink = `daily/entry/${printDailyDate(new Date())}${hasCreatedTodaysDaily ? `/exercise/add` : ""}`;
 
     return (
         <>
@@ -38,8 +42,8 @@ export const BottomTabs = () => {
                             <chakra.span fontSize="xs">Progress</chakra.span>
                         </HFlex>
                     </Tab>
-                    <Tab as={ReactLink} to="/exercise/add" w="100%" h="58px" isDisabled={!daily.id}>
-                        {location.pathname === "/exercise/add" ? (
+                    <Tab as={ReactLink} to={addExerciseLink} w="100%" h="58px">
+                        {location.pathname === addExerciseLink ? (
                             <HFlex alignItems="center">
                                 <CheckCircleIcon
                                     color="pink.400"
@@ -52,7 +56,7 @@ export const BottomTabs = () => {
                             </HFlex>
                         ) : (
                             <HFlex alignItems="center">
-                                <Icon as={IoIosAddCircle} color={daily.id ? "pink.400" : "grey"} fontSize="38px" />
+                                <Icon as={IoIosAddCircle} color={"pink.400"} fontSize="38px" />
                                 {/* <chakra.span fontSize="xs">Add exercise</chakra.span> */}
                             </HFlex>
                         )}

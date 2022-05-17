@@ -6,7 +6,7 @@ import { Scrollable } from "@/components/Scrollable";
 import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { orm } from "@/orm";
-import { useDaily } from "@/orm-hooks";
+import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
 import { routeMap } from "@/routes";
 import { isDailyTodayAtom } from "@/store";
@@ -107,7 +107,7 @@ function ExerciseTaskItem({ exo }: { exo: Exercise }) {
 }
 
 const ExerciseCheckbox = ({ exo }: { exo: Exercise }) => {
-    const daily = useDaily();
+    const daily = useCurrentDaily();
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
     const addExerciseToDailyCompletedList = useMutation(
@@ -131,7 +131,7 @@ const ExerciseCheckbox = ({ exo }: { exo: Exercise }) => {
 };
 
 const CardioCheckbox = () => {
-    const daily = useDaily();
+    const daily = useCurrentDaily();
 
     const toggleDailyCardio = useMutation(
         (hasDoneCardio: boolean) => orm.daily.upsert(daily.id, (current) => ({ ...current, hasDoneCardio })),
@@ -157,7 +157,7 @@ const CardioLine = () => (
 );
 
 const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
-    const daily = useDaily();
+    const daily = useCurrentDaily();
 
     const removeExerciseFromDaily = useMutation(
         async () => {

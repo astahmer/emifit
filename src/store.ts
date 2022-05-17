@@ -10,11 +10,20 @@ export const browserHistory = createBrowserHistory({ window });
 
 let wasUpdatedFromBackButton = false;
 browserHistory.listen((update) => {
-    // When navigating to the homepage, sets the location.pathname so the currentDate daily entry id
-    // (from: "/[anything]" to "/daily/entry/:id")
-    if (update.action === "PUSH" && update.location.pathname === "/") {
-        const dailyId = printDailyDate(store.get(currentDateAtom));
-        return browserHistory.replace(`/daily/entry/${dailyId}`);
+    if (update.action === "PUSH") {
+        // When navigating to the homepage, sets the location.pathname to the currentDate daily entry id
+        // (from: "/[anything]" to "/daily/entry/:id")
+        if (update.location.pathname === "/") {
+            const dailyId = printDailyDate(store.get(currentDateAtom));
+            return browserHistory.replace(`/daily/entry/${dailyId}`);
+        }
+
+        // Updates the currentDate to the current daily entry date
+        // (from: "/daily/entry/:someId" to "/daily/entry/:anotherId")
+        // -> when navigating using BottomTabs.Add when today's daily has not been created yet
+        if (update.location.pathname.startsWith("/daily/entry/")) {
+            return store.set(currentDateAtom, parseDailyDateFromUrl(window.location.href));
+        }
     }
 
     // When navigating using the browser back button, sets currentDate to the date of the previous (now current) location.pathname

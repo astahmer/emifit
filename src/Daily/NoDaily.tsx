@@ -2,7 +2,7 @@ import { HFlex } from "@/components/HFlex";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { orm } from "@/orm";
 import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
-import { useDailyInvalidate } from "@/orm-hooks";
+import { useCurrentDailyInvalidate } from "@/orm-hooks";
 import { Alert, AlertIcon, Box, Divider, Text } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { useMutation } from "react-query";
@@ -21,7 +21,7 @@ export const NoDaily = () => {
 };
 const EmptyTodayDaily = () => {
     const id = useAtomValue(currentDailyIdAtom);
-    const invalidate = useDailyInvalidate();
+    const invalidate = useCurrentDailyInvalidate();
 
     const createDaily = useMutation(
         (category: string) => {

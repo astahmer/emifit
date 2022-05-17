@@ -6,7 +6,7 @@ import { groupIn } from "@/functions/groupBy";
 import { serializeDaily } from "@/functions/snapshot";
 import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
-import { useDaily, useHasProgram } from "@/orm-hooks";
+import { useCurrentDaily, useHasProgram } from "@/orm-hooks";
 import { Program } from "@/orm-types";
 import { ProgramCard } from "@/Programs/ProgramCard";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
@@ -43,7 +43,7 @@ import { GoToClosestPreviousDailyEntryButton } from "./GoToClosestPreviousDailyE
 export const WithDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
-    const daily = useDaily();
+    const daily = useCurrentDaily();
     const hasAtLeastOneExercise = daily.exerciseList.length > 0;
 
     const updateDailyCategory = useMutation((category: string) => orm.daily.upsert(daily.id, { category }), {
@@ -136,7 +136,7 @@ const ViewTypeButton = (props: ButtonProps) => {
 };
 
 const DailyExerciseList = () => {
-    const daily = useDaily();
+    const daily = useCurrentDaily();
     const hasAtLeastOneExercise = daily?.exerciseList.length > 0;
     const viewType = useAtomValue(viewTypeAtom);
 
@@ -160,7 +160,7 @@ const EmptyExerciseList = () => {
 const TodayEmptyExerciseList = () => {
     const [showProgramCombobox, setShowProgramCombobox] = useState(false);
 
-    const daily = useDaily();
+    const daily = useCurrentDaily();
     const hasProgram = useHasProgram({ index: "by-category", query: daily.category });
 
     return (
@@ -197,7 +197,7 @@ const ProgramSearch = () => {
     const [selectedProgram, setSelectedProgram] = useState<Program>(null);
 
     const dailyId = useAtomValue(currentDailyIdAtom);
-    const daily = useDaily();
+    const daily = useCurrentDaily();
 
     const useProgramMutation = useMutation(
         async () => {

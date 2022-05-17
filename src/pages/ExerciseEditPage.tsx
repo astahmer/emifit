@@ -4,7 +4,7 @@ import { orm } from "@/orm";
 import { Exercise } from "@/orm-types";
 import { routeMap } from "@/routes";
 import { currentDailyIdAtom } from "@/store";
-import { useDaily } from "@/orm-hooks";
+import { useCurrentDaily } from "@/orm-hooks";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Heading } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
@@ -16,7 +16,7 @@ export const ExerciseEditPage = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
     const { id: exerciseId } = useParams<{ id: string }>();
 
-    const daily = useDaily();
+    const daily = useCurrentDaily();
     const exercise = daily?.exerciseList.find((exo) => exo.id === exerciseId);
 
     const navigate = useNavigate();

@@ -3,7 +3,7 @@ import { orm } from "@/orm";
 import { Exercise } from "@/orm-types";
 import { routeMap } from "@/routes";
 import { currentDailyIdAtom, showSkeletonsAtom } from "@/store";
-import { useDaily, useDailyInvalidate, useDailyQuery } from "@/orm-hooks";
+import { useCurrentDaily, useCurrentDailyInvalidate, useCurrentDailyQuery } from "@/orm-hooks";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Flex, Heading, Skeleton } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
@@ -13,11 +13,11 @@ import { DailyExerciseTaskListSkeleton } from "@/Daily/DailyExerciseTaskListSkel
 
 export const ExerciseAddPage = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
-    const query = useDailyQuery();
+    const query = useCurrentDailyQuery();
     const daily = query.data;
 
     const navigate = useNavigate();
-    const invalidate = useDailyInvalidate();
+    const invalidate = useCurrentDailyInvalidate();
     const addExerciseToDaily = useMutation(
         (exo: Exercise) =>
             orm.daily.upsert(dailyId, (current) => ({

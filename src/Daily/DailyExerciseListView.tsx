@@ -1,7 +1,7 @@
 import { ReorderItemBox } from "@/components/ReorderItemBox";
 import { ExerciseListItem } from "@/Exercises/ExerciseList";
 import { orm } from "@/orm";
-import { useDaily } from "@/orm-hooks";
+import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
 import { Box, Flex } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "react-query";
 
 export const DailyExerciseListView = ({ exerciseList }: WithExerciseList) => {
-    const daily = useDaily();
+    const daily = useCurrentDaily();
     const exerciseIdList = useMemo(() => daily.exerciseList.map((e) => e.id), [daily.exerciseList]);
     const [items, setItems] = useState(exerciseIdList);
 

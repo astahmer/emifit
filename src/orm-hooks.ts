@@ -4,12 +4,11 @@ import { useQuery, useQueryClient } from "react-query";
 import { groupIn } from "./functions/groupBy";
 import { computeExerciseFromExoId, computeExerciseFromIncompleteExo } from "./functions/snapshot";
 import { orm, StoreIndex, StoreQueryParams } from "./orm";
-import { Daily, Exercise, Program, ProgramWithReferences } from "./orm-types";
+import { Daily, DailyWithReferences, Exercise, Program, ProgramWithReferences } from "./orm-types";
 import { getMostRecentsExerciseById } from "./orm-utils";
 import { currentDailyIdAtom } from "./store";
 
-export const useDailyQuery = () => {
-    const id = useAtomValue(currentDailyIdAtom);
+export const useDailyQuery = (id: DailyWithReferences["id"]) => {
     const query = useQuery(["daily", id], async () => {
         const daily = await orm.daily.find(id);
         if (!daily) return null;
@@ -21,9 +20,10 @@ export const useDailyQuery = () => {
 
     return query;
 };
-export const useDaily = () => ({ ...useDailyQuery().data, invalidate: useDailyInvalidate() });
 
-export const useDailyInvalidate = () => {
+export const useCurrentDailyQuery = () => useDailyQuery(useAtomValue(currentDailyIdAtom));
+export const useCurrentDaily = () => ({ ...useCurrentDailyQuery().data, invalidate: useCurrentDailyInvalidate() });
+export const useCurrentDailyInvalidate = () => {
     const id = useAtomValue(currentDailyIdAtom);
     const queryClient = useQueryClient();
 
@@ -75,7 +75,7 @@ export function useExerciseList<Index extends StoreIndex<"exercise"> = undefined
 }
 
 export const useExerciseListInDailyCategory = () => {
-    const daily = useDaily();
+    const daily = useCurrentDaily();
     return useExerciseList({ index: "by-category", query: daily.category });
 };
 

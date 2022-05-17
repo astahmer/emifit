@@ -1,5 +1,5 @@
 import { showSkeletonsAtom } from "@/store";
-import { useDailyQuery } from "@/orm-hooks";
+import { useCurrentDailyQuery } from "@/orm-hooks";
 import { Divider, Flex, Skeleton } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { DailyExerciseTaskListSkeleton } from "./DailyExerciseTaskListSkeleton";
@@ -7,7 +7,7 @@ import { NoDaily } from "./NoDaily";
 import { WithDaily } from "./WithDaily";
 
 export const DailyEntry = () => {
-    const query = useDailyQuery();
+    const query = useCurrentDailyQuery();
     const daily = query.data;
     const showSkeletons = useAtomValue(showSkeletonsAtom);
 
