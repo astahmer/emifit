@@ -1,6 +1,6 @@
-import { useProgramInterpret } from "@/Programs/useProgramInterpret";
 import { useExerciseList } from "@/orm-hooks";
 import { Exercise, Serie } from "@/orm-types";
+import { useProgramInterpret } from "@/Programs/useProgramInterpret";
 import { StringOrNumber, WithOnChange } from "@/types";
 import {
     Accordion,
@@ -8,7 +8,6 @@ import {
     AccordionIcon,
     AccordionItem,
     AccordionPanel,
-    Badge,
     Stack,
     Stat,
     StatGroup,
@@ -17,32 +16,31 @@ import {
     Text,
     useCheckboxGroup,
     UseCheckboxGroupReturn,
-    Wrap,
-    WrapItem,
 } from "@chakra-ui/react";
+import { sortArrayOfObjectByPropFromArray } from "@pastable/core";
 import { useSelector } from "@xstate/react";
 import { CheckboxSquare } from "../components/CheckboxCircle";
-import { ExerciseTag, ExerciseTagList } from "./ExerciseTag";
-import { ExerciseSetList } from "./ExerciseSetList";
+import { ExerciseTagList } from "./ExerciseTag";
 
 export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[]>) => {
-    const exercises = useExerciseList();
     const interpret = useProgramInterpret();
     const catId = useSelector(interpret, (s) => s.context.categoryId);
-    const exerciseList = useSelector(interpret, (s) => s.context.exerciseList);
-    const names = exerciseList.map((exo) => exo.name);
+    const selectedExerciseList = useSelector(interpret, (s) => s.context.exerciseList);
 
-    const { getCheckboxProps } = useCheckboxGroup({ onChange, defaultValue: exerciseList.map((ex) => ex.id) });
+    const exercises = useExerciseList({ index: "by-category", query: catId });
+    const names = selectedExerciseList.map((exo) => exo.name);
+
+    const { getCheckboxProps } = useCheckboxGroup({ onChange, defaultValue: selectedExerciseList.map((ex) => ex.id) });
 
     return (
         <Accordion allowToggle w="100%">
-            {exercises
-                .filter((exo) => !names.includes(exo.name))
-                .concat(exerciseList)
-                .filter((ex) => ex.category === catId)
-                .map((exercise) => (
-                    <ExerciseAccordion key={exercise.id} exercise={exercise} getCheckboxProps={getCheckboxProps} />
-                ))}
+            {sortArrayOfObjectByPropFromArray(
+                exercises.filter((exo) => !names.includes(exo.name)).concat(selectedExerciseList),
+                "id",
+                exercises.map((exo) => exo.id)
+            ).map((exercise) => (
+                <ExerciseAccordion key={exercise.id} exercise={exercise} getCheckboxProps={getCheckboxProps} />
+            ))}
         </Accordion>
     );
 };

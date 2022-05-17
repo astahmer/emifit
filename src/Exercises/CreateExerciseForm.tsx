@@ -93,7 +93,7 @@ export const CreateExerciseForm = ({
                                     });
                                 }
                             }}
-                            getItems={(items) => items.filter((exo) => exo.category === category)}
+                            params={{ index: "by-category", query: category }}
                         />
                         <TagMultiSelect
                             control={form.control}

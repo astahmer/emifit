@@ -3,20 +3,23 @@ import { MultiCombobox, MultiComboboxProps } from "@/components/MultiCombobox";
 import { Exercise } from "@/orm-types";
 import { useExerciseList } from "@/orm-hooks";
 import { FormControl, FormErrorMessage, FormLabel, forwardRef } from "@chakra-ui/react";
+import { StoreQueryParams } from "@/orm";
 
 export const ExerciseCombobox = forwardRef(
     (
         {
             error,
             getItems,
+            params,
             ...props
         }: Omit<ComboboxProps<Exercise>, "items" | "getValue" | "itemToString" | "label"> & {
             error?: string;
             getItems?: (items: Exercise[]) => Exercise[];
+            params?: StoreQueryParams<"exercise">;
         },
         ref
     ) => {
-        const items = useExerciseList();
+        const items = useExerciseList(params);
 
         return (
             <FormControl isInvalid={Boolean(error)}>
@@ -40,11 +43,15 @@ export const ExerciseListCombobox = forwardRef(
     (
         {
             error,
+            params,
             ...props
-        }: Omit<MultiComboboxProps, "items" | "getValue" | "itemToString" | "label"> & { error?: string },
+        }: Omit<MultiComboboxProps, "items" | "getValue" | "itemToString" | "label"> & {
+            error?: string;
+            params?: StoreQueryParams<"exercise">;
+        },
         ref
     ) => {
-        const items = useExerciseList();
+        const items = useExerciseList(params);
 
         return (
             <FormControl isInvalid={Boolean(error)}>

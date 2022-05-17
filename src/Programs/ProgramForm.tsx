@@ -10,19 +10,17 @@ import { PickCategoryStep } from "./Steps/PickCategoryStep";
 import { PickExercisesStep } from "./Steps/PickExercisesStep";
 
 export function ProgramForm() {
-    const exercises = useExerciseList();
-
     const interpret = useProgramInterpret();
     const send = interpret.send;
 
     const selectedExerciseList = useSelector(interpret, (s) => s.context.exerciseList);
     const hasSelectedExercises = Boolean(selectedExerciseList.length);
 
-    const category = useSelector(interpret, (s) => s.context.categoryId);
-    const isCategorySelected = Boolean(category);
+    const catId = useSelector(interpret, (s) => s.context.categoryId);
+    const isCategorySelected = Boolean(catId);
 
-    const scopedExercises = exercises.filter((ex) => ex.category === category);
-    const hasExercises = Boolean(selectedExerciseList.length || scopedExercises.length);
+    const exerciseList = useExerciseList({ index: "by-category", query: catId });
+    const hasExercises = Boolean(selectedExerciseList.length || exerciseList.length);
 
     const onSubmit = (exercise: Exercise) => send({ type: "CreateExercise", exercise });
 
@@ -63,7 +61,7 @@ export function ProgramForm() {
                 {interpret.state.matches("creating.editSettings") && <EditSettingsStep />}
             </Box>
             {interpret.state.matches("creating.maybeCreatingExercise.creatingExercise") && isCategorySelected && (
-                <CreateExerciseStep {...{ hasSelectedExercises, category, onSubmit }} />
+                <CreateExerciseStep {...{ hasSelectedExercises, category: catId, onSubmit }} />
             )}
         </Box>
     );
