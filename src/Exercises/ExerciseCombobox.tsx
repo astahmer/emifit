@@ -10,7 +10,7 @@ export const ExerciseCombobox = forwardRef(
             error,
             getItems,
             ...props
-        }: Omit<ComboboxProps, "items" | "getValue" | "itemToString" | "label"> & {
+        }: Omit<ComboboxProps<Exercise>, "items" | "getValue" | "itemToString" | "label"> & {
             error?: string;
             getItems?: (items: Exercise[]) => Exercise[];
         },

@@ -84,6 +84,15 @@ export const CreateExerciseForm = ({
                     <Stack p="8" pt="4" overflow="auto" h="100%" minH={0}>
                         <ExerciseCombobox
                             {...form.register("name", { required })}
+                            onSelectedItemChange={(changes) => {
+                                if (changes.selectedItem) {
+                                    form.reset({
+                                        series: changes.selectedItem.series,
+                                        nbSeries: changes.selectedItem.series.length,
+                                        tags: changes.selectedItem.tags,
+                                    });
+                                }
+                            }}
                             getItems={(items) => items.filter((exo) => exo.category === category)}
                         />
                         <TagMultiSelect

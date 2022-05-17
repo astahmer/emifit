@@ -1,6 +1,8 @@
 import { MultiSelect, MultiSelectProps } from "@/components/MultiSelect";
 import { Categories } from "@/constants";
+import { mergeProps } from "@/functions/mergeProps";
 import { Tag } from "@/orm-types";
+import { PickOptional } from "@/types";
 import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
 import { Controller, ControllerProps } from "react-hook-form";
 
@@ -27,7 +29,8 @@ export function TagMultiSelect({
         | "getButtonProps"
         | "renderButtonText"
         | "onChange"
-    >) {
+    > &
+    PickOptional<MultiSelectProps<Tag, true>, "onChange">) {
     const isInvalid = Boolean(error);
     const category = Categories.find((cat) => cat.id === (catId as typeof Categories[number]["id"]));
     const items = category.children as any as Array<Tag>;
@@ -38,8 +41,7 @@ export function TagMultiSelect({
                 {...{ name, control, defaultValue, required, rules }}
                 render={({ field: { ref, ...controllerProps } }) => (
                     <MultiSelect
-                        {...props}
-                        {...controllerProps}
+                        {...mergeProps(props, controllerProps)}
                         defaultValue={defaultValue}
                         ref={ref}
                         getValue={(item) => item.id}
