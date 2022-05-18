@@ -110,6 +110,7 @@ export const CreateExerciseForm = ({
                             max={10}
                             label="Nb of series"
                             type="number"
+                            inputMode="numeric"
                             error={form.formState.errors.nbSeries}
                         />
                         <div>
@@ -151,12 +152,14 @@ const WeightForm = ({ form }: { form: UseFormReturn<typeof formDefaultValues> })
         }
 
         if (nbSeries < current.length) {
+            console.log("series.replace");
             series.replace(series.fields.slice(0, nbSeries));
             return;
         }
 
         for (let i = 0; i < nbSeries; i++) {
             if (i >= current.length) {
+                console.log("series.append");
                 series.append(makeSerie(i, current), { shouldFocus: false });
             }
         }
@@ -237,11 +240,15 @@ const SeriesForm = ({
                 <TextInput
                     {...form.register(`series.${index}.reps`, { valueAsNumber: true })}
                     type="number"
+                    inputMode="numeric"
                     defaultValue={serie.reps}
                     min={1}
                     max={20}
                     label="Nb of reps"
-                    onChange={(e) => (getSerie().reps = e.target.valueAsNumber)}
+                    onChange={(e) => {
+                        console.log(getSerie(), index, e.target.valueAsNumber);
+                        getSerie().reps = e.target.valueAsNumber;
+                    }}
                     isRequired
                 />
             </Stack>
