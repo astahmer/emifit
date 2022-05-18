@@ -29,3 +29,4 @@ export const parseDailyDateFromUrl = (url: string) => {
     return parseDate(dailyId.replaceAll("-", "/"));
 };
 export const printDailyDate = (date: CalendarDate) => printDate(date).replaceAll("/", "-");
+export const formatDailyIdToDailyEntryParam = (dailyId: string) => dailyId.replaceAll("/", "-");

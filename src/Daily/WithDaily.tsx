@@ -39,6 +39,7 @@ import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
 import { DailyExerciseListView } from "./DailyExerciseListView";
 import { useLastFilledDailyDate } from "./useLastFilledDailyDate";
 import { GoToClosestPreviousDailyEntryButton } from "./GoToClosestPreviousDailyEntryButton";
+import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 
 export const WithDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
@@ -181,7 +182,7 @@ const TodayEmptyExerciseList = () => {
                     </Box>
                 )}
                 <Box alignSelf="center">
-                    <ReactLink to={`/daily/entry/${daily.id}/exercise/add`}>
+                    <ReactLink to={`/daily/entry/${formatDailyIdToDailyEntryParam(daily.id)}/exercise/add`}>
                         <RadioCardButton as="div" variant="solid">
                             Add exercise
                         </RadioCardButton>

@@ -8,7 +8,7 @@ import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
-import { printDailyDate } from "@/orm-utils";
+import { formatDailyIdToDailyEntryParam, printDailyDate } from "@/orm-utils";
 import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, Divider, Flex, Heading, Menu, MenuButton, MenuItem, MenuList, Spacer, Text } from "@chakra-ui/react";
@@ -30,7 +30,7 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
             <Divider my="4" />
             <Box alignSelf="center">
                 {isDailyToday ? (
-                    <ReactLink to={`/daily/entry/${dailyId}/exercise/add`}>
+                    <ReactLink to={`/daily/entry/${formatDailyIdToDailyEntryParam(dailyId)}/exercise/add`}>
                         <RadioCardButton>Add exercise</RadioCardButton>
                     </ReactLink>
                 ) : (
