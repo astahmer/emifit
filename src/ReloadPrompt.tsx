@@ -1,6 +1,7 @@
 import "./ReloadPrompt.css";
 
 import { useRegisterSW } from "virtual:pwa-register/react";
+import { Show } from "./components/Show";
 
 function ReloadPrompt() {
     // replaced dynamically
@@ -39,8 +40,8 @@ function ReloadPrompt() {
     };
 
     return (
-        <div className="ReloadPrompt-container">
-            {(offlineReady || needRefresh) && (
+        <Show cond={offlineReady || needRefresh}>
+            <div className="ReloadPrompt-container">
                 <div className="ReloadPrompt-toast">
                     <div className="ReloadPrompt-message">
                         {offlineReady ? (
@@ -58,9 +59,9 @@ function ReloadPrompt() {
                         Close
                     </button>
                 </div>
-            )}
-            <div className="ReloadPrompt-date">{buildDate}</div>
-        </div>
+                <div className="ReloadPrompt-date">{buildDate}</div>
+            </div>
+        </Show>
     );
 }
 

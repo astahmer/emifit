@@ -2,7 +2,8 @@
     "name": "emifit",
     "version": "0.0.0",
     "scripts": {
-        "dev": "SW_DEV=true vite",
+        "dev": "vite",
+        "dev:sw": "SW_DEV=true vite",
         "local": "vite --host --port 3001",
         "build": "tsc && vite build",
         "serve": "vite preview",
