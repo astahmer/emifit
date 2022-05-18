@@ -19,6 +19,7 @@ import { ProgressPage } from "./pages/ProgressPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { routeMap } from "./routes";
 import { browserHistory, debugModeAtom, store } from "./store";
+import ReloadPrompt from "./ReloadPrompt";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ function App() {
                                     <Route path={routeMap.programs} element={<ProgramsPage />} />
                                 </Route>
                             </Routes>
+                            <ReloadPrompt />
                         </HistoryRouter>
                     </ChakraProvider>
                 </QueryClientProvider>

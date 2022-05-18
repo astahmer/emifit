@@ -7,6 +7,7 @@ specifiers:
   '@emotion/react': ^11.8.2
   '@emotion/styled': ^11.8.1
   '@pastable/core': ^0.1.19
+  '@rollup/plugin-replace': ^4.0.0
   '@types/canvas-confetti': ^1.4.2
   '@types/react': ^17.0.43
   '@types/react-dom': ^17.0.14
@@ -43,6 +44,10 @@ specifiers:
   vite: ^2.9.1
   vite-plugin-checker: ^0.4.5
   vite-plugin-pwa: ^0.11.13
+  workbox-core: ^6.5.3
+  workbox-precaching: ^6.5.3
+  workbox-routing: ^6.5.3
+  workbox-window: ^6.5.3
   xstate: ^4.30.6
 
 dependencies:
@@ -80,6 +85,7 @@ dependencies:
   xstate: 4.30.6
 
 devDependencies:
+  '@rollup/plugin-replace': 4.0.0
   '@types/canvas-confetti': 1.4.2
   '@types/react': 17.0.43
   '@types/react-dom': 17.0.14
@@ -91,6 +97,10 @@ devDependencies:
   vite: 2.9.1
   vite-plugin-checker: 0.4.5_vite@2.9.1
   vite-plugin-pwa: 0.11.13_vite@2.9.1
+  workbox-core: 6.5.3
+  workbox-precaching: 6.5.3
+  workbox-routing: 6.5.3
+  workbox-window: 6.5.3
 
 packages:
 
@@ -2394,6 +2404,26 @@ packages:
       '@rollup/pluginutils': 3.1.0_rollup@2.70.1
       magic-string: 0.25.9
       rollup: 2.70.1
+    dev: true
+
+  /@rollup/plugin-replace/4.0.0:
+    resolution: {integrity: sha512-+rumQFiaNac9y64OHtkHGmdjm7us9bo1PlbgQfdihQtuNxzjpaB064HbRnewUOggLQxVCCyINfStkgmBeQpv1g==}
+    peerDependencies:
+      rollup: ^1.20.0 || ^2.0.0
+    dependencies:
+      '@rollup/pluginutils': 3.1.0
+      magic-string: 0.25.9
+    dev: true
+
+  /@rollup/pluginutils/3.1.0:
+    resolution: {integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==}
+    engines: {node: '>= 8.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0
+    dependencies:
+      '@types/estree': 0.0.39
+      estree-walker: 1.0.1
+      picomatch: 2.3.1
     dev: true
 
   /@rollup/pluginutils/3.1.0_rollup@2.70.1:
@@ -4874,7 +4904,7 @@ packages:
       rollup: 2.70.1
       vite: 2.9.1
       workbox-build: 6.5.2
-      workbox-window: 6.5.2
+      workbox-window: 6.5.3
     transitivePeerDependencies:
       - '@types/babel__core'
       - supports-color
@@ -5041,6 +5071,10 @@ packages:
     resolution: {integrity: sha512-IlxLGQf+wJHCR+NM0UWqDh4xe/Gu6sg2i4tfZk6WIij34IVk9BdOQgi6WvqSHd879jbQIUgL2fBdJUJyAP5ypQ==}
     dev: true
 
+  /workbox-core/6.5.3:
+    resolution: {integrity: sha512-Bb9ey5n/M9x+l3fBTlLpHt9ASTzgSGj6vxni7pY72ilB/Pb3XtN+cZ9yueboVhD5+9cNQrC9n/E1fSrqWsUz7Q==}
+    dev: true
+
   /workbox-expiration/6.5.2:
     resolution: {integrity: sha512-5Hfp0uxTZJrgTiy9W7AjIIec+9uTOtnxY/tRBm4DbqcWKaWbVTa+izrKzzOT4MXRJJIJUmvRhWw4oo8tpmMouw==}
     dependencies:
@@ -5071,6 +5105,14 @@ packages:
       workbox-strategies: 6.5.2
     dev: true
 
+  /workbox-precaching/6.5.3:
+    resolution: {integrity: sha512-sjNfgNLSsRX5zcc63H/ar/hCf+T19fRtTqvWh795gdpghWb5xsfEkecXEvZ8biEi1QD7X/ljtHphdaPvXDygMQ==}
+    dependencies:
+      workbox-core: 6.5.3
+      workbox-routing: 6.5.3
+      workbox-strategies: 6.5.3
+    dev: true
+
   /workbox-range-requests/6.5.2:
     resolution: {integrity: sha512-zi5VqF1mWqfCyJLTMXn1EuH/E6nisqWDK1VmOJ+TnjxGttaQrseOhMn+BMvULFHeF8AvrQ0ogfQ6bSv0rcfAlg==}
     dependencies:
@@ -5094,10 +5136,22 @@ packages:
       workbox-core: 6.5.2
     dev: true
 
+  /workbox-routing/6.5.3:
+    resolution: {integrity: sha512-DFjxcuRAJjjt4T34RbMm3MCn+xnd36UT/2RfPRfa8VWJGItGJIn7tG+GwVTdHmvE54i/QmVTJepyAGWtoLPTmg==}
+    dependencies:
+      workbox-core: 6.5.3
+    dev: true
+
   /workbox-strategies/6.5.2:
     resolution: {integrity: sha512-fgbwaUMxbG39BHjJIs2y2X21C0bmf1Oq3vMQxJ1hr6y5JMJIm8rvKCcf1EIdAr+PjKdSk4ddmgyBQ4oO8be4Uw==}
     dependencies:
       workbox-core: 6.5.2
+    dev: true
+
+  /workbox-strategies/6.5.3:
+    resolution: {integrity: sha512-MgmGRrDVXs7rtSCcetZgkSZyMpRGw8HqL2aguszOc3nUmzGZsT238z/NN9ZouCxSzDu3PQ3ZSKmovAacaIhu1w==}
+    dependencies:
+      workbox-core: 6.5.3
     dev: true
 
   /workbox-streams/6.5.2:
@@ -5116,6 +5170,13 @@ packages:
     dependencies:
       '@types/trusted-types': 2.0.2
       workbox-core: 6.5.2
+    dev: true
+
+  /workbox-window/6.5.3:
+    resolution: {integrity: sha512-GnJbx1kcKXDtoJBVZs/P7ddP0Yt52NNy4nocjBpYPiRhMqTpJCNrSL+fGHZ/i/oP6p/vhE8II0sA6AZGKGnssw==}
+    dependencies:
+      '@types/trusted-types': 2.0.2
+      workbox-core: 6.5.3
     dev: true
 
   /wrappy/1.0.2:
