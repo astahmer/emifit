@@ -111,6 +111,7 @@ const ExerciseCheckbox = ({ exo }: { exo: Exercise }) => {
     return (
         <CheckboxSquare
             getIconProps={() => ({ size: "sm" })}
+            defaultChecked={daily.completedList.some((completed) => completed === exo.id)}
             onChange={(e) => addExerciseToDailyCompletedList.mutate(e.target.checked)}
             isDisabled={!isDailyToday}
         />
