@@ -36,6 +36,7 @@ export const Categories = [
             ...SharedTags,
             { id: "QuadFocus", label: "Quad focus", group: "Muscle" },
             { id: "GlutesFocus", label: "Glutes focus", group: "Muscle" },
+            { id: "BarebellDumbell", label: "Barebell & dumbell", group: "Muscle" },
         ],
     },
 ] as const;
