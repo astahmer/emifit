@@ -1,6 +1,5 @@
 import { CheckboxCircleInFragment, CheckboxSquare } from "@/components/CheckboxCircle";
 import { ConfirmationButton } from "@/components/ConfirmationButton";
-import { DotsIconButton } from "@/components/DotsIconButton";
 import { RadioCardButton } from "@/components/RadioCard";
 import { Scrollable } from "@/components/Scrollable";
 import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
@@ -11,7 +10,7 @@ import { Exercise, WithExerciseList } from "@/orm-types";
 import { formatDailyIdToDailyEntryParam, printDailyDate } from "@/orm-utils";
 import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Divider, Flex, Heading, Menu, MenuButton, MenuItem, MenuList, Spacer, Text } from "@chakra-ui/react";
+import { Box, Divider, Flex, Heading, HStack, IconButton, Spacer, Text } from "@chakra-ui/react";
 import { WithChildren } from "@pastable/core";
 import { useAtomValue } from "jotai";
 import { Fragment } from "react";
@@ -163,24 +162,32 @@ const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
     const navigate = useNavigate();
 
     return (
-        <Menu strategy="fixed">
-            <MenuButton as={DotsIconButton} ml="auto" mt="2" aria-label="menu" />
-            <MenuList>
-                <MenuItem
-                    icon={<EditIcon />}
-                    onClick={() => navigate(`/daily/entry/${printDailyDate(daily.date)}/exercise/edit/${exo.id}`)}
-                >
-                    Edit daily exercise
-                </MenuItem>
-                <ConfirmationButton
-                    renderTrigger={(onOpen) => (
-                        <MenuItem icon={<DeleteIcon />} onClick={onOpen}>
-                            Remove exercise from daily
-                        </MenuItem>
-                    )}
-                    onConfirm={() => removeExerciseFromDaily.mutate()}
-                />
-            </MenuList>
-        </Menu>
+        <HStack ml="auto" mt="2" aria-label="menu">
+            <IconButton
+                icon={<EditIcon />}
+                onClick={() => navigate(`/daily/entry/${printDailyDate(daily.date)}/exercise/edit/${exo.id}`)}
+                aria-label="Edit"
+                size="sm"
+                colorScheme="pink"
+                variant="outline"
+            >
+                Edit daily exercise
+            </IconButton>
+            <ConfirmationButton
+                renderTrigger={(onOpen) => (
+                    <IconButton
+                        icon={<DeleteIcon />}
+                        onClick={onOpen}
+                        aria-label="Delete"
+                        size="sm"
+                        colorScheme="pink"
+                        variant="outline"
+                    >
+                        Remove exercise from daily
+                    </IconButton>
+                )}
+                onConfirm={() => removeExerciseFromDaily.mutate()}
+            />
+        </HStack>
     );
 };
