@@ -34,7 +34,7 @@ try {
         headers: { Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}` },
         data: { value: newVersion },
     });
-    console.log(`Successfully updated VITE_APP_VERSION to ${updateResponse.data.value}`);
+    console.log(`Successfully updated VITE_APP_VERSION to ${newVersion}`);
 } catch (error) {
     console.log(error.response.data);
 }
