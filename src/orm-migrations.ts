@@ -14,6 +14,7 @@ export const runMigrations: (
     console.log({ db, oldVersion, newVersion, transaction });
     let migrationVersion = oldVersion;
     const isVersionChange = transaction.mode === "versionchange";
+    const tx = transaction;
 
     console.log("start migrating");
     if (migrationVersion === 0 && isVersionChange) {
@@ -38,8 +39,6 @@ export const runMigrations: (
         console.log("migrated to version", migrationVersion);
     }
     if (migrationVersion === 1) {
-        const tx = transaction;
-
         await onVersionMigrated?.(migrationVersion, tx);
         let cursor = await tx.objectStore("daily").index("by-time").openCursor();
 
@@ -53,6 +52,8 @@ export const runMigrations: (
         migrationVersion++;
         console.log("migrated to version", migrationVersion);
     }
+
+    await onVersionMigrated?.(migrationVersion, tx);
 
     console.log("done migrating");
 };
