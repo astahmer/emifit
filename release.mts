@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { readFile, writeFile } from "fs/promises";
 
 const env = dotenv.config();
-const newVersion = env.parsed.VITE_APP_VERSION;
+const newVersion = Number(env.parsed.VITE_APP_VERSION) + 1;
 console.log(`Releasing EmiFIT with version <${newVersion}>`);
 
 // @see https://vercel.com/docs/rest-api#endpoints/projects/edit-an-environment-variable
@@ -14,7 +14,7 @@ try {
     console.log("Updating version in local .env file");
     await writeFile(
         "./.env",
-        envFile.replace(/VITE_APP_VERSION=\d+(\.\d+\.\d+)?/, `VITE_APP_VERSION=${Number(newVersion) + 1}`)
+        envFile.replace(/VITE_APP_VERSION=\d+(\.\d+\.\d+)?/, `VITE_APP_VERSION=${Number(newVersion)}`)
     );
     console.log("Done updating local file");
 
@@ -32,7 +32,7 @@ try {
             VITE_APP_VERSION.id
         }`,
         headers: { Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}` },
-        data: { value: newVersion },
+        data: { value: String(newVersion) },
     });
     console.log(`Successfully updated VITE_APP_VERSION to ${newVersion}`);
 } catch (error) {
