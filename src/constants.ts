@@ -8,7 +8,7 @@ const SharedTags = [
     { id: "Freeweight", label: "Freeweight", group: "Type" },
     { id: "Bodyweight", label: "Bodyweight", group: "Type" },
     { id: "Barebell", label: "Barebell", group: "Type" },
-    { id: "Dumbell", label: "Dumbell", group: "Type" },
+    { id: "Dumbbell", label: "Dumbbell", group: "Type" },
 ] as const;
 
 export const Categories = [
