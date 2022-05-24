@@ -7,6 +7,8 @@ const SharedTags = [
     { id: "Machine", label: "Machine", group: "Type" },
     { id: "Freeweight", label: "Freeweight", group: "Type" },
     { id: "Bodyweight", label: "Bodyweight", group: "Type" },
+    { id: "Barebell", label: "Barebell", group: "Type" },
+    { id: "Dumbell", label: "Dumbell", group: "Type" },
 ] as const;
 
 export const Categories = [
@@ -36,7 +38,6 @@ export const Categories = [
             ...SharedTags,
             { id: "QuadFocus", label: "Quad focus", group: "Muscle" },
             { id: "GlutesFocus", label: "Glutes focus", group: "Muscle" },
-            { id: "BarebellDumbell", label: "Barebell & dumbell", group: "Muscle" },
         ],
     },
 ] as const;
