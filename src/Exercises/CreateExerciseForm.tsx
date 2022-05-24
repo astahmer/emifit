@@ -96,7 +96,7 @@ export const CreateExerciseForm = ({
                                         tags: changes.selectedItem.tags,
                                     });
                                 } else {
-                                    form.setValue("name", null);
+                                    form.reset({ name: null, series: [], nbSeries: 0, tags: [] });
                                 }
                             }}
                             params={{ index: "by-category", query: category }}
