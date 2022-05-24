@@ -89,10 +89,13 @@ export const CreateExerciseForm = ({
                             onSelectedItemChange={(changes) => {
                                 if (changes.selectedItem) {
                                     form.reset({
+                                        name: changes.selectedItem.name,
                                         series: changes.selectedItem.series,
                                         nbSeries: changes.selectedItem.series.length,
                                         tags: changes.selectedItem.tags,
                                     });
+                                } else {
+                                    form.setValue("name", null);
                                 }
                             }}
                             params={{ index: "by-category", query: category }}
