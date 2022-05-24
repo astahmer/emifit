@@ -3,7 +3,7 @@ import { orm } from "@/orm";
 import { Exercise } from "@/orm-types";
 import { routeMap } from "@/routes";
 import { currentDailyIdAtom, showSkeletonsAtom } from "@/store";
-import { useCurrentDaily, useCurrentDailyInvalidate, useCurrentDailyQuery } from "@/orm-hooks";
+import { useCurrentDailyInvalidate, useCurrentDailyQuery } from "@/orm-hooks";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Flex, Heading, Skeleton } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
@@ -23,6 +23,7 @@ export const ExerciseAddPage = () => {
             orm.daily.upsert(dailyId, (current) => ({
                 ...current,
                 exerciseList: (current.exerciseList || []).concat(exo.id),
+                completedList: (current.completedList || []).concat(exo.id), // Added that since ExerciseCheckbox has been commented out
             })),
         {
             onSuccess: () => {

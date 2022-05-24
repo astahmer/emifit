@@ -71,7 +71,8 @@ function ExerciseTaskItem({ exo }: { exo: Exercise }) {
 
     return (
         <Flex>
-            {isDailyToday ? (
+            {/* Currently that is deadcode but i'm leaving it just in case one day she wants it back */}
+            {isDailyToday && false ? (
                 <Flex h="100%" alignItems="center" px="8">
                     <ExerciseCheckbox exo={exo} />
                 </Flex>
