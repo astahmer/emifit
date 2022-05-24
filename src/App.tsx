@@ -3,6 +3,7 @@ import { WithChildren } from "@pastable/core";
 import { CalendarDefaultTheme } from "@uselessdev/datepicker";
 import { Provider, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { useHotkeys } from "react-hotkeys-hook";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
@@ -10,6 +11,7 @@ import { Outlet, Route, Routes, unstable_HistoryRouter as HistoryRouter } from "
 import { BottomTabs } from "./components/BottomTabs";
 import { DailyEntry } from "./Daily/DailyEntry";
 import { DevTools } from "./DevTools";
+import { ErrorFallback } from "./components/ErrorFallback";
 import { makeDb } from "./orm";
 import { ExerciseAddPage } from "./pages/ExerciseAddPage";
 import { ExerciseEditPage } from "./pages/ExerciseEditPage";
@@ -17,9 +19,9 @@ import { HomePage, HomePageLayout } from "./pages/HomePage";
 import { ProgramsPage } from "./pages/ProgramsPage";
 import { ProgressPage } from "./pages/ProgressPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import ReloadPrompt from "./ReloadPrompt";
 import { routeMap } from "./routes";
 import { browserHistory, debugModeAtom, store } from "./store";
-import ReloadPrompt from "./ReloadPrompt";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -67,7 +69,9 @@ const Layout = () => {
     return (
         <Flex as="main" direction="column" boxSize="100%">
             <Flex as="section" id="View" direction="column" h="100%" overflow="hidden">
-                <Outlet />
+                <ErrorBoundary FallbackComponent={ErrorFallback}>
+                    <Outlet />
+                </ErrorBoundary>
             </Flex>
             <Box as="footer" mt="auto" w="100%" flexShrink={0}>
                 <BottomTabs />
