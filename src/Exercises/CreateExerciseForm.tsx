@@ -152,14 +152,12 @@ const WeightForm = ({ form }: { form: UseFormReturn<typeof formDefaultValues> })
         }
 
         if (nbSeries < current.length) {
-            console.log("series.replace");
             series.replace(series.fields.slice(0, nbSeries));
             return;
         }
 
         for (let i = 0; i < nbSeries; i++) {
             if (i >= current.length) {
-                console.log("series.append");
                 series.append(makeSerie(i, current), { shouldFocus: false });
             }
         }
@@ -229,9 +227,8 @@ const SeriesForm = ({
                             {...form.register(`series.${index}.kg`, { valueAsNumber: true })}
                             defaultValue={serie.kg}
                             min={1}
-                            max={20}
+                            max={200}
                             onChange={(_, value) => {
-                                console.log(getSerie(), index, value);
                                 getSerie().kg = value;
                             }}
                             inputProps={{ placeholder: "kg" }}
@@ -249,7 +246,6 @@ const SeriesForm = ({
                     max={20}
                     label="Nb of reps"
                     onChange={(e) => {
-                        console.log(getSerie(), index, e.target.valueAsNumber);
                         getSerie().reps = e.target.valueAsNumber;
                     }}
                     isRequired
