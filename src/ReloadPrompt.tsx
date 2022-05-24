@@ -40,11 +40,11 @@ function ReloadPrompt() {
     };
 
     return (
-        <Show cond={offlineReady || needRefresh}>
+        <Show cond={needRefresh}>
             <div className="ReloadPrompt-container">
                 <div className="ReloadPrompt-toast">
                     <div className="ReloadPrompt-message">
-                        {offlineReady ? (
+                        {offlineReady && false ? (
                             <span>App ready to work offline</span>
                         ) : (
                             <span>New content available, click on reload button to update.</span>
