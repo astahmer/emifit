@@ -85,7 +85,7 @@ export const CreateExerciseForm = ({
                         <ExerciseCombobox
                             {...form.register("name", { required })}
                             defaultValue={defaultValues.name}
-                            initialSelectedItem={defaultValues as any as Exercise}
+                            initialSelectedItem={defaultValues.name ? (defaultValues as any as Exercise) : undefined}
                             onSelectedItemChange={(changes) => {
                                 if (changes.selectedItem) {
                                     form.reset({
@@ -230,7 +230,10 @@ const SeriesForm = ({
                             defaultValue={serie.kg}
                             min={1}
                             max={20}
-                            onChange={(_, value) => (getSerie().kg = value)}
+                            onChange={(_, value) => {
+                                console.log(getSerie(), index, value);
+                                getSerie().kg = value;
+                            }}
                             inputProps={{ placeholder: "kg" }}
                             inputMode="numeric"
                             isRequired
