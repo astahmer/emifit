@@ -14,7 +14,7 @@ export const ExerciseSetList = ({ setList, ...props }: { setList: Serie[] } & Li
         >
             {setList.map((serie) => (
                 <ListItem key={serie.id}>
-                    with {serie.kg} kg / {serie.reps} reps
+                    {serie.kind === "warmup" ? "(warmup) " : ""} with {serie.kg} kg / {serie.reps} reps
                 </ListItem>
             ))}
         </OrderedList>

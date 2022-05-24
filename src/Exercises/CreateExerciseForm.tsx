@@ -1,5 +1,6 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
+import { SwitchInput } from "@/components/SwitchInput";
 import { TextInput } from "@/components/TextInput";
 import { serializeExercise } from "@/functions/snapshot";
 import { onError } from "@/functions/toasts";
@@ -218,10 +219,15 @@ const SeriesForm = ({
                         />
                     )}
                 />
-                {/* <Text ml="1" fontSize="xs" color="gray.400">
-                    ({nbRepsBySeries})
-                </Text> */}
             </Flex>
+            {index === 0 ? (
+                <SwitchInput
+                    id={`serie-${index}-is-warmup`}
+                    label="Warmup set ?"
+                    onChange={(e) => void form.setValue(`series.${index}.kind`, e.target.checked ? "warmup" : null)}
+                    defaultChecked={serie.kind === "warmup"}
+                />
+            ) : null}
             <Stack direction="row">
                 <TextInput
                     label="kg"

@@ -1,4 +1,5 @@
 import type { Category } from "./constants";
+import { LiteralUnion } from "./types";
 
 export interface Exercise {
     id: string;
@@ -13,6 +14,7 @@ export interface Serie {
     id: string;
     kg: number;
     reps: number;
+    kind: LiteralUnion<"warmup">;
 }
 
 export interface Tag {

@@ -11,7 +11,6 @@ import { formatDailyIdToDailyEntryParam, printDailyDate } from "@/orm-utils";
 import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, Divider, Flex, Heading, HStack, IconButton, Spacer, Text } from "@chakra-ui/react";
-import { WithChildren } from "@pastable/core";
 import { useAtomValue } from "jotai";
 import { Fragment } from "react";
 import { useMutation } from "react-query";
@@ -23,7 +22,8 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
     const dailyId = useAtomValue(currentDailyIdAtom);
 
     return (
-        <ExerciseTaskListView exerciseList={exerciseList}>
+        <Scrollable pt="2" pb="8">
+            <ExerciseTaskList exerciseList={exerciseList} />
             <Divider my="4" />
             <CardioLine />
             <Divider my="4" />
@@ -36,15 +36,6 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
                     <GoBackToTodayEntryButton />
                 )}
             </Box>
-        </ExerciseTaskListView>
-    );
-};
-
-const ExerciseTaskListView = ({ children, exerciseList }: { exerciseList: Exercise[] } & Partial<WithChildren>) => {
-    return (
-        <Scrollable pt="2" pb="8">
-            <ExerciseTaskList exerciseList={exerciseList} />
-            {children}
         </Scrollable>
     );
 };

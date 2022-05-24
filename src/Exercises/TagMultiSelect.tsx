@@ -3,7 +3,7 @@ import { Categories } from "@/constants";
 import { mergeProps } from "@/functions/mergeProps";
 import { Tag } from "@/orm-types";
 import { PickOptional } from "@/types";
-import { FormControl, FormErrorMessage, FormLabel } from "@chakra-ui/react";
+import { FormControl, FormErrorMessage, FormLabel, Text } from "@chakra-ui/react";
 import { Controller, ControllerProps } from "react-hook-form";
 
 export function TagMultiSelect({
@@ -50,14 +50,17 @@ export function TagMultiSelect({
                         items={items}
                         label={(getLabelProps) => <FormLabel {...getLabelProps()}>Tags</FormLabel>}
                         getButtonProps={() => ({
+                            w: "100%",
                             "aria-invalid": isInvalid,
                             _invalid: { borderWidth: "1px", borderColor: "red.500", boxShadow: `0 0 0 1px #e53e3e` },
                         })}
-                        renderButtonText={(selection) =>
-                            selection.length
-                                ? `(${selection.length}) ${selection.map((item) => item.label).join(", ")}`
-                                : "Select one or more tags"
-                        }
+                        renderButtonText={(selection) => (
+                            <Text maxW="100%" textOverflow="ellipsis" overflow="hidden">
+                                {selection.length
+                                    ? `(${selection.length}) ${selection.map((item) => item.label).join(", ")}`
+                                    : "Select one or more tags"}
+                            </Text>
+                        )}
                     />
                 )}
             />
