@@ -10,7 +10,7 @@ export const ExerciseTag = ({ tag, ...props }: { tag: Tag } & BadgeProps) => (
 export const ExerciseTagList = ({ tagList, ...props }: { tagList: Tag[] } & WrapProps) => {
     return (
         <Wrap {...props}>
-            {tagList.map((tag) => (
+            {tagList.filter(Boolean).map((tag) => (
                 <WrapItem key={tag.id}>
                     <ExerciseTag tag={tag} />
                 </WrapItem>
