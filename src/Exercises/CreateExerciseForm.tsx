@@ -2,13 +2,11 @@ import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { SwitchInput } from "@/components/SwitchInput";
 import { TextInput } from "@/components/TextInput";
-import { serializeExercise } from "@/functions/snapshot";
 import { onError } from "@/functions/toasts";
-import { orm } from "@/orm";
 import { Exercise, Serie } from "@/orm-types";
 import { makeExercise, makeSerie } from "@/orm-utils";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
-import { Box, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
+import { Box, BoxProps, Button, Divider, Flex, Heading, IconButton, Stack, Text } from "@chakra-ui/react";
 import { Fragment, ReactNode, useEffect } from "react";
 import {
     FormProvider,
@@ -18,7 +16,7 @@ import {
     useFormContext,
     UseFormReturn,
 } from "react-hook-form";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation } from "react-query";
 import { ExerciseCombobox } from "./ExerciseCombobox";
 import { TagMultiSelect } from "./TagMultiSelect";
 
@@ -28,114 +26,113 @@ const formDefaultValues: Pick<Exercise, "name" | "tags" | "series"> & { nbSeries
     tags: [],
     series: [makeSerie(0)] as Serie[],
 };
+export type ExerciseFormValues = typeof formDefaultValues;
 
 type CreateExerciseParams = Omit<typeof formDefaultValues, "nbSeries"> & { category: string };
 
 const required = { value: true, message: "This field is required" };
 
 export const CreateExerciseForm = ({
+    id,
     renderSubmit,
     category,
     onSubmit,
+    onChange,
     defaultValues = formDefaultValues,
-    shouldPersist = true,
+    renderFormTop,
+    shouldOverflow = true,
 }: {
+    id?: BoxProps["id"];
     category: string;
     onSubmit?: (data: Exercise) => void;
+    onChange?: (values: typeof formDefaultValues) => void;
     renderSubmit?: (form: UseFormReturn<typeof formDefaultValues>) => ReactNode;
-    shouldPersist?: boolean;
     defaultValues?: typeof formDefaultValues;
+    renderFormTop?: () => ReactNode;
+    shouldOverflow?: boolean;
 }) => {
     const form = useForm({ defaultValues });
 
-    const queryClient = useQueryClient();
-    const mutation = useMutation(
-        async (params: CreateExerciseParams) => {
-            const row = makeExercise({ ...params, category });
-            if (shouldPersist) {
-                await orm.exercise.add(serializeExercise(row));
-            }
-
-            return row;
-        },
-        {
-            onSuccess: (data) => {
-                queryClient.invalidateQueries(orm.exercise.name);
-                onSubmit?.(data);
-            },
-            onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
-        }
-    );
+    const mutation = useMutation(async (params: CreateExerciseParams) => makeExercise({ ...params, category }), {
+        onSuccess: onSubmit,
+        onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+    });
 
     const onCreate = ({ nbSeries, ...params }: typeof formDefaultValues) =>
         mutation.mutate(makeExercise({ ...params, category }));
 
+    useEffect(() => {
+        if (!onChange) return;
+
+        const sub = form.watch((values) => void onChange(values as typeof formDefaultValues));
+        return () => sub.unsubscribe();
+    }, [onChange, form.watch]);
+
     return (
         <FormProvider {...form}>
             <Box
+                id={id}
                 as="form"
-                id="add-form"
                 onSubmit={form.handleSubmit(onCreate)}
-                h="100%"
-                minH={0}
+                h={shouldOverflow ? "100%" : undefined}
+                minH={shouldOverflow ? 0 : undefined}
                 d="flex"
                 flexDirection="column"
             >
-                <Box h="100%" minH={0}>
-                    <Stack p="8" pt="4" overflow="auto" h="100%" minH={0}>
-                        <ExerciseCombobox
-                            {...form.register("name", { required })}
-                            defaultValue={defaultValues.name}
-                            initialSelectedItem={defaultValues.name ? (defaultValues as any as Exercise) : undefined}
-                            onSelectedItemChange={(changes) => {
-                                if (changes.selectedItem) {
-                                    form.reset({
-                                        name: changes.selectedItem.name,
-                                        series: changes.selectedItem.series,
-                                        nbSeries: changes.selectedItem.series.length,
-                                        tags: changes.selectedItem.tags,
-                                    });
-                                } else {
-                                    form.reset({ name: null, series: [], nbSeries: 0, tags: [] });
-                                }
-                            }}
-                            params={{ index: "by-category", query: category }}
-                        />
-                        <TagMultiSelect
-                            control={form.control}
-                            name="tags"
-                            rules={{ required }}
-                            catId={category}
-                            error={(form.formState.errors.tags as any)?.message}
-                        />
-                        <TextInput
-                            {...form.register("nbSeries", { valueAsNumber: true })}
-                            min={1}
-                            max={10}
-                            label="Nb of series"
-                            type="number"
-                            inputMode="numeric"
-                            error={form.formState.errors.nbSeries}
-                        />
-                        <div>
-                            <Divider my="4" />
-                        </div>
-                        <WeightForm form={form} />
-                        <div>
-                            <Button
-                                mt="8"
-                                isFullWidth
-                                leftIcon={<AddIcon />}
-                                colorScheme="pink"
-                                variant="outline"
-                                onClick={() => form.setValue("nbSeries", form.getValues().nbSeries + 1)}
-                                size="sm"
-                            >
-                                Add serie
-                            </Button>
-                        </div>
-                    </Stack>
-                </Box>
+                <Stack p="8" pt="4" overflow={shouldOverflow ? "auto" : undefined} h="100%" minH={0}>
+                    {renderFormTop?.()}
+                    <ExerciseCombobox
+                        {...form.register("name", { required })}
+                        defaultValue={defaultValues.name}
+                        initialSelectedItem={defaultValues.name ? (defaultValues as any as Exercise) : undefined}
+                        onSelectedItemChange={(changes) => {
+                            if (changes.selectedItem) {
+                                form.reset({
+                                    name: changes.selectedItem.name,
+                                    series: changes.selectedItem.series,
+                                    nbSeries: changes.selectedItem.series.length,
+                                    tags: changes.selectedItem.tags,
+                                });
+                            } else {
+                                form.reset({ name: null, series: [], nbSeries: 0, tags: [] });
+                            }
+                        }}
+                        params={{ index: "by-category", query: category }}
+                    />
+                    <TagMultiSelect
+                        control={form.control}
+                        name="tags"
+                        rules={{ required }}
+                        catId={category}
+                        error={(form.formState.errors.tags as any)?.message}
+                    />
+                    <TextInput
+                        {...form.register("nbSeries", { valueAsNumber: true })}
+                        min={1}
+                        max={10}
+                        label="Nb of series"
+                        type="number"
+                        inputMode="numeric"
+                        error={form.formState.errors.nbSeries}
+                    />
+                    <div>
+                        <Divider my="4" />
+                    </div>
+                    <WeightForm form={form} />
+                    <div>
+                        <Button
+                            mt="8"
+                            isFullWidth
+                            leftIcon={<AddIcon />}
+                            colorScheme="pink"
+                            variant="outline"
+                            onClick={() => form.setValue("nbSeries", form.getValues().nbSeries + 1)}
+                            size="sm"
+                        >
+                            Add serie
+                        </Button>
+                    </div>
+                </Stack>
                 <Box mb="2" flexShrink={0}>
                     {renderSubmit?.(form)}
                 </Box>

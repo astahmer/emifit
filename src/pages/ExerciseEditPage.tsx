@@ -50,7 +50,6 @@ export const ExerciseEditPage = () => {
                         category={daily.category}
                         onSubmit={editExerciseById.mutate}
                         defaultValues={{ ...exercise, nbSeries: exercise.series.length }}
-                        shouldPersist={false}
                         renderSubmit={(form) => {
                             const [name, tags] = form.watch(["name", "tags"]);
 

@@ -9,6 +9,8 @@ export interface Exercise {
     series: Serie[];
     createdAt: Date;
     madeFromExerciseId?: string;
+    /** if made within Y superset */
+    supersetId?: Program["id"] | null;
 }
 export interface Serie {
     id: string;
