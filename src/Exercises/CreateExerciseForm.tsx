@@ -114,6 +114,11 @@ export const CreateExerciseForm = ({
                         type="number"
                         inputMode="numeric"
                         error={form.formState.errors.nbSeries}
+                        onWheel={() => {
+                            if ((document.activeElement as HTMLInputElement).type === "number") {
+                                (document.activeElement as HTMLInputElement).blur();
+                            }
+                        }}
                     />
                     <div>
                         <Divider my="4" />
