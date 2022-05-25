@@ -22,6 +22,7 @@ import { SettingsPage } from "./pages/SettingsPage";
 import ReloadPrompt from "./ReloadPrompt";
 import { routeMap } from "./routes";
 import { browserHistory, debugModeAtom, store } from "./store";
+import { ClickToComponent } from "click-to-react-component";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ function App() {
                                 </Route>
                             </Routes>
                             <ReloadPrompt />
+                            <ClickToComponent />
                         </HistoryRouter>
                     </ChakraProvider>
                 </QueryClientProvider>
