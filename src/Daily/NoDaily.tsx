@@ -66,7 +66,7 @@ const EmptyPastDay = () => {
         <>
             <Box m="4">
                 <Box m="4">
-                    <Alert status="warning" rounded="full" justifyContent="center">
+                    <Alert status="info" rounded="full" justifyContent="center" colorScheme="gray">
                         <AlertIcon />
                         Nothing to see here !
                     </Alert>
