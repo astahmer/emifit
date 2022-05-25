@@ -11,13 +11,16 @@ import { HFlex } from "./HFlex";
 import { useDailyQuery } from "@/orm-hooks";
 import { printDailyDate } from "@/orm-utils";
 import { printDate } from "@/functions/utils";
+import { match } from "ts-pattern";
 
 export const BottomTabs = () => {
     const location = useLocation();
     const submitBtnRef = useRef<HTMLButtonElement>(null);
     const todaysDaily = useDailyQuery(printDate(new Date()));
     const hasCreatedTodaysDaily = Boolean(todaysDaily.data?.id);
-    const addExerciseLink = `daily/entry/${printDailyDate(new Date())}${hasCreatedTodaysDaily ? `/exercise/add` : ""}`;
+    const addExerciseLink = `/daily/entry/${printDailyDate(new Date())}${hasCreatedTodaysDaily ? `/exercise/add` : ""}`;
+
+    const defaultIndex = getDefaultTabIndex(location.pathname);
 
     return (
         <>
@@ -28,6 +31,7 @@ export const BottomTabs = () => {
                 borderTop="1px solid"
                 borderTopColor="gray.300"
                 bgColor="gray.50"
+                defaultIndex={defaultIndex}
             >
                 <TabList>
                     <Tab as={ReactLink} to="/" w="100%" h="58px">
@@ -79,3 +83,27 @@ export const BottomTabs = () => {
         </>
     );
 };
+
+const getDefaultTabIndex = (pathname: string) =>
+    match(pathname)
+        .when(
+            (path) => path === "/" || (path.startsWith("/daily/entry") && !path.includes("exercise")),
+            () => 0
+        )
+        .when(
+            (path) => path.startsWith("/progress"),
+            () => 1
+        )
+        .when(
+            (path) => path.startsWith("/daily/entry") && path.includes("exercise"),
+            () => 2
+        )
+        .when(
+            (path) => path.startsWith("/programs"),
+            () => 3
+        )
+        .when(
+            (path) => path.startsWith("/settings"),
+            () => 4
+        )
+        .run();
