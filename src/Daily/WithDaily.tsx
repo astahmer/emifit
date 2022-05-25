@@ -23,7 +23,7 @@ import {
     Text,
 } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdChecklist, MdGridView, MdList, MdOutlineViewCompact } from "react-icons/md";
 import { IoMdExpand } from "react-icons/io";
 import { useMutation } from "react-query";
@@ -160,6 +160,12 @@ const TodayEmptyExerciseList = () => {
 
     const daily = useCurrentDaily();
     const hasProgram = useHasProgram({ index: "by-category", query: daily.category });
+
+    useEffect(() => {
+        if (showProgramCombobox && !hasProgram) {
+            setShowProgramCombobox(false);
+        }
+    }, [showProgramCombobox, hasProgram]);
 
     return (
         <HFlex h="100%" justifyContent="center">
