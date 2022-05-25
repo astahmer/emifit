@@ -1,16 +1,12 @@
 import { HFlex } from "@/components/HFlex";
 import { RadioCardButton } from "@/components/RadioCard";
-import { ScrollableStack } from "@/components/Scrollable";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
-import { groupIn } from "@/functions/groupBy";
-import { serializeDaily } from "@/functions/snapshot";
-import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCurrentDaily, useHasProgram } from "@/orm-hooks";
 import { Program } from "@/orm-types";
 import { ProgramCard } from "@/Programs/ProgramCard";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
-import { currentDailyIdAtom, isDailyTodayAtom, isCompactViewAtom } from "@/store";
+import { isDailyTodayAtom, isCompactViewAtom } from "@/store";
 import { CheckIcon } from "@chakra-ui/icons";
 import {
     Alert,
@@ -40,6 +36,7 @@ import { DailyExerciseListView } from "./DailyExerciseListView";
 import { useLastFilledDailyDate } from "./useLastFilledDailyDate";
 import { GoToClosestPreviousDailyEntryButton } from "./GoToClosestPreviousDailyEntryButton";
 import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
+import { useProgramForDailyMutation } from "../Programs/useProgramForDailyMutation";
 
 export const WithDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
@@ -197,37 +194,8 @@ const TodayEmptyExerciseList = () => {
 const ProgramSearch = () => {
     const [selectedProgram, setSelectedProgram] = useState<Program>(null);
 
-    const dailyId = useAtomValue(currentDailyIdAtom);
     const daily = useCurrentDaily();
-
-    const useProgramMutation = useMutation(
-        async () => {
-            const program = await orm.program.find(selectedProgram.id);
-            const exerciseList = await orm.exercise.get();
-            const exerciseListById = groupIn(exerciseList, "id");
-
-            const exerciseCloneList = program.exerciseList
-                .map((id) => exerciseListById[id])
-                .map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id }));
-
-            const tx = orm.exercise.tx("readwrite");
-            const insertMany = exerciseCloneList.map((exo) => tx.store.add(exo));
-
-            return Promise.all([
-                ...insertMany,
-                orm.daily.upsert(dailyId, (current) => ({
-                    ...serializeDaily({
-                        ...current,
-                        programId: program.id,
-                        exerciseList: [],
-                    }),
-                    exerciseList: current.exerciseList.concat(exerciseCloneList.map((exo) => exo.id)),
-                })),
-                tx.done,
-            ]);
-        },
-        { onSuccess: daily.invalidate }
-    );
+    const programMutation = useProgramForDailyMutation();
 
     return (
         <Stack alignSelf="center" mt="4" w="100%" px="4">
@@ -247,7 +215,7 @@ const ProgramSearch = () => {
                         py="4"
                         mb="4"
                         size="lg"
-                        onClick={useProgramMutation.mutate.bind(undefined)}
+                        onClick={() => programMutation.mutate(selectedProgram)}
                     >
                         Use this program
                     </Button>

@@ -5,8 +5,10 @@ import { serializeProgram } from "@/functions/snapshot";
 import { onError, successToast } from "@/functions/toasts";
 import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
+import { useCurrentDaily } from "@/orm-hooks";
 import { Program } from "@/orm-types";
-import { ChevronDownIcon, ChevronUpIcon, DeleteIcon, DragHandleIcon, EditIcon } from "@chakra-ui/icons";
+import { isDailyTodayAtom } from "@/store";
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, DeleteIcon, DragHandleIcon, EditIcon } from "@chakra-ui/icons";
 import {
     Badge,
     Box,
@@ -22,9 +24,11 @@ import {
     UnorderedList,
     useDisclosure,
 } from "@chakra-ui/react";
+import { useAtomValue } from "jotai";
 import { ReactNode } from "react";
 import { HiOutlineDuplicate } from "react-icons/hi";
 import { useMutation, useQueryClient } from "react-query";
+import { useProgramForDailyMutation } from "./useProgramForDailyMutation";
 
 export type ProgramCardProps = { program: Program; headerRight?: () => ReactNode; defaultIsOpen?: boolean };
 export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCardProps) => {
@@ -102,11 +106,20 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
         }
     );
 
+    const isDailyToday = useAtomValue(isDailyTodayAtom);
+    const daily = useCurrentDaily();
+    const programMutation = useProgramForDailyMutation();
+
     return (
         <>
             <Menu strategy="absolute">
                 <MenuButton as={DotsIconButton} />
                 <MenuList>
+                    {isDailyToday && program.category === daily.category && (
+                        <MenuItem icon={<CheckIcon />} onClick={() => programMutation.mutate(program)}>
+                            Use program
+                        </MenuItem>
+                    )}
                     <MenuItem icon={<EditIcon />} onClick={() => onEdit(program)}>
                         Edit program
                     </MenuItem>
