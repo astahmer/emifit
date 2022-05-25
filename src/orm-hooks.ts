@@ -83,7 +83,10 @@ export function useHasProgram<Index extends StoreIndex<"program"> = undefined>(
     params: StoreQueryParams<"program", Index> = {}
 ) {
     return Boolean(
-        useQuery([orm.program.name, "hasProgram"], async () => Boolean(await orm.program.count(params))).data
+        useQuery([orm.program.name, "hasProgram", params], async () => {
+            const count = await orm.program.count(params);
+            return Boolean(count);
+        }).data
     );
 }
 
