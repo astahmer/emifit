@@ -2,8 +2,8 @@ import { CalendarButton } from "@/components/CalendarButton";
 import { DailyEntry } from "@/Daily/DailyEntry";
 import { currentDateAtom } from "@/store";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { Flex, IconButton } from "@chakra-ui/react";
-import { addDays, isFuture } from "date-fns";
+import { Box, Flex, IconButton } from "@chakra-ui/react";
+import { addDays, format, isFuture } from "date-fns";
 import { useAtom } from "jotai";
 import { Outlet } from "react-router-dom";
 
@@ -30,14 +30,28 @@ const Header = () => {
     const isNextDayInFuture = isFuture(addDays(currentDate, 1));
 
     return (
-        <Flex as="section" id="HomeHeader" p="4" justifyContent="space-between" alignItems="center">
+        <Flex as="section" id="HomeHeader" p="4" justifyContent="space-between" alignItems="center" mt="4">
             <IconButton
                 variant="unstyled"
                 aria-label="Prev day"
                 icon={<ChevronLeftIcon fontSize="32px" />}
                 onClick={() => setDate((current) => addDays(current, -1))}
             />
-            <CalendarButton selectedDate={currentDate} onChange={setDate} />
+            <Box d="flex-column" pos="relative">
+                <Box
+                    pos="absolute"
+                    bottom="100%"
+                    mb="1"
+                    left="0"
+                    right="0"
+                    textAlign="center"
+                    fontWeight="bold"
+                    color="pink.300"
+                >
+                    {format(currentDate, "EEEE")}
+                </Box>
+                <CalendarButton selectedDate={currentDate} onChange={setDate} />
+            </Box>
             <IconButton
                 variant="unstyled"
                 aria-label="Next day"
