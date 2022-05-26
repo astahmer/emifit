@@ -1,12 +1,14 @@
 import { HFlex } from "@/components/HFlex";
 import { RadioCardButton } from "@/components/RadioCard";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
+import { ExerciseGridView } from "@/Exercises/ExerciseGrid";
 import { orm } from "@/orm";
 import { useCurrentDaily, useHasProgram } from "@/orm-hooks";
 import { Program } from "@/orm-types";
+import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 import { ProgramCard } from "@/Programs/ProgramCard";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
-import { isDailyTodayAtom, isCompactViewAtom } from "@/store";
+import { isCompactViewAtom, isDailyTodayAtom } from "@/store";
 import { CheckIcon } from "@chakra-ui/icons";
 import {
     Alert,
@@ -17,26 +19,23 @@ import {
     ButtonProps,
     Divider,
     Flex,
-    Heading,
     IconButton,
     Stack,
     Text,
 } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { MdChecklist, MdGridView, MdList, MdOutlineViewCompact } from "react-icons/md";
 import { IoMdExpand } from "react-icons/io";
+import { MdChecklist, MdGridView, MdList, MdOutlineViewCompact } from "react-icons/md";
 import { useMutation } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { match } from "ts-pattern";
-import { DailyExerciseGridView } from "./DailyExerciseGridView";
+import { useProgramForDailyMutation } from "../Programs/useProgramForDailyMutation";
+import { DailyExerciseListView } from "./DailyExerciseListView";
 import { DailyExerciseTaskListView } from "./DailyExerciseTaskListView";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
-import { DailyExerciseListView } from "./DailyExerciseListView";
-import { useLastFilledDailyDate } from "./useLastFilledDailyDate";
 import { GoToClosestPreviousDailyEntryButton } from "./GoToClosestPreviousDailyEntryButton";
-import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
-import { useProgramForDailyMutation } from "../Programs/useProgramForDailyMutation";
+import { useLastFilledDailyDate } from "./useLastFilledDailyDate";
 
 export const WithDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
@@ -141,7 +140,7 @@ const DailyExerciseList = () => {
     return hasAtLeastOneExercise ? (
         match(viewType)
             .with("task", () => <DailyExerciseTaskListView exerciseList={daily.exerciseList} />)
-            .with("grid", () => <DailyExerciseGridView exerciseList={daily.exerciseList} />)
+            .with("grid", () => <ExerciseGridView exerciseList={daily.exerciseList} />)
             .with("list", () => <DailyExerciseListView exerciseList={daily.exerciseList} />)
             .exhaustive()
     ) : (

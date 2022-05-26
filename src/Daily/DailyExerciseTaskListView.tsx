@@ -1,22 +1,22 @@
-import { CheckboxCircleInFragment, CheckboxSquare } from "@/components/CheckboxCircle";
-import { ConfirmationButton } from "@/components/ConfirmationButton";
+import { CheckboxCircleInFragment } from "@/components/CheckboxCircle";
 import { RadioCardButton } from "@/components/RadioCard";
 import { Scrollable } from "@/components/Scrollable";
 import { ExerciseGrid } from "@/Exercises/ExerciseGrid";
+import { ExerciseMenu } from "@/Exercises/ExerciseMenu";
 import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { groupBy } from "@/functions/groupBy";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
-import { formatDailyIdToDailyEntryParam, printDailyDate } from "@/orm-utils";
+import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
-import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Divider, Flex, Heading, HStack, IconButton, Spacer, Text } from "@chakra-ui/react";
+import { Box, Divider, Flex, Heading, Spacer, Text } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { Fragment } from "react";
 import { useMutation } from "react-query";
-import { Link as ReactLink, useNavigate } from "react-router-dom";
+import { Link as ReactLink } from "react-router-dom";
+import { ExerciseCheckbox } from "../Exercises/ExerciseCheckbox";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
 
 export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) => {
@@ -124,31 +124,6 @@ function ExerciseTaskItem({ exo }: { exo: Exercise }) {
     );
 }
 
-const ExerciseCheckbox = ({ exo }: { exo: Exercise }) => {
-    const daily = useCurrentDaily();
-    const isDailyToday = useAtomValue(isDailyTodayAtom);
-
-    const addExerciseToDailyCompletedList = useMutation(
-        (checked: boolean) =>
-            orm.daily.upsert(daily.id, (current) => ({
-                ...current,
-                completedList: checked
-                    ? current.completedList.concat(exo.id)
-                    : current.completedList.filter((completed) => exo.id !== completed),
-            })),
-        { onSuccess: daily.invalidate }
-    );
-
-    return (
-        <CheckboxSquare
-            getIconProps={() => ({ size: "sm" })}
-            defaultChecked={daily.completedList.some((completed) => completed === exo.id)}
-            onChange={(e) => addExerciseToDailyCompletedList.mutate(e.target.checked)}
-            isDisabled={!isDailyToday}
-        />
-    );
-};
-
 const CardioCheckbox = () => {
     const daily = useCurrentDaily();
 
@@ -174,51 +149,3 @@ const CardioLine = () => (
         <Text ml="2">Cardio done ?</Text>
     </Flex>
 );
-
-const ExerciseMenu = ({ exo }: { exo: Exercise }) => {
-    const daily = useCurrentDaily();
-
-    const removeExerciseFromDaily = useMutation(
-        async () => {
-            await orm.daily.upsert(daily.id, (current) => ({
-                ...current,
-                completedList: current.completedList.filter((completed) => exo.id !== completed),
-                exerciseList: current.exerciseList.filter((exercise) => exo.id !== exercise),
-            }));
-            return orm.exercise.delete(exo.id);
-        },
-        { onSuccess: daily.invalidate }
-    );
-
-    const navigate = useNavigate();
-
-    return (
-        <HStack ml="auto" mt="2" aria-label="menu">
-            <IconButton
-                icon={<EditIcon />}
-                onClick={() => navigate(`/daily/entry/${printDailyDate(daily.date)}/exercise/edit/${exo.id}`)}
-                aria-label="Edit"
-                size="sm"
-                colorScheme="pink"
-                variant="outline"
-            >
-                Edit daily exercise
-            </IconButton>
-            <ConfirmationButton
-                renderTrigger={(onOpen) => (
-                    <IconButton
-                        icon={<DeleteIcon />}
-                        onClick={onOpen}
-                        aria-label="Delete"
-                        size="sm"
-                        colorScheme="pink"
-                        variant="outline"
-                    >
-                        Remove exercise from daily
-                    </IconButton>
-                )}
-                onConfirm={() => removeExerciseFromDaily.mutate()}
-            />
-        </HStack>
-    );
-};
