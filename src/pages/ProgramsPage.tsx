@@ -30,7 +30,7 @@ export const ProgramsPage = () => {
             const currentProgram = ctx.programId ? programList.find((p) => p.id === ctx.programId) : null;
 
             const tx = orm.exercise.tx("readwrite");
-            const programId = currentProgram.id || makeId();
+            const programId = currentProgram?.id || makeId();
             const newExos = ctx.exerciseList.map((exo) => ({
                 ...exo,
                 id: makeId(),
