@@ -20,6 +20,7 @@ import { useInterpret, useSelector } from "@xstate/react";
 import { makeExerciseAddPageMachine } from "./exerciseAddPageMachine";
 import { InterpreterFrom } from "xstate";
 import { makeExercise } from "@/orm-utils";
+import { Fragment } from "react";
 
 const [ExerciseAddPageProvider, useExerciseAddPageContext] =
     createContextWithHook<InterpreterFrom<typeof makeExerciseAddPageMachine>>("ExerciseAddPageContext");
@@ -59,7 +60,7 @@ export const ExerciseAddPage = () => {
                     <Box px="8" py="4" minH={0}>
                         <SwitchInput
                             id="isSuperset"
-                            label="Is superset ?"
+                            label="Is it a superset ?"
                             onChange={(e) => service.send(e.target.checked ? "AddExercise" : "RemoveExercise")}
                         />
                     </Box>
@@ -181,13 +182,24 @@ const SupersetForm = () => {
     return (
         <Stack h="100%" overflow="auto" minH={0}>
             {makeArrayOf(exoCount).map((_, i) => (
-                <CreateExerciseForm
-                    key={i}
-                    category={daily.category}
-                    defaultValues={service.state.context.supersetForms[i]}
-                    onChange={(values) => service.send({ type: "UpdateSupersetForm", index: i, form: values })}
-                    shouldOverflow={false}
-                />
+                <Fragment key={i}>
+                    {i > 0 && (
+                        <Box px="8">
+                            <Divider my="2" />
+                        </Box>
+                    )}
+                    <Box px="6">
+                        <Heading as="h3" size="md" color="pink.300" mb="-4">
+                            Exercise {i + 1}
+                        </Heading>
+                    </Box>
+                    <CreateExerciseForm
+                        category={daily.category}
+                        defaultValues={service.state.context.supersetForms[i]}
+                        onChange={(values) => service.send({ type: "UpdateSupersetForm", index: i, form: values })}
+                        shouldOverflow={false}
+                    />
+                </Fragment>
             ))}
             {canSubmit && (
                 <Box p="4" pb="0">
