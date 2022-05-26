@@ -2,8 +2,10 @@ import { CheckboxCircleInFragment, CheckboxSquare } from "@/components/CheckboxC
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { RadioCardButton } from "@/components/RadioCard";
 import { Scrollable } from "@/components/Scrollable";
+import { ExerciseGrid } from "@/Exercises/ExerciseGrid";
 import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
+import { groupBy } from "@/functions/groupBy";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
@@ -40,22 +42,59 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
     );
 };
 
-const ExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => (
-    <>
-        {exerciseList.map((exo, index) => {
-            return (
-                <Fragment key={index}>
-                    {index > 0 && (
-                        <Box px="8">
-                            <Divider my="2" />
-                        </Box>
-                    )}
-                    <ExerciseTaskItem exo={exo} />
-                </Fragment>
-            );
-        })}
-    </>
-);
+const ExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
+    const taskList = [] as Array<Exercise | Exercise[]>;
+    const addedSuperset = [] as Array<Exercise["supersetId"]>;
+    const groupedBySupersetId = groupBy(exerciseList, (exercise) => exercise.supersetId);
+
+    for (let i = 0; i < exerciseList.length; i++) {
+        const exo = exerciseList[i];
+        if (exo.supersetId) {
+            if (addedSuperset.includes(exo.supersetId)) continue;
+            taskList.push(groupedBySupersetId[exo.supersetId]);
+            addedSuperset.push(exo.supersetId);
+        } else {
+            taskList.push(exo);
+        }
+    }
+
+    let supersetIndex = 0;
+
+    return (
+        <>
+            {taskList.map((exoOrSuperset, index) => {
+                if (Array.isArray(exoOrSuperset)) {
+                    supersetIndex++;
+                    return (
+                        <Fragment key={index}>
+                            {index > 0 && (
+                                <Box px="8">
+                                    <Divider my="2" />
+                                </Box>
+                            )}
+                            <Box px="4" pt="2">
+                                <Heading as="h3" size={"sm"} opacity={"0.5"} color="pink.500">
+                                    Superset {supersetIndex}
+                                </Heading>
+                                <ExerciseGrid exerciseList={exoOrSuperset} />
+                            </Box>
+                        </Fragment>
+                    );
+                }
+                return (
+                    <Fragment key={index}>
+                        {index > 0 && (
+                            <Box px="8">
+                                <Divider my="2" />
+                            </Box>
+                        )}
+                        <ExerciseTaskItem exo={exoOrSuperset} />
+                    </Fragment>
+                );
+            })}
+        </>
+    );
+};
 
 function ExerciseTaskItem({ exo }: { exo: Exercise }) {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
