@@ -11,6 +11,8 @@ export interface Exercise {
     madeFromExerciseId?: string;
     /** if made within Y superset */
     supersetId?: Program["id"] | null;
+    /** if made from X program */
+    programId?: Program["id"] | null;
 }
 export interface Serie {
     id: string;
@@ -32,6 +34,7 @@ export interface Program {
     exerciseList: Exercise[];
     createdAt: Date;
     updatedAt: Date;
+    madeFromProgramId?: string;
 }
 
 export interface Daily {

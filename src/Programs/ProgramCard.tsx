@@ -1,7 +1,7 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
 import { HFlex } from "@/components/HFlex";
-import { serializeProgram } from "@/functions/snapshot";
+import { serializeExercise, serializeProgram } from "@/functions/snapshot";
 import { onError, successToast } from "@/functions/toasts";
 import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
@@ -89,14 +89,34 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
     });
 
     const cloneMutation = useMutation(
-        async (program: Program) =>
-            orm.program.add(
-                serializeProgram({
-                    ...program,
-                    id: makeId(),
-                    name: program.name + " (clone)",
-                })
-            ),
+        async (program: Program) => {
+            const tx = orm.exercise.tx("readwrite");
+            const programId = makeId();
+            const newExos = program.exerciseList.map((exo) => ({
+                ...exo,
+                id: makeId(),
+                madeFromExerciseId: exo.id,
+                programId: programId,
+            }));
+            const insertMany = newExos.map((exo) => tx.store.add(serializeExercise(exo)));
+
+            const now = new Date();
+            return Promise.all([
+                ...insertMany,
+                orm.program.add({
+                    ...serializeProgram({
+                        ...program,
+                        id: programId,
+                        name: program.name + " (clone)",
+                        exerciseList: newExos,
+                        madeFromProgramId: program.id,
+                    }),
+                    createdAt: now,
+                    updatedAt: now,
+                }),
+                tx.done,
+            ]);
+        },
         {
             onSuccess: () => {
                 queryClient.invalidateQueries(orm.program.name);

@@ -21,7 +21,7 @@ export function useProgramForDailyMutation() {
 
             const exerciseCloneList = program.exerciseList
                 .map((id) => exerciseListById[id])
-                .map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id }));
+                .map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id, programId: selectedProgram.id }));
 
             const tx = orm.exercise.tx("readwrite");
             const insertMany = exerciseCloneList.map((exo) => tx.store.add(exo));

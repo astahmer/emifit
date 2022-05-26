@@ -50,7 +50,27 @@ export const runMigrations: (
             cursor = await cursor.continue();
         }
         migrationVersion++;
-        console.log("migrated to version", migrationVersion);
+        console.log("migrated to version", migrationVersion, "cast daily.date string to Date");
+    }
+
+    // nothing changed between v1 -> v13
+    migrationVersion = 13;
+
+    if (migrationVersion === 13) {
+        await onVersionMigrated?.(migrationVersion, tx);
+        const program = await tx.objectStore("program").getAll();
+        const exerciseList = await tx.objectStore("exercise").getAll();
+        const exerciseMap = new Map(exerciseList.map((e) => [e.id, e]));
+
+        for (const p of program) {
+            await Promise.all(
+                p.exerciseList.map((exo) =>
+                    tx.objectStore("exercise").put({ ...exerciseMap.get(exo), programId: p.id })
+                )
+            );
+        }
+        migrationVersion++;
+        console.log("migrated to version", migrationVersion, "add programId to exercises created from program");
     }
 
     await onVersionMigrated?.(migrationVersion, tx);

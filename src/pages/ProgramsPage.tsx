@@ -28,14 +28,15 @@ export const ProgramsPage = () => {
     const mutation = useMutation(
         async (ctx: typeof programFormMachine["context"]) => {
             const currentProgram = ctx.programId ? programList.find((p) => p.id === ctx.programId) : null;
-            const isEditing = Boolean(currentProgram);
-
-            navigate(routeMap.home);
-            confetti();
-            successToast(`Program <${ctx.programName}> ${isEditing ? "updated" : "created"}`);
 
             const tx = orm.exercise.tx("readwrite");
-            const newExos = ctx.exerciseList.map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id }));
+            const programId = currentProgram.id || makeId();
+            const newExos = ctx.exerciseList.map((exo) => ({
+                ...exo,
+                id: makeId(),
+                madeFromExerciseId: exo.id,
+                programId,
+            }));
             const insertMany = newExos.map((exo) => tx.store.add(serializeExercise(exo)));
 
             const params = {
@@ -51,12 +52,18 @@ export const ProgramsPage = () => {
 
             return Promise.all([
                 ...insertMany,
-                orm.program.put({ ...params, id: makeId(), createdAt: now, updatedAt: now }),
+                orm.program.put({ ...params, id: programId, createdAt: now, updatedAt: now }),
                 tx.done,
             ]);
         },
         {
-            onSuccess: (data) => {
+            onSuccess: (_data, ctx) => {
+                const currentProgram = ctx.programId ? programList.find((p) => p.id === ctx.programId) : null;
+                const isEditing = Boolean(currentProgram);
+
+                navigate(routeMap.home);
+                confetti();
+                successToast(`Program <${ctx.programName}> ${isEditing ? "updated" : "created"}`);
                 queryClient.invalidateQueries(orm.program.name);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
