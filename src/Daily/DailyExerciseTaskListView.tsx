@@ -2,7 +2,7 @@ import { CheckboxCircleInFragment } from "@/components/CheckboxCircle";
 import { RadioCardButton } from "@/components/RadioCard";
 import { Scrollable } from "@/components/Scrollable";
 import { ExerciseGrid } from "@/Exercises/ExerciseGrid";
-import { ExerciseMenu } from "@/Exercises/ExerciseMenu";
+import { ExerciseMenu, SupersetExerciseMenu } from "@/Exercises/ExerciseMenu";
 import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { groupBy } from "@/functions/groupBy";
@@ -43,6 +43,8 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
 };
 
 const ExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
+    const isDailyToday = useAtomValue(isDailyTodayAtom);
+
     const taskList = [] as Array<Exercise | Exercise[]>;
     const addedSuperset = [] as Array<Exercise["supersetId"]>;
     const groupedBySupersetId = groupBy(exerciseList, (exercise) => exercise.supersetId);
@@ -73,9 +75,13 @@ const ExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
                                 </Box>
                             )}
                             <Box px="4" pt="2">
-                                <Heading as="h3" size={"sm"} opacity={"0.5"} color="pink.500">
-                                    Superset {supersetIndex}
-                                </Heading>
+                                <Box d="flex" alignItems="flex-end">
+                                    <Heading as="h3" size={"sm"} opacity={"0.5"} color="pink.500">
+                                        Superset {supersetIndex}
+                                    </Heading>
+
+                                    {isDailyToday && <SupersetExerciseMenu exerciseList={exoOrSuperset} />}
+                                </Box>
                                 <ExerciseGrid exerciseList={exoOrSuperset} />
                             </Box>
                         </Fragment>

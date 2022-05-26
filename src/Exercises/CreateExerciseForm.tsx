@@ -190,8 +190,8 @@ const SeriesForm = ({
     serie: Serie;
     series: UseFieldArrayReturn<typeof formDefaultValues, "series">;
 }) => {
-    const form = useFormContext<typeof formDefaultValues>();
     const getSerie = () => series.fields[index];
+    const form = useFormContext<typeof formDefaultValues>();
     const deleteSerie = () => {
         form.setValue("nbSeries", form.getValues().nbSeries - 1);
         series.remove(index);
@@ -237,10 +237,10 @@ const SeriesForm = ({
                     inputMode="numeric"
                     defaultValue={serie.kg}
                     min={1}
-                    max={20}
+                    max={400}
                     label="Nb of kg"
                     onChange={(e) => {
-                        getSerie().kg = e.target.valueAsNumber;
+                        series.update(index, { ...getSerie(), kg: e.target.valueAsNumber });
                     }}
                     isRequired
                 />
@@ -255,7 +255,7 @@ const SeriesForm = ({
                             min={1}
                             max={20}
                             onChange={(_, value) => {
-                                getSerie().reps = value;
+                                series.update(index, { ...getSerie(), reps: value });
                             }}
                             isRequired
                             inputProps={{ placeholder: "reps" }}

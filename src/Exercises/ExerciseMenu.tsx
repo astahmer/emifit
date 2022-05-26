@@ -55,3 +55,56 @@ export function ExerciseMenu({ exo }: { exo: Exercise }) {
         </HStack>
     );
 }
+
+export function SupersetExerciseMenu({ exerciseList }: { exerciseList: Exercise[] }) {
+    const daily = useCurrentDaily();
+
+    const removeSupersetFromDaily = useMutation(
+        async () => {
+            const removedExerciseIdList = exerciseList.map((exercise) => exercise.id);
+            await Promise.all(exerciseList.map((exo) => orm.exercise.delete(exo.id)));
+
+            return orm.daily.upsert(daily.id, (current) => ({
+                ...current,
+                completedList: current.completedList.filter((completed) => !removedExerciseIdList.includes(completed)),
+                exerciseList: current.exerciseList.filter((exercise) => !removedExerciseIdList.includes(exercise)),
+            }));
+        },
+        { onSuccess: daily.invalidate }
+    );
+
+    const navigate = useNavigate();
+    const firstExo = exerciseList[0];
+
+    return (
+        <HStack ml="auto" mt="2" aria-label="menu">
+            <IconButton
+                icon={<EditIcon />}
+                onClick={() =>
+                    navigate(`/daily/entry/${printDailyDate(daily.date)}/exercise/superset/edit/${firstExo.supersetId}`)
+                }
+                aria-label="Edit"
+                size="sm"
+                colorScheme="pink"
+                variant="outline"
+            >
+                Edit daily exercise
+            </IconButton>
+            <ConfirmationButton
+                renderTrigger={(onOpen) => (
+                    <IconButton
+                        icon={<DeleteIcon />}
+                        onClick={onOpen}
+                        aria-label="Delete"
+                        size="sm"
+                        colorScheme="pink"
+                        variant="outline"
+                    >
+                        Remove exercise from daily
+                    </IconButton>
+                )}
+                onConfirm={() => removeSupersetFromDaily.mutate()}
+            />
+        </HStack>
+    );
+}

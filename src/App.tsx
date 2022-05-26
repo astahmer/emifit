@@ -24,6 +24,8 @@ import { routeMap } from "./routes";
 import { browserHistory, debugModeAtom, store } from "./store";
 import { ClickToComponent } from "click-to-react-component";
 import "./App.css";
+import { ExerciseSupersetEditPage } from "./pages/ExerciseSupersetEditPage";
+import { ExercisePageLayout } from "./pages/ExercisePageLayout";
 
 const queryClient = new QueryClient();
 const theme = extendTheme(CalendarDefaultTheme, { config: { initialColorMode: "light" } });
@@ -42,13 +44,15 @@ function App() {
                                         <Route index element={<DailyEntry />} />
                                         <Route path="entry/:dailyId" element={<DailyEntry />} />
                                     </Route>
-                                    {/* TODO ExoLayout et mettre en children ces 3 là */}
-                                    <Route path="daily/entry/:dailyId/exercise/add" element={<ExerciseAddPage />} />
-                                    <Route
-                                        path="daily/entry/:dailyId/exercise/edit/:exoId"
-                                        element={<ExerciseEditPage />}
-                                    />
-                                    <Route path="daily/entry/:dailyId/exercise/select" element={<ExerciseAddPage />} />
+                                    <Route path="daily/entry/:dailyId/exercise" element={<ExercisePageLayout />}>
+                                        <Route path="add" element={<ExerciseAddPage />} />
+                                        <Route path="edit/:exoId" element={<ExerciseEditPage />} />
+                                        <Route
+                                            path="superset/edit/:supersetId"
+                                            element={<ExerciseSupersetEditPage />}
+                                        />
+                                        <Route path="select" element={<ExerciseAddPage />} />
+                                    </Route>
                                     <Route path={routeMap.progress} element={<ProgressPage />} />
                                     <Route path={routeMap.settings} element={<SettingsPage />} />
                                     <Route path={routeMap.programs} element={<ProgramsPage />} />

@@ -1,5 +1,9 @@
 import type { ExerciseFormValues } from "@/Exercises/CreateExerciseForm";
-import { assign, ContextFrom, createMachine } from "xstate";
+import { createContextWithHook } from "@/functions/createContextWithHook";
+import { assign, createMachine, InterpreterFrom } from "xstate";
+
+export const [ExercisePageLayoutProvider, useExerciseAddPageContext] =
+    createContextWithHook<InterpreterFrom<typeof makeExerciseAddPageMachine>>("ExerciseAddPageContext");
 
 interface Context {
     exerciseCount: number;
@@ -7,7 +11,7 @@ interface Context {
     supersetForms: Record<number, ExerciseFormValues>;
 }
 
-export const makeExerciseAddPageMachine = () =>
+export const makeExerciseAddPageMachine = (initialContext?: Partial<Context>) =>
     createMachine(
         {
             id: "exerciseAddPage",
@@ -20,9 +24,18 @@ export const makeExerciseAddPageMachine = () =>
                     | { type: "UpdateSupersetForm"; form: ExerciseFormValues; index: number },
             },
             tsTypes: {} as import("./exerciseAddPageMachine.typegen").Typegen0,
-            context: { exerciseCount: 1, singleForm: {} as ExerciseFormValues, supersetForms: {} },
-            initial: "single",
+            context: { exerciseCount: 1, singleForm: {} as ExerciseFormValues, supersetForms: {}, ...initialContext },
+            initial: "initial",
             states: {
+                initial: {
+                    always: [
+                        { target: "single.canSubmit", cond: "hasFilledSingleForm" },
+                        { target: "superset.canSubmit", cond: "hasAllSupersetFormFilled" },
+                        { target: "single.editing", cond: "hasNotFilledSingleForm" },
+                        { target: "superset.editing", cond: "hasNotAllSupersetFormFilled" },
+                        { target: "single.editing" },
+                    ],
+                },
                 single: {
                     initial: "editing",
                     states: {
@@ -106,9 +119,9 @@ export const makeExerciseAddPageMachine = () =>
 
 const hasFilledSingleForm = (ctx: Context) => Boolean(ctx.singleForm.name && ctx.singleForm.tags.length);
 const hasAllSupersetFormFilled = (ctx: Context) => {
-    console.log(ctx);
     const values = Object.values(ctx.supersetForms);
     if (!values.length) return false;
     if (ctx.exerciseCount !== values.length) return false;
+
     return values.every((form) => Boolean(form.name && form.tags.length));
 };

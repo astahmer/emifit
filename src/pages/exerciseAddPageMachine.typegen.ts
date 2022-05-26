@@ -9,6 +9,7 @@ export interface Typegen0 {
         updateSupersetForm: "UpdateSupersetForm";
     };
     internalEvents: {
+        "": { type: "" };
         "xstate.init": { type: "xstate.init" };
     };
     invokeSrcNameMap: {};
@@ -20,13 +21,14 @@ export interface Typegen0 {
     };
     eventsCausingServices: {};
     eventsCausingGuards: {
-        hasFilledSingleForm: "UpdateForm";
-        hasNotFilledSingleForm: "UpdateForm";
-        hasAllSupersetFormFilled: "UpdateSupersetForm";
-        hasNotAllSupersetFormFilled: "UpdateSupersetForm";
+        hasFilledSingleForm: "" | "UpdateForm";
+        hasAllSupersetFormFilled: "" | "UpdateSupersetForm";
+        hasNotFilledSingleForm: "" | "UpdateForm";
+        hasNotAllSupersetFormFilled: "" | "UpdateSupersetForm";
     };
     eventsCausingDelays: {};
     matchesStates:
+        | "initial"
         | "single"
         | "single.editing"
         | "single.canSubmit"

@@ -79,7 +79,7 @@ export const BottomTabs = () => {
                     </Tab>
                 </TabList>
             </Tabs>
-            <button ref={submitBtnRef} hidden type="submit" form="add-form" />
+            <button ref={submitBtnRef} hidden type="submit" form="single-form" />
         </>
     );
 };
