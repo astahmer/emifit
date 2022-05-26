@@ -255,6 +255,7 @@ function ListComponent<IsMulti extends boolean, Item = any>({
 
                     const value = String(getValue(item as Item));
                     const itemIndex = items.findIndex((i) => getValue(i) === value);
+
                     return (
                         <SelectListItem
                             key={value}
@@ -274,7 +275,7 @@ function ListComponent<IsMulti extends boolean, Item = any>({
                             })}
                         >
                             {isMulti ? (
-                                <Checkbox isChecked={values.includes(value)} value={value} onChange={() => null} />
+                                <Checkbox isChecked={values.includes(value)} value={value} pointerEvents="none" />
                             ) : null}
                             <Text>{label}</Text>
                         </SelectListItem>
