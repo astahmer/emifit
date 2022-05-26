@@ -29,9 +29,6 @@ const queryClient = new QueryClient();
 const theme = extendTheme(CalendarDefaultTheme, { config: { initialColorMode: "light" } });
 
 function App() {
-    const setDebugMode = useSetAtom(debugModeAtom);
-    useHotkeys("cmd+k", () => setDebugMode((current) => !current));
-
     return (
         <DbProvider>
             <Provider unstable_createStore={() => store}>
@@ -68,6 +65,9 @@ function App() {
 }
 
 const Layout = () => {
+    const setDebugMode = useSetAtom(debugModeAtom);
+    useHotkeys("cmd+k", () => setDebugMode((current) => !current));
+
     return (
         <Flex as="main" direction="column" boxSize="100%">
             <Flex as="section" id="View" direction="column" h="100%" overflow="hidden">
