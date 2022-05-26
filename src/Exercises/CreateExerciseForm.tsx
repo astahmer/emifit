@@ -232,34 +232,35 @@ const SeriesForm = ({
             ) : null}
             <Stack direction="row">
                 <TextInput
-                    label="kg"
-                    render={() => (
-                        <MobileNumberInput
-                            {...form.register(`series.${index}.kg`, { valueAsNumber: true })}
-                            defaultValue={serie.kg}
-                            min={1}
-                            max={400}
-                            onChange={(_, value) => {
-                                getSerie().kg = value;
-                            }}
-                            inputProps={{ placeholder: "kg" }}
-                            inputMode="numeric"
-                            isRequired
-                        />
-                    )}
-                />
-                <TextInput
-                    {...form.register(`series.${index}.reps`, { valueAsNumber: true })}
+                    {...form.register(`series.${index}.kg`, { valueAsNumber: true })}
                     type="number"
                     inputMode="numeric"
-                    defaultValue={serie.reps}
+                    defaultValue={serie.kg}
                     min={1}
                     max={20}
-                    label="Nb of reps"
+                    label="Nb of kg"
                     onChange={(e) => {
-                        getSerie().reps = e.target.valueAsNumber;
+                        getSerie().kg = e.target.valueAsNumber;
                     }}
                     isRequired
+                />
+                <TextInput
+                    label="Nb of reps"
+                    render={() => (
+                        <MobileNumberInput
+                            {...form.register(`series.${index}.reps`, { valueAsNumber: true })}
+                            type="number"
+                            inputMode="numeric"
+                            defaultValue={serie.reps}
+                            min={1}
+                            max={20}
+                            onChange={(_, value) => {
+                                getSerie().reps = value;
+                            }}
+                            isRequired
+                            inputProps={{ placeholder: "reps" }}
+                        />
+                    )}
                 />
             </Stack>
         </Fragment>
