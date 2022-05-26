@@ -6,6 +6,7 @@ import {
     AlertDialogHeader,
     AlertDialogOverlay,
     Button,
+    ButtonProps,
     useDisclosure,
 } from "@chakra-ui/react";
 import { ReactNode, useRef } from "react";
@@ -13,9 +14,13 @@ import { ReactNode, useRef } from "react";
 export function ConfirmationButton({
     renderTrigger,
     onConfirm,
+    label = "Confirm",
+    colorScheme = "red",
 }: {
     renderTrigger: (onOpen: () => void) => ReactNode;
     onConfirm: () => void;
+    label?: ReactNode;
+    colorScheme?: ButtonProps["colorScheme"];
 }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef();
@@ -36,8 +41,8 @@ export function ConfirmationButton({
                             <Button ref={cancelRef} onClick={onClose}>
                                 Cancel
                             </Button>
-                            <Button colorScheme="red" onClick={() => (onConfirm(), onClose())} ml={3}>
-                                Delete
+                            <Button colorScheme={colorScheme} onClick={() => (onConfirm(), onClose())} ml={3}>
+                                {label}
                             </Button>
                         </AlertDialogFooter>
                     </AlertDialogContent>

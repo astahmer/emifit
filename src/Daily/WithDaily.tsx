@@ -1,3 +1,4 @@
+import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { HFlex } from "@/components/HFlex";
 import { RadioCardButton } from "@/components/RadioCard";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
@@ -213,17 +214,23 @@ const ProgramSearch = () => {
             {selectedProgram && (
                 <>
                     <ProgramCard program={selectedProgram} defaultIsOpen />
-                    <Button
-                        leftIcon={<CheckIcon />}
-                        colorScheme="pink"
-                        variant="solid"
-                        py="4"
-                        mb="4"
-                        size="lg"
-                        onClick={() => programMutation.mutate(selectedProgram)}
-                    >
-                        Use this program
-                    </Button>
+                    <ConfirmationButton
+                        onConfirm={() => programMutation.mutate(selectedProgram)}
+                        colorScheme="whatsapp"
+                        renderTrigger={(onOpen) => (
+                            <Button
+                                leftIcon={<CheckIcon />}
+                                colorScheme="pink"
+                                variant="solid"
+                                py="4"
+                                mb="4"
+                                size="lg"
+                                onClick={onOpen}
+                            >
+                                Use this program
+                            </Button>
+                        )}
+                    />
                 </>
             )}
         </Stack>

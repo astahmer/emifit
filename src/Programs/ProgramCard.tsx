@@ -136,9 +136,15 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
                 <MenuButton as={DotsIconButton} />
                 <MenuList>
                     {isDailyToday && program.category === daily.category && (
-                        <MenuItem icon={<CheckIcon />} onClick={() => programMutation.mutate(program)}>
-                            Use program
-                        </MenuItem>
+                        <ConfirmationButton
+                            onConfirm={() => programMutation.mutate(program)}
+                            colorScheme="whatsapp"
+                            renderTrigger={(onOpen) => (
+                                <MenuItem icon={<CheckIcon />} onClick={onOpen}>
+                                    Use program
+                                </MenuItem>
+                            )}
+                        />
                     )}
                     <MenuItem icon={<EditIcon />} onClick={() => onEdit(program)}>
                         Edit program

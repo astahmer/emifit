@@ -5,6 +5,7 @@ import { toasts } from "./functions/toasts";
 import { orm } from "./orm";
 import { currentDailyIdAtom, debugModeAtom, showSkeletonsAtom } from "./store";
 import { useCurrentDailyInvalidate } from "./orm-hooks";
+import { ConfirmationButton } from "./components/ConfirmationButton";
 
 export function DevTools() {
     const debugMode = useAtomValue(debugModeAtom);
@@ -38,16 +39,15 @@ const DevToolsContent = () => {
     return (
         <Stack fontSize="sm">
             <SwitchInput label="With skeletons" onChange={(e) => setShowSkeletons(e.target.checked)} />
-            <Button
-                onClick={() => {
+            <ConfirmationButton
+                onConfirm={() => {
                     orm.daily.delete(dailyId);
                     invalidate();
                 }}
-            >
-                Delete today's entry
-            </Button>
-            <Button
-                onClick={async () => {
+                renderTrigger={(onOpen) => <Button onClick={onOpen}>Delete today's entry</Button>}
+            />
+            <ConfirmationButton
+                onConfirm={async () => {
                     const info = toasts.info("Clearing DB...");
                     await Promise.all([
                         orm.db.clear(orm.daily.name),
@@ -59,9 +59,8 @@ const DevToolsContent = () => {
                     invalidate();
                     window.location.reload();
                 }}
-            >
-                Reset DB
-            </Button>
+                renderTrigger={(onOpen) => <Button onClick={onOpen}>Reset DB</Button>}
+            />
         </Stack>
     );
 };

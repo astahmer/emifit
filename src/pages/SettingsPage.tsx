@@ -32,6 +32,7 @@ import { ReactNode, useRef } from "react";
 import { BiExport, BiImport } from "react-icons/bi";
 import { useMutation } from "react-query";
 import { runMigrations } from "@/orm-migrations";
+import { ConfirmationButton } from "@/components/ConfirmationButton";
 
 export const SettingsPage = () => {
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
@@ -150,14 +151,20 @@ const ExportImportData = () => {
                         programList={loadMutation.data.programList}
                         dailyList={loadMutation.data.dailyList}
                     />
-                    <Button
-                        leftIcon={<Icon as={CheckIcon} />}
-                        colorScheme="pink"
-                        variant="outline"
-                        onClick={importMutation.mutate.bind(undefined)}
-                    >
-                        Save loaded data
-                    </Button>
+                    <ConfirmationButton
+                        onConfirm={importMutation.mutate.bind(undefined)}
+                        colorScheme="twitter"
+                        renderTrigger={(onOpen) => (
+                            <Button
+                                leftIcon={<Icon as={CheckIcon} />}
+                                colorScheme="pink"
+                                variant="outline"
+                                onClick={onOpen}
+                            >
+                                Save loaded data
+                            </Button>
+                        )}
+                    />
                 </>
             )}
         </Stack>
