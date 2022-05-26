@@ -238,7 +238,7 @@ const SeriesForm = ({
                             {...form.register(`series.${index}.kg`, { valueAsNumber: true })}
                             defaultValue={serie.kg}
                             min={1}
-                            max={200}
+                            max={400}
                             onChange={(_, value) => {
                                 getSerie().kg = value;
                             }}
