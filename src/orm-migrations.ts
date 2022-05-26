@@ -11,9 +11,12 @@ export const runMigrations: (
         tx: IDBPTransaction<EmifitSchema, StoreNames<EmifitSchema>[], "versionchange" | "readwrite">
     ) => void | Promise<void>
 ) => Promise<void> = async (db, oldVersion, newVersion, transaction, onVersionMigrated) => {
-    console.log({ db, oldVersion, newVersion, transaction });
     let migrationVersion = oldVersion;
+
     const isVersionChange = transaction.mode === "versionchange";
+    const isImport = oldVersion === newVersion;
+    console.log({ db, oldVersion, newVersion, transaction, migrationVersion, isVersionChange, isImport });
+
     const tx = transaction;
 
     console.log("start migrating");
@@ -53,8 +56,8 @@ export const runMigrations: (
         console.log("migrated to version", migrationVersion, "cast daily.date string to Date");
     }
 
-    // nothing changed between v1 -> v13
-    migrationVersion = 13;
+    // nothing changed between v2 -> v13
+    if (migrationVersion === 2) migrationVersion = 13;
 
     if (migrationVersion === 13) {
         await onVersionMigrated?.(migrationVersion, tx);
