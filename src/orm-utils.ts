@@ -11,7 +11,7 @@ export const makeExercise = (params: Pick<Exercise, "name" | "tags" | "series"> 
         createdAt: new Date(),
         series: params.series.map((serie) => ({ ...serie, id: makeId() })),
     } as Exercise);
-export const makeSerie = (index: number, current = []) => ({ id: makeId(), kg: current[index - 1]?.kg ?? 1, reps: 6 });
+export const makeSerie = (index: number, current = []) => ({ id: makeId(), kg: current[index - 1]?.kg ?? 10, reps: 6 });
 
 export function getMostRecentsExerciseById(list: Exercise[]) {
     const groupByNames = groupBy(list, "name");
