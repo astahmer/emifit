@@ -112,7 +112,7 @@ export const CreateExerciseForm = ({
                         max={10}
                         label="Nb of series"
                         type="number"
-                        inputMode="numeric"
+                        inputMode="decimal"
                         error={form.formState.errors.nbSeries}
                         onWheel={() => {
                             if ((document.activeElement as HTMLInputElement).type === "number") {
@@ -234,7 +234,7 @@ const SeriesForm = ({
                 <TextInput
                     {...form.register(`series.${index}.kg`, { valueAsNumber: true })}
                     type="number"
-                    inputMode="numeric"
+                    inputMode="decimal"
                     defaultValue={serie.kg}
                     min={1}
                     max={400}
@@ -250,7 +250,7 @@ const SeriesForm = ({
                         <MobileNumberInput
                             {...form.register(`series.${index}.reps`, { valueAsNumber: true })}
                             type="number"
-                            inputMode="numeric"
+                            inputMode="decimal"
                             defaultValue={serie.reps}
                             min={1}
                             max={20}
