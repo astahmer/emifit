@@ -17,7 +17,6 @@ export const getDatabaseSnapshot = async () => {
 
 export function computeSnapshotFromExport(data: ExportedData): DatabaseSnapshot {
     const exerciseListById = groupIn(data.exerciseList, "id");
-    console.log(exerciseListById);
     return {
         dailyList: data.dailyList.map((d) => ({
             ...d,
@@ -68,7 +67,6 @@ export interface DatabaseSnapshot {
 export function computeExerciseFromExoId(exerciseListById: Record<string, ExerciseWithReferences>) {
     return (id: Exercise["id"]): Exercise => {
         const exo = exerciseListById[id];
-        !exo && console.log({ id, exerciseListById, exo });
         return { ...exo, tags: exo.tags.map((id) => CategoriesTagsById[id]) };
     };
 }

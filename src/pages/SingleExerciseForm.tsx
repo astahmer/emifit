@@ -29,7 +29,6 @@ export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => 
             onChange={(values) => service.send({ type: "UpdateForm", form: values })}
             renderSubmit={() => {
                 const canSubmit = useSelector(service, (state) => state.matches("single.canSubmit"));
-                console.log({ canSubmit });
 
                 return (
                     canSubmit && (

@@ -37,7 +37,6 @@ export const useDailyListQuery = () => {
             const list = await orm.daily.get();
             const exerciseList = await orm.exercise.get();
             const exerciseListById = groupIn(exerciseList, "id");
-            console.log(list, exerciseList, exerciseListById);
 
             return list.map(
                 (daily) =>
