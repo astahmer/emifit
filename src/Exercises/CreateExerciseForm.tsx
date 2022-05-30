@@ -190,7 +190,6 @@ const SeriesForm = ({
     serie: Serie;
     series: UseFieldArrayReturn<typeof formDefaultValues, "series">;
 }) => {
-    const getSerie = () => series.fields[index];
     const form = useFormContext<typeof formDefaultValues>();
     const deleteSerie = () => {
         form.setValue("nbSeries", form.getValues().nbSeries - 1);
@@ -240,7 +239,7 @@ const SeriesForm = ({
                     max={800}
                     label="kgs"
                     onChange={(e) => {
-                        series.update(index, { ...getSerie(), kg: e.target.valueAsNumber });
+                        form.setValue(`series.${index}.kg`, e.target.valueAsNumber);
                     }}
                     isRequired
                 />
@@ -255,7 +254,7 @@ const SeriesForm = ({
                             min={1}
                             max={20}
                             onChange={(_, value) => {
-                                series.update(index, { ...getSerie(), reps: value });
+                                form.setValue(`series.${index}.reps`, value);
                             }}
                             isRequired
                             inputProps={{ placeholder: "reps" }}
