@@ -237,8 +237,8 @@ const SeriesForm = ({
                     inputMode="decimal"
                     defaultValue={serie.kg}
                     min={1}
-                    max={400}
-                    label="Nb of kg"
+                    max={800}
+                    label="kgs"
                     onChange={(e) => {
                         series.update(index, { ...getSerie(), kg: e.target.valueAsNumber });
                     }}
