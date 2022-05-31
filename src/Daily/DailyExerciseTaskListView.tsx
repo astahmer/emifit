@@ -13,6 +13,7 @@ import { Exercise, WithExerciseList } from "@/orm-types";
 import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
 import { Box, Divider, Flex, Heading, Spacer, Text } from "@chakra-ui/react";
+import confetti from "canvas-confetti";
 import { useAtomValue } from "jotai";
 import { Fragment } from "react";
 import { useMutation } from "react-query";
@@ -136,7 +137,14 @@ const CardioCheckbox = () => {
 
     const toggleDailyCardio = useMutation(
         (hasDoneCardio: boolean) => orm.daily.upsert(daily.id, (current) => ({ ...current, hasDoneCardio })),
-        { onSuccess: daily.invalidate }
+        {
+            onSuccess: (_, hasDoneCardio) => {
+                daily.invalidate();
+                if (hasDoneCardio) {
+                    confetti();
+                }
+            },
+        }
     );
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
