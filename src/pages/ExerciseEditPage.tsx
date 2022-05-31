@@ -27,9 +27,10 @@ export const ExerciseEditPage = () => {
         (exo: Exercise) =>
             orm.exercise.upsert(exerciseId, (current) => ({ ...current, ...serializeExercise(exo), id: exerciseId })),
         {
-            onSuccess: () => {
+            onSuccess: (_, vars) => {
                 daily.invalidate();
                 navigate(routeMap.home);
+                toasts.success(`Exercise <${vars.name}> updated !`);
             },
         }
     );

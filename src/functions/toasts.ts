@@ -4,7 +4,7 @@ import { getRandomString } from "@pastable/core";
 // Toasts
 const toast = createStandaloneToast();
 const baseToastConfig: UseToastOptions & UniqueToastOptions = {
-    duration: 3000,
+    duration: 1500,
     isClosable: true,
     unique: true,
     position: "top",

@@ -1,5 +1,6 @@
 import { SwitchInput } from "@/components/SwitchInput";
 import { serializeExercise } from "@/functions/snapshot";
+import { toasts } from "@/functions/toasts";
 import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCurrentDailyInvalidate, useCurrentDailyQuery } from "@/orm-hooks";
@@ -35,10 +36,11 @@ export const ExerciseAddPage = () => {
             }));
         },
         {
-            onSuccess: () => {
+            onSuccess: (_, vars) => {
                 queryClient.invalidateQueries(orm.exercise.name);
                 invalidate();
                 navigate(routeMap.home);
+                toasts.success(`Exercise <${vars.name}> added !`);
             },
         }
     );
