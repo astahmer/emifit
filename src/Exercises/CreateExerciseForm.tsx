@@ -41,6 +41,7 @@ export const CreateExerciseForm = ({
     defaultValues = formDefaultValues,
     renderFormTop,
     shouldOverflow = true,
+    getExerciseItems,
 }: {
     id?: BoxProps["id"];
     category: string;
@@ -50,6 +51,7 @@ export const CreateExerciseForm = ({
     defaultValues?: typeof formDefaultValues;
     renderFormTop?: () => ReactNode;
     shouldOverflow?: boolean;
+    getExerciseItems?: (items: Exercise[]) => Exercise[];
 }) => {
     const form = useForm({ defaultValues });
 
@@ -98,6 +100,7 @@ export const CreateExerciseForm = ({
                             }
                         }}
                         params={{ index: "by-category", query: category }}
+                        getItems={getExerciseItems}
                     />
                     <TagMultiSelect
                         control={form.control}

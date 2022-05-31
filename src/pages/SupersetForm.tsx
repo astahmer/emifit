@@ -12,6 +12,7 @@ import { getRouteTypeFromPathname } from "./ExercisePageLayout";
 export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void> }) {
     const query = useCurrentDailyQuery();
     const daily = query.data;
+    const exoNameList = daily.exerciseList.map((exo) => exo.name);
 
     const service = useExerciseAddPageContext();
     const exoCount = useSelector(service, (state) => state.context.exerciseCount);
@@ -42,6 +43,7 @@ export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void
                         defaultValues={service.state.context.supersetForms[i]}
                         onChange={(values) => service.send({ type: "UpdateSupersetForm", index: i, form: values })}
                         shouldOverflow={false}
+                        getExerciseItems={(items) => items.filter((item) => !exoNameList.includes(item.name))}
                     />
                 </Fragment>
             ))}

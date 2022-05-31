@@ -11,6 +11,7 @@ import { getRouteTypeFromPathname } from "./ExercisePageLayout";
 export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => void | Promise<void> }) {
     const query = useCurrentDailyQuery();
     const daily = query.data;
+    const exoNameList = daily.exerciseList.map((exo) => exo.name);
 
     const service = useExerciseAddPageContext();
 
@@ -27,6 +28,7 @@ export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => 
             category={daily.category}
             onSubmit={onSubmit}
             onChange={(values) => service.send({ type: "UpdateForm", form: values })}
+            getExerciseItems={(items) => items.filter((item) => !exoNameList.includes(item.name))}
             renderSubmit={() => {
                 const canSubmit = useSelector(service, (state) => state.matches("single.canSubmit"));
 
