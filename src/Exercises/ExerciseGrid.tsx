@@ -1,27 +1,12 @@
 import { Scrollable } from "@/components/Scrollable";
-import { ExpandButton } from "@/Daily/CompactButton";
-import { ExerciseTag } from "@/Exercises/ExerciseTag";
+import { ExpandButton, useCompactState } from "@/Daily/ExpandButton";
+import { ExerciseTag, ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { Exercise, WithExerciseList } from "@/orm-types";
 import { isCompactViewAtom } from "@/store";
-import {
-    Box,
-    Divider,
-    Flex,
-    Grid,
-    Heading,
-    HStack,
-    IconButton,
-    ListItem,
-    Stack,
-    Text,
-    UnorderedList,
-    useDisclosure,
-    Wrap,
-    WrapItem,
-} from "@chakra-ui/react";
+import { Box, Divider, Flex, Grid, Heading, Stack, Wrap, WrapItem } from "@chakra-ui/react";
 import { chunk, WithChildren } from "@pastable/core";
 import { useAtomValue } from "jotai";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment } from "react";
 import { ExerciseSetList, ExerciseSetListOverview } from "./ExerciseSetList";
 
 export const ExerciseGridView = ({ exerciseList, children }: WithExerciseList & Partial<WithChildren>) => {
@@ -62,23 +47,7 @@ export function ExerciseGrid({ exerciseList }: { exerciseList: Exercise[] }) {
 }
 
 function ExerciseGridItem({ exo }: { exo: Exercise }) {
-    const isCompact = useAtomValue(isCompactViewAtom);
-    const toggle = useDisclosure({ defaultIsOpen: false });
-    const isHidden = !toggle.isOpen;
-
-    const isFirstRenderRef = useRef(true);
-    useEffect(() => {
-        if (isFirstRenderRef.current) {
-            isFirstRenderRef.current = false;
-            return;
-        }
-
-        if (!isCompact) {
-            toggle.onOpen();
-        } else {
-            toggle.onClose();
-        }
-    }, [isCompact]);
+    const toggle = useCompactState();
 
     return (
         <Flex>
@@ -90,19 +59,8 @@ function ExerciseGridItem({ exo }: { exo: Exercise }) {
                     <ExpandButton ml="auto" isActive={toggle.isOpen} onClick={toggle.onToggle} />
                 </Flex>
                 <ExerciseSetListOverview setList={exo.series} />
-                <Wrap mt="2">
-                    {exo.tags.slice(0, isHidden ? 2 : undefined).map((tag) => (
-                        <WrapItem key={tag.id}>
-                            <ExerciseTag tag={tag} />
-                        </WrapItem>
-                    ))}
-                    {isHidden && exo.tags.length > 2 ? (
-                        <WrapItem>
-                            <ExerciseTag tag={{ id: "...", label: "...", group: "none" }} />
-                        </WrapItem>
-                    ) : null}
-                </Wrap>
-                {isHidden ? null : <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />}
+                <ExerciseTagList mt="2" tagList={exo.tags} isHidden={toggle.isHidden} />
+                {toggle.isHidden ? null : <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />}
             </Flex>
         </Flex>
     );

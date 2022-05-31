@@ -1,14 +1,33 @@
+import { HFlex } from "@/components/HFlex";
 import { ReorderItemBox } from "@/components/ReorderItemBox";
-import { ExerciseListItem } from "@/Exercises/ExerciseList";
+import { ExerciseListItem } from "@/Exercises/ExerciseListItem";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
-import { Box, Flex } from "@chakra-ui/react";
+import { isDailyTodayAtom } from "@/store";
+import { DragHandleIcon } from "@chakra-ui/icons";
+import { Box, Flex, Icon } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
+import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "react-query";
 
 export const DailyExerciseListView = ({ exerciseList }: WithExerciseList) => {
+    const isDailyToday = useAtomValue(isDailyTodayAtom);
+    return isDailyToday ? (
+        <ReoderableExerciseListView exerciseList={exerciseList} />
+    ) : (
+        <Flex flexDirection="column" pt="2" pb="8" px="4" overflowY="auto">
+            {exerciseList.map((exo) => (
+                <Box key={exo.id} py="1" px="4">
+                    <ExerciseListItem exo={exo} />
+                </Box>
+            ))}
+        </Flex>
+    );
+};
+
+const ReoderableExerciseListView = ({ exerciseList }: WithExerciseList) => {
     const daily = useCurrentDaily();
     const exerciseIdList = useMemo(() => daily.exerciseList.map((e) => e.id), [daily.exerciseList]);
     const [items, setItems] = useState(exerciseIdList);
@@ -73,6 +92,9 @@ const ReorderExerciseItem = ({
         >
             <Flex bg="white">
                 <ExerciseListItem exo={exercise} />
+                <HFlex justifyContent="space-around" p="4" ml="auto">
+                    <Icon as={DragHandleIcon} size="24px" />
+                </HFlex>
             </Flex>
         </ReorderItemBox>
     );

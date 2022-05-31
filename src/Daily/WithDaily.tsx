@@ -9,7 +9,7 @@ import { Program } from "@/orm-types";
 import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 import { ProgramCard } from "@/Programs/ProgramCard";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
-import { isDailyTodayAtom } from "@/store";
+import { isCompactViewAtom, isDailyTodayAtom } from "@/store";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Alert, AlertIcon, Box, Button, ButtonGroup, ButtonProps, Divider, Flex, Stack, Text } from "@chakra-ui/react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
@@ -19,7 +19,7 @@ import { useMutation } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { match } from "ts-pattern";
 import { useProgramForDailyMutation } from "../Programs/useProgramForDailyMutation";
-import { CompactViewButton } from "./CompactButton";
+import { CompactViewButton } from "./ExpandButton";
 import { DailyExerciseListView } from "./DailyExerciseListView";
 import { DailyExerciseTaskListView } from "./DailyExerciseTaskListView";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
@@ -58,15 +58,12 @@ export const WithDaily = () => {
 };
 
 const ListToolbar = () => {
-    const viewType = useAtomValue(viewTypeAtom);
     return (
         <Flex mx="auto" p="2" w="100%" alignItems="center" minH="42px">
             <SwitchViewType />
-            {viewType === "grid" && (
-                <Box ml="auto">
-                    <CompactViewButton />
-                </Box>
-            )}
+            <Box ml="auto">
+                <CompactViewButton />
+            </Box>
         </Flex>
     );
 };
@@ -76,6 +73,7 @@ const viewTypeAtom = atom("task" as ViewType);
 
 const SwitchViewType = () => {
     const setViewType = useSetAtom(viewTypeAtom);
+    const setIsCompactView = useSetAtom(isCompactViewAtom);
 
     return (
         <ButtonGroup
@@ -86,6 +84,7 @@ const SwitchViewType = () => {
                 const value = (e.target as HTMLButtonElement).value;
                 if (!value) return;
                 setViewType(value as ViewType);
+                setIsCompactView(true);
             }}
         >
             <ViewTypeButton leftIcon={<MdChecklist />} value="task">
