@@ -10,8 +10,22 @@ import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 import { ProgramCard } from "@/Programs/ProgramCard";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
 import { isCompactViewAtom, isDailyTodayAtom } from "@/store";
-import { CheckIcon } from "@chakra-ui/icons";
-import { Alert, AlertIcon, Box, Button, ButtonGroup, ButtonProps, Divider, Flex, Stack, Text } from "@chakra-ui/react";
+import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import {
+    Alert,
+    AlertIcon,
+    Box,
+    Button,
+    ButtonGroup,
+    ButtonProps,
+    Divider,
+    Flex,
+    IconButton,
+    Stack,
+    Text,
+    useDisclosure,
+    UseDisclosureReturn,
+} from "@chakra-ui/react";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { MdChecklist, MdGridView, MdList } from "react-icons/md";
@@ -19,9 +33,9 @@ import { useMutation } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { match } from "ts-pattern";
 import { useProgramForDailyMutation } from "../Programs/useProgramForDailyMutation";
-import { CompactViewButton } from "./ExpandButton";
 import { DailyExerciseListView } from "./DailyExerciseListView";
 import { DailyExerciseTaskListView } from "./DailyExerciseTaskListView";
+import { CompactViewButton } from "./ExpandButton";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
 import { GoToClosestPreviousDailyEntryButton } from "./GoToClosestPreviousDailyEntryButton";
 import { useLastFilledDailyDate } from "./useLastFilledDailyDate";
@@ -58,20 +72,40 @@ export const WithDaily = () => {
 };
 
 const ListToolbar = () => {
+    const viewType = useAtomValue(viewTypeAtom);
+    const daily = useCurrentDaily();
+    const withCompactViewButton =
+        viewType === "task" ? (daily.exerciseList.some((exo) => exo.supersetId) ? true : false) : true;
+
+    const toggle = useDisclosure({ defaultIsOpen: true });
+
     return (
-        <Flex mx="auto" p="2" w="100%" alignItems="center" minH="42px">
-            <SwitchViewType />
-            <Box ml="auto">
-                <CompactViewButton />
-            </Box>
-        </Flex>
+        <Box pos="relative">
+            <Flex
+                mx="auto"
+                p="2"
+                w="100%"
+                alignItems="center"
+                minH="42px"
+                pos={!toggle.isOpen ? "absolute" : undefined}
+                left={!toggle.isOpen ? "-3px" : undefined}
+                top="0"
+            >
+                <SwitchViewType toggle={toggle} />
+                {withCompactViewButton && toggle.isOpen && (
+                    <Box ml="auto">
+                        <CompactViewButton />
+                    </Box>
+                )}
+            </Flex>
+        </Box>
     );
 };
 
 type ViewType = "task" | "grid" | "list";
 const viewTypeAtom = atom("task" as ViewType);
 
-const SwitchViewType = () => {
+const SwitchViewType = ({ toggle }: { toggle: UseDisclosureReturn }) => {
     const setViewType = useSetAtom(viewTypeAtom);
     const setIsCompactView = useSetAtom(isCompactViewAtom);
 
@@ -87,15 +121,25 @@ const SwitchViewType = () => {
                 setIsCompactView(true);
             }}
         >
-            <ViewTypeButton leftIcon={<MdChecklist />} value="task">
-                Task view
-            </ViewTypeButton>
-            <ViewTypeButton leftIcon={<MdGridView />} value="grid">
-                Grid view
-            </ViewTypeButton>
-            <ViewTypeButton leftIcon={<MdList />} value="list">
-                List view
-            </ViewTypeButton>
+            <IconButton
+                icon={toggle.isOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                aria-label="close"
+                colorScheme="gray"
+                onClick={toggle.onToggle}
+            />
+            {toggle.isOpen && (
+                <>
+                    <ViewTypeButton leftIcon={<MdChecklist />} value="task">
+                        Task view
+                    </ViewTypeButton>
+                    <ViewTypeButton leftIcon={<MdGridView />} value="grid">
+                        Grid view
+                    </ViewTypeButton>
+                    <ViewTypeButton leftIcon={<MdList />} value="list">
+                        List view
+                    </ViewTypeButton>
+                </>
+            )}
         </ButtonGroup>
     );
 };
