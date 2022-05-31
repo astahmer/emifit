@@ -1,4 +1,5 @@
 import { CheckboxCircleInFragment } from "@/components/CheckboxCircle";
+import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { RadioCardButton } from "@/components/RadioCard";
 import { Scrollable } from "@/components/Scrollable";
 import { ExerciseGrid } from "@/Exercises/ExerciseGrid";
@@ -139,7 +140,20 @@ const CardioCheckbox = () => {
     );
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
-    return (
+    return daily.hasDoneCardio ? (
+        <ConfirmationButton
+            onConfirm={() => toggleDailyCardio.mutate(false)}
+            renderTrigger={(onOpen) => (
+                <CheckboxCircleInFragment
+                    getIconProps={() => ({ size: "sm" })}
+                    onChange={onOpen}
+                    isChecked={daily.hasDoneCardio}
+                    defaultChecked={daily.hasDoneCardio}
+                    isDisabled={!isDailyToday}
+                />
+            )}
+        />
+    ) : (
         <CheckboxCircleInFragment
             getIconProps={() => ({ size: "sm" })}
             onChange={(e) => toggleDailyCardio.mutate(e.target.checked)}
