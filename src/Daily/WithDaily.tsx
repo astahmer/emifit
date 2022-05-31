@@ -30,7 +30,7 @@ export const WithDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
     const daily = useCurrentDaily();
-    const hasAtLeastOneExercise = daily.exerciseList.length > 0;
+    const hasAtLeastOneExercise = daily.exerciseList?.length > 0;
 
     const updateDailyCategory = useMutation((category: string) => orm.daily.upsert(daily.id, { category }), {
         onSuccess: daily.invalidate,
@@ -51,7 +51,7 @@ export const WithDaily = () => {
                     </Text>
                 </Box>
             )}
-            {daily.exerciseList.length > 1 && <ListToolbar />}
+            {daily.exerciseList?.length > 1 && <ListToolbar />}
             <DailyExerciseList />
         </>
     );
