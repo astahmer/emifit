@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { chunk, WithChildren } from "@pastable/core";
 import { useAtomValue } from "jotai";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { ExerciseSetList, ExerciseSetListOverview } from "./ExerciseSetList";
 
 export const ExerciseGridView = ({ exerciseList, children }: WithExerciseList & Partial<WithChildren>) => {
@@ -63,11 +63,17 @@ export function ExerciseGrid({ exerciseList }: { exerciseList: Exercise[] }) {
 
 function ExerciseGridItem({ exo }: { exo: Exercise }) {
     const isCompact = useAtomValue(isCompactViewAtom);
-    const toggle = useDisclosure();
+    const toggle = useDisclosure({ defaultIsOpen: false });
     const isHidden = !toggle.isOpen;
 
+    const isFirstRenderRef = useRef(true);
     useEffect(() => {
-        if (isCompact) {
+        if (isFirstRenderRef.current) {
+            isFirstRenderRef.current = false;
+            return;
+        }
+
+        if (!isCompact) {
             toggle.onOpen();
         } else {
             toggle.onClose();

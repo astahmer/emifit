@@ -9,8 +9,8 @@ export function ExpandButton(props: Partial<IconButtonProps>) {
         <IconButton
             size="xs"
             aria-label="Compact grid view"
-            icon={props.isActive ? <IoMdExpand /> : <MdOutlineViewCompact />}
-            colorScheme={props.isActive ? "pink" : undefined}
+            icon={!props.isActive ? <IoMdExpand /> : <MdOutlineViewCompact />}
+            colorScheme={!props.isActive ? "pink" : undefined}
             {...props}
         />
     );
@@ -19,5 +19,5 @@ export function ExpandButton(props: Partial<IconButtonProps>) {
 export function CompactViewButton() {
     const [isCompact, setCompact] = useAtom(isCompactViewAtom);
 
-    return <ExpandButton isActive={isCompact} onClick={() => setCompact((current) => !current)} />;
+    return <ExpandButton isActive={!isCompact} onClick={() => setCompact((current) => !current)} />;
 }
