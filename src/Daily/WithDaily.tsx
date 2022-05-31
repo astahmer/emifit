@@ -80,7 +80,7 @@ const ListToolbar = () => {
     const toggle = useDisclosure({ defaultIsOpen: true });
 
     return (
-        <Box pos="relative">
+        <Box pos="relative" marginBottom={viewType === "grid" ? (toggle.isOpen ? "-15px" : "27px") : undefined}>
             <Flex
                 mx="auto"
                 p="2"
