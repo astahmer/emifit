@@ -49,7 +49,7 @@ export function ExerciseGrid({ exerciseList }: { exerciseList: Exercise[] }) {
                         <Grid gridTemplateColumns="4fr 1fr 4fr">
                             {chunk.map((exo, exoIndex) => (
                                 <Fragment key={exoIndex}>
-                                    {exoIndex > 0 && <Divider orientation="vertical" justifySelf="center" />}
+                                    {exoIndex > 0 && <Divider orientation="vertical" justifySelf="center" h="auto" />}
                                     <ExerciseGridItem exo={exo} />
                                 </Fragment>
                             ))}
