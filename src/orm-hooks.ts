@@ -30,11 +30,13 @@ export const useCurrentDailyInvalidate = () => {
     return () => void queryClient.invalidateQueries(["daily", id]);
 };
 
-export const useDailyListQuery = () => {
+export const useDailyListQuery = <Index extends StoreIndex<"daily"> = undefined>(
+    params: StoreQueryParams<"daily", Index> = {}
+) => {
     const query = useQuery(
         ["dailyList"],
         async () => {
-            const list = await orm.daily.get();
+            const list = await orm.daily.get(params);
             const exerciseList = await orm.exercise.get();
             const exerciseListById = groupIn(exerciseList, "id");
 
@@ -51,7 +53,11 @@ export const useDailyListQuery = () => {
 
     return query;
 };
-export const useDailyList = () => useDailyListQuery().data;
+
+export const useDailyList = <Index extends StoreIndex<"daily"> = undefined>(
+    params: StoreQueryParams<"daily", Index> = {}
+) => useDailyListQuery(params).data;
+
 function useExerciseUnsorted<Index extends StoreIndex<"exercise"> = undefined>(
     params: StoreQueryParams<"exercise", Index> = {}
 ) {

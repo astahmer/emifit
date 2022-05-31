@@ -1,6 +1,10 @@
+import { printDate } from "@/functions/utils";
+import { useDailyList } from "@/orm-hooks";
 import { isDailyTodayAtom } from "@/store";
 import {
+    Box,
     Button,
+    Circle,
     Popover,
     PopoverBody,
     PopoverContent,
@@ -12,7 +16,6 @@ import {
     Calendar,
     CalendarControls,
     CalendarDate,
-    CalendarDays,
     CalendarMonth,
     CalendarMonthName,
     CalendarMonths,
@@ -23,6 +26,7 @@ import {
 import { format } from "date-fns";
 import { useAtomValue } from "jotai";
 import { useRef } from "react";
+import { EmiFitCalendarDays } from "./CalendarDays";
 
 export const CalendarButton = ({
     selectedDate,
@@ -42,6 +46,8 @@ export const CalendarButton = ({
     useOutsideClick({ ref: calendarRef, handler: onClose, enabled: isOpen });
 
     const isDailyToday = useAtomValue(isDailyTodayAtom);
+    const dailyList = useDailyList();
+    const dailyIdList = dailyList.map((daily) => daily.id);
 
     return (
         <Popover placement="auto-start" isOpen={isOpen} onClose={onClose} isLazy>
@@ -69,6 +75,7 @@ export const CalendarButton = ({
                     onSelectDate={handleSelectDate}
                     singleDateSelection
                     disableFutureDates
+                    highlightToday
                 >
                     <PopoverBody p={0}>
                         <CalendarControls>
@@ -80,7 +87,22 @@ export const CalendarButton = ({
                             <CalendarMonth>
                                 <CalendarMonthName />
                                 <CalendarWeek />
-                                <CalendarDays />
+                                <EmiFitCalendarDays
+                                    getVariant={(args) =>
+                                        dailyIdList.includes(printDate(args.day)) ? "filled" : args.variant
+                                    }
+                                    render={(args) =>
+                                        dailyIdList.includes(printDate(args.day)) ? (
+                                            <Box d="flex" flexDirection="column" alignItems="center">
+                                                <div>{format(args.day, "d")}</div>
+                                                <Circle size="4px" bgColor="pink.300" />
+                                                {/* <Box w="100%" h="2px" bgColor="pink.300" /> */}
+                                            </Box>
+                                        ) : (
+                                            format(args.day, "d")
+                                        )
+                                    }
+                                />
                             </CalendarMonth>
                         </CalendarMonths>
                     </PopoverBody>
