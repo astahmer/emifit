@@ -9,29 +9,17 @@ import { Program } from "@/orm-types";
 import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 import { ProgramCard } from "@/Programs/ProgramCard";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
-import { isCompactViewAtom, isDailyTodayAtom } from "@/store";
+import { isDailyTodayAtom } from "@/store";
 import { CheckIcon } from "@chakra-ui/icons";
-import {
-    Alert,
-    AlertIcon,
-    Box,
-    Button,
-    ButtonGroup,
-    ButtonProps,
-    Divider,
-    Flex,
-    IconButton,
-    Stack,
-    Text,
-} from "@chakra-ui/react";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { Alert, AlertIcon, Box, Button, ButtonGroup, ButtonProps, Divider, Flex, Stack, Text } from "@chakra-ui/react";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
-import { IoMdExpand } from "react-icons/io";
-import { MdChecklist, MdGridView, MdList, MdOutlineViewCompact } from "react-icons/md";
+import { MdChecklist, MdGridView, MdList } from "react-icons/md";
 import { useMutation } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { match } from "ts-pattern";
 import { useProgramForDailyMutation } from "../Programs/useProgramForDailyMutation";
+import { CompactViewButton } from "./CompactButton";
 import { DailyExerciseListView } from "./DailyExerciseListView";
 import { DailyExerciseTaskListView } from "./DailyExerciseTaskListView";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
@@ -76,7 +64,7 @@ const ListToolbar = () => {
             <SwitchViewType />
             {viewType === "grid" && (
                 <Box ml="auto">
-                    <CompactButton />
+                    <CompactViewButton />
                 </Box>
             )}
         </Flex>
@@ -110,21 +98,6 @@ const SwitchViewType = () => {
                 List view
             </ViewTypeButton>
         </ButtonGroup>
-    );
-};
-
-const CompactButton = () => {
-    const [isCompact, setCompact] = useAtom(isCompactViewAtom);
-
-    return (
-        <IconButton
-            size="xs"
-            aria-label="Compact grid view"
-            icon={isCompact ? <IoMdExpand /> : <MdOutlineViewCompact />}
-            isActive={isCompact}
-            colorScheme={isCompact ? "pink" : undefined}
-            onClick={() => setCompact((current) => !current)}
-        />
     );
 };
 

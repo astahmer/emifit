@@ -1,6 +1,5 @@
-import { Box, ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
+import { Box, ChakraProvider, Flex } from "@chakra-ui/react";
 import { WithChildren } from "@pastable/core";
-import { CalendarDefaultTheme } from "@uselessdev/datepicker";
 import { Provider, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -26,16 +25,15 @@ import { ClickToComponent } from "click-to-react-component";
 import "./App.css";
 import { ExerciseSupersetEditPage } from "./pages/ExerciseSupersetEditPage";
 import { ExercisePageLayout } from "./pages/ExercisePageLayout";
+import { appTheme } from "./theme";
 
 const queryClient = new QueryClient();
-const theme = extendTheme(CalendarDefaultTheme, { config: { initialColorMode: "light" } });
-
 function App() {
     return (
         <DbProvider>
             <Provider unstable_createStore={() => store}>
                 <QueryClientProvider client={queryClient}>
-                    <ChakraProvider theme={theme}>
+                    <ChakraProvider theme={appTheme}>
                         <HistoryRouter history={browserHistory}>
                             <Routes>
                                 <Route path="/" element={<Layout />}>
