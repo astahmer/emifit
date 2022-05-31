@@ -6,7 +6,7 @@ import { useInterpret } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { ExercisePageLayoutProvider, makeExerciseAddPageMachine } from "./exerciseAddPageMachine";
+import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "./ExerciseFormMachine";
 import { SupersetForm } from "./SupersetForm";
 
 export const ExerciseSupersetEditPage = () => {
@@ -17,7 +17,7 @@ export const ExerciseSupersetEditPage = () => {
     const exerciseList = daily?.exerciseList?.filter((exo) => exo.supersetId === supersetId);
 
     const service = useInterpret(() =>
-        makeExerciseAddPageMachine({
+        makeExerciseFormMachine({
             exerciseCount: exerciseList.length,
             supersetForms: Object.fromEntries(
                 exerciseList.map((exercise, index) => [index, { ...exercise, nbSeries: exercise.series.length }])
@@ -51,8 +51,8 @@ export const ExerciseSupersetEditPage = () => {
     }, [supersetId, navigate]);
 
     return (
-        <ExercisePageLayoutProvider value={service}>
+        <ExerciseFormMachineProvider value={service}>
             {exerciseList?.length && service.initialized && <SupersetForm onSubmit={editSupersetExerciseList.mutate} />}
-        </ExercisePageLayoutProvider>
+        </ExerciseFormMachineProvider>
     );
 };

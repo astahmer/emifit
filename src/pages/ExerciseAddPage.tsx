@@ -10,7 +10,7 @@ import { Box } from "@chakra-ui/react";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { ExercisePageLayoutProvider, makeExerciseAddPageMachine } from "./exerciseAddPageMachine";
+import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "./ExerciseFormMachine";
 import { SingleExerciseForm } from "./SingleExerciseForm";
 import { SupersetForm } from "./SupersetForm";
 
@@ -18,7 +18,7 @@ export const ExerciseAddPage = () => {
     const query = useCurrentDailyQuery();
     const daily = query.data;
 
-    const service = useInterpret(makeExerciseAddPageMachine);
+    const service = useInterpret(makeExerciseFormMachine);
     const isSuperset = useSelector(service, (state) => state.matches("superset"));
 
     const queryClient = useQueryClient();
@@ -74,7 +74,7 @@ export const ExerciseAddPage = () => {
     );
 
     return (
-        <ExercisePageLayoutProvider value={service}>
+        <ExerciseFormMachineProvider value={service}>
             <Box px="8" py="4" minH={0}>
                 <SwitchInput
                     id="isSuperset"
@@ -87,6 +87,6 @@ export const ExerciseAddPage = () => {
             ) : (
                 <SupersetForm onSubmit={addExerciseSupersetToDaily.mutate} />
             )}
-        </ExercisePageLayoutProvider>
+        </ExerciseFormMachineProvider>
     );
 };

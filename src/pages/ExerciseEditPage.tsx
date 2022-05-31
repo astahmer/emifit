@@ -8,7 +8,7 @@ import { useInterpret } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { ExercisePageLayoutProvider, makeExerciseAddPageMachine } from "./exerciseAddPageMachine";
+import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "./ExerciseFormMachine";
 import { SingleExerciseForm } from "./SingleExerciseForm";
 
 export const ExerciseEditPage = () => {
@@ -19,7 +19,7 @@ export const ExerciseEditPage = () => {
     const exercise = daily?.exerciseList?.find((exo) => exo.id === exerciseId);
 
     const service = useInterpret(() =>
-        makeExerciseAddPageMachine({ singleForm: { ...exercise, nbSeries: exercise.series.length } })
+        makeExerciseFormMachine({ singleForm: { ...exercise, nbSeries: exercise.series.length } })
     );
 
     const navigate = useNavigate();
@@ -46,8 +46,8 @@ export const ExerciseEditPage = () => {
     }, [exerciseId, navigate, exercise.supersetId]);
 
     return (
-        <ExercisePageLayoutProvider value={service}>
+        <ExerciseFormMachineProvider value={service}>
             {exercise && service.initialized && <SingleExerciseForm onSubmit={editExerciseById.mutate} />}
-        </ExercisePageLayoutProvider>
+        </ExerciseFormMachineProvider>
     );
 };

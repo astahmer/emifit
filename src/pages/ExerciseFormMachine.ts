@@ -2,8 +2,8 @@ import type { ExerciseFormValues } from "@/Exercises/CreateExerciseForm";
 import { createContextWithHook } from "@/functions/createContextWithHook";
 import { assign, createMachine, InterpreterFrom } from "xstate";
 
-export const [ExercisePageLayoutProvider, useExerciseAddPageContext] =
-    createContextWithHook<InterpreterFrom<typeof makeExerciseAddPageMachine>>("ExerciseAddPageContext");
+export const [ExerciseFormMachineProvider, useExerciseFormMachine] =
+    createContextWithHook<InterpreterFrom<typeof makeExerciseFormMachine>>("ExerciseAddPageContext");
 
 interface Context {
     exerciseCount: number;
@@ -11,10 +11,10 @@ interface Context {
     supersetForms: Record<number, ExerciseFormValues>;
 }
 
-export const makeExerciseAddPageMachine = (initialContext?: Partial<Context>) =>
+export const makeExerciseFormMachine = (initialContext?: Partial<Context>) =>
     createMachine(
         {
-            id: "exerciseAddPage",
+            id: "ExerciseFormMachine",
             schema: {
                 context: {} as Context,
                 events: {} as
@@ -23,7 +23,7 @@ export const makeExerciseAddPageMachine = (initialContext?: Partial<Context>) =>
                     | { type: "UpdateForm"; form: ExerciseFormValues }
                     | { type: "UpdateSupersetForm"; form: ExerciseFormValues; index: number },
             },
-            tsTypes: {} as import("./exerciseAddPageMachine.typegen").Typegen0,
+            tsTypes: {} as import("./ExerciseFormMachine.typegen").Typegen0,
             context: { exerciseCount: 1, singleForm: {} as ExerciseFormValues, supersetForms: {}, ...initialContext },
             initial: "initial",
             states: {

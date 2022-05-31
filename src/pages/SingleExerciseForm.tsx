@@ -5,7 +5,7 @@ import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider } from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { match } from "ts-pattern";
-import { useExerciseAddPageContext } from "./exerciseAddPageMachine";
+import { useExerciseFormMachine } from "./ExerciseFormMachine";
 import { getRouteTypeFromPathname } from "./ExercisePageLayout";
 
 export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => void | Promise<void> }) {
@@ -13,7 +13,7 @@ export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => 
     const daily = query.data;
     const exoNameList = daily.exerciseList.map((exo) => exo.name);
 
-    const service = useExerciseAddPageContext();
+    const service = useExerciseFormMachine();
 
     const route = getRouteTypeFromPathname(location.pathname);
     const title = match(route)

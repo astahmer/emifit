@@ -6,7 +6,7 @@ import { makeArrayOf } from "@pastable/core";
 import { useSelector } from "@xstate/react";
 import { Fragment } from "react";
 import { match } from "ts-pattern";
-import { useExerciseAddPageContext } from "./exerciseAddPageMachine";
+import { useExerciseFormMachine } from "./ExerciseFormMachine";
 import { getRouteTypeFromPathname } from "./ExercisePageLayout";
 
 export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void> }) {
@@ -14,7 +14,7 @@ export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void
     const daily = query.data;
     const exoNameList = daily.exerciseList.map((exo) => exo.name);
 
-    const service = useExerciseAddPageContext();
+    const service = useExerciseFormMachine();
     const exoCount = useSelector(service, (state) => state.context.exerciseCount);
     const canSubmit = useSelector(service, (state) => state.matches("superset.canSubmit"));
 
