@@ -2,21 +2,28 @@ import { CheckboxCircleInFragment } from "@/components/CheckboxCircle";
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { RadioCardButton } from "@/components/RadioCard";
 import { Scrollable } from "@/components/Scrollable";
+import { Show } from "@/components/Show";
+import { TextInput } from "@/components/TextInput";
 import { ExerciseGrid } from "@/Exercises/ExerciseGrid";
 import { ExerciseMenu, SupersetExerciseMenu } from "@/Exercises/ExerciseMenu";
 import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { groupBy } from "@/functions/groupBy";
+import { serializeExercise, serializeProgram } from "@/functions/snapshot";
+import { onError, toasts } from "@/functions/toasts";
+import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
-import { Exercise, WithExerciseList } from "@/orm-types";
+import { Exercise, Program, WithExerciseList } from "@/orm-types";
 import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
-import { Box, Divider, Flex, Heading, Spacer, Text } from "@chakra-ui/react";
+import { CheckIcon } from "@chakra-ui/icons";
+import { Box, Button, Divider, Flex, Heading, Spacer, Stack, Text, toast } from "@chakra-ui/react";
 import confetti from "canvas-confetti";
 import { useAtomValue } from "jotai";
-import { Fragment } from "react";
-import { useMutation } from "react-query";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { IoListSharp } from "react-icons/io5";
+import { useMutation, useQueryClient } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { ExerciseCheckbox } from "../Exercises/ExerciseCheckbox";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
@@ -40,6 +47,8 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
                     <GoBackToTodayEntryButton />
                 )}
             </Box>
+            <Divider my="4" />
+            <UseAsProgramButton />
         </Scrollable>
     );
 };
@@ -177,3 +186,112 @@ const CardioLine = () => (
         <Text ml="2">Cardio done ?</Text>
     </Flex>
 );
+
+const UseAsProgramButton = () => {
+    const daily = useCurrentDaily();
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation(
+        async () => {
+            const tx = orm.exercise.tx("readwrite");
+            const programId = makeId();
+            const newExos = daily.exerciseList.map((exo) => ({
+                ...exo,
+                id: makeId(),
+                madeFromExerciseId: exo.id,
+                programId: programId,
+            }));
+            const insertMany = newExos.map((exo) => tx.store.add(serializeExercise(exo)));
+
+            const now = new Date();
+            const programName = nameRef.current.value;
+
+            return Promise.all([
+                ...insertMany,
+                orm.program.add({
+                    ...serializeProgram({
+                        category: daily.category,
+                        id: programId,
+                        name: programName,
+                        exerciseList: newExos,
+                    } as Program),
+                    createdAt: now,
+                    updatedAt: now,
+                }),
+                tx.done,
+            ]);
+        },
+        {
+            onSuccess: () => {
+                const programName = nameRef.current.value;
+                queryClient.invalidateQueries(orm.program.name);
+                toasts.success(`Program <${programName}> cloned`);
+
+                setShowProgramNameInput(false);
+                setCanCreate(false);
+            },
+            onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+        }
+    );
+
+    const [showProgramNameInput, setShowProgramNameInput] = useState(false);
+
+    useEffect(() => {
+        if (showProgramNameInput && !daily.exerciseList?.length) {
+            setShowProgramNameInput(false);
+        }
+    }, [showProgramNameInput, daily.exerciseList]);
+
+    const nameRef = useRef<HTMLInputElement>();
+    const [canCreate, setCanCreate] = useState(false);
+
+    return (
+        <Show
+            when={showProgramNameInput}
+            fallback={
+                <Box alignSelf="center">
+                    <RadioCardButton
+                        leftIcon={<IoListSharp />}
+                        py="4"
+                        mb="4"
+                        onClick={() => setShowProgramNameInput(true)}
+                    >
+                        Use as program ?
+                    </RadioCardButton>
+                </Box>
+            }
+        >
+            <ConfirmationButton
+                onConfirm={mutation.mutate}
+                colorScheme="whatsapp"
+                renderTrigger={(onOpen) => (
+                    <Stack as="form" onSubmit={(e) => e.preventDefault()} alignSelf="center" mb="8" w="100%" px="4">
+                        <TextInput
+                            ref={nameRef}
+                            onChange={(e) => {
+                                if (e.target.value) {
+                                    if (canCreate) return;
+                                    setCanCreate(true);
+                                }
+
+                                if (!canCreate) return;
+                                setCanCreate(false);
+                            }}
+                            label="Program name"
+                        />
+                        <RadioCardButton
+                            leftIcon={<CheckIcon />}
+                            py="4"
+                            mb="4"
+                            onClick={onOpen}
+                            disabled={!canCreate}
+                            type="submit"
+                        >
+                            Create program
+                        </RadioCardButton>
+                    </Stack>
+                )}
+            />
+        </Show>
+    );
+};
