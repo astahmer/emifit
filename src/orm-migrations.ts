@@ -18,6 +18,17 @@ export const runMigrations: (
     console.log({ db, oldVersion, newVersion, transaction, migrationVersion, isVersionChange, isImport });
 
     const tx = transaction;
+    let hasRunCallback = false;
+    const run = () => {
+        if (hasRunCallback) {
+            return;
+        }
+        hasRunCallback = true;
+        console.log("running migration at version", migrationVersion);
+        if (onVersionMigrated) {
+            return onVersionMigrated(migrationVersion, tx);
+        }
+    };
 
     console.log("start migrating");
     if (migrationVersion === 0 && isVersionChange) {
@@ -42,7 +53,7 @@ export const runMigrations: (
         console.log("migrated to version", migrationVersion);
     }
     if (migrationVersion === 1) {
-        await onVersionMigrated?.(migrationVersion, tx);
+        await run();
         let cursor = await tx.objectStore("daily").index("by-time").openCursor();
 
         while (cursor) {
@@ -57,10 +68,10 @@ export const runMigrations: (
     }
 
     // nothing changed between v2 -> v13
-    if (migrationVersion === 2) migrationVersion = 13;
+    if (migrationVersion >= 2 && migrationVersion <= 12) migrationVersion = 13;
 
     if (migrationVersion === 13) {
-        await onVersionMigrated?.(migrationVersion, tx);
+        await run();
         const program = await tx.objectStore("program").getAll();
         const exerciseList = await tx.objectStore("exercise").getAll();
         const exerciseMap = new Map(exerciseList.map((e) => [e.id, e]));
@@ -76,7 +87,38 @@ export const runMigrations: (
         console.log("migrated to version", migrationVersion, "add programId to exercises created from program");
     }
 
-    await onVersionMigrated?.(migrationVersion, tx);
+    // nothing changed between v13 -> v24
+    if (migrationVersion >= 13 && migrationVersion < 24) migrationVersion = 24;
+
+    if (migrationVersion >= 24) {
+        await run();
+        const exerciseList = await tx.objectStore("exercise").getAll();
+
+        const removedTagId = "CBarbell";
+        const renamedTagId = "Barebell";
+
+        const exerciseListWithRemovedTag = exerciseList.filter((e) => e.tags.some((t) => t === removedTagId));
+        const exerciseListWithRenamedTag = exerciseList.filter((e) => e.tags.some((t) => t === renamedTagId));
+        console.log({ exerciseList, exerciseListWithRemovedTag, exerciseListWithRenamedTag });
+
+        await Promise.all(
+            (exerciseListWithRemovedTag || []).map((exo) =>
+                tx.objectStore("exercise").put({ ...exo, tags: exo.tags.filter((t) => t !== removedTagId) })
+            )
+        );
+        await Promise.all(
+            (exerciseListWithRenamedTag || []).map((exo) =>
+                tx
+                    .objectStore("exercise")
+                    .put({ ...exo, tags: exo.tags.filter((t) => t !== renamedTagId).concat("Barbell") })
+            )
+        );
+
+        console.log("migrated to version", migrationVersion, "rm CBarbell & rename Barebell to -> Barbell");
+        migrationVersion++;
+    }
+
+    if (oldVersion === newVersion) await run();
 
     console.log("done migrating");
 };

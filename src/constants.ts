@@ -7,7 +7,7 @@ const SharedTags = [
     { id: "Machine", label: "Machine", group: "Type" },
     { id: "Freeweight", label: "Freeweight", group: "Type" },
     { id: "Bodyweight", label: "Bodyweight", group: "Type" },
-    { id: "Barebell", label: "Barbell", group: "Type" },
+    { id: "Barbell", label: "Barbell", group: "Type" },
     { id: "Dumbbell", label: "Dumbbell", group: "Type" },
     { id: "Poulie", label: "Poulie", group: "Type" },
 ] as const;
