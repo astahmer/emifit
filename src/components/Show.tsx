@@ -1,6 +1,10 @@
 import { WithChildren } from "@pastable/core";
-import { ReactElement } from "react";
+import { ReactElement, ReactNode } from "react";
 
-export function Show({ cond, children }: WithChildren & { cond: boolean }): ReactElement | null {
-    return cond ? (children as ReactElement) : null;
+export function Show({
+    when,
+    children,
+    fallback,
+}: WithChildren & { when: boolean; fallback?: ReactNode }): ReactElement | null {
+    return when ? (children as ReactElement) : (fallback as any) || null;
 }

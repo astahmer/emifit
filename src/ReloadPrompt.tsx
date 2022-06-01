@@ -40,7 +40,7 @@ function ReloadPrompt() {
     };
 
     return (
-        <Show cond={needRefresh}>
+        <Show when={needRefresh}>
             <div className="ReloadPrompt-container">
                 <div className="ReloadPrompt-toast">
                     <div className="ReloadPrompt-message">
