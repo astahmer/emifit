@@ -1,7 +1,14 @@
 import { IDBPDatabase, IndexKey, IndexNames, openDB, StoreKey } from "idb";
 import { del, get, update } from "idb-keyval";
 import { runMigrations } from "./orm-migrations";
-import { DailyWithReferences, ExerciseWithReferences, ProgramWithReferences } from "./orm-types";
+import {
+    CategoryWithReferences,
+    DailyWithReferences,
+    ExerciseWithReferences,
+    Group,
+    ProgramWithReferences,
+    Tag,
+} from "./orm-types";
 
 // https://javascript.info/indexeddb
 // https://www.npmjs.com/package/idb#opendb
@@ -24,6 +31,28 @@ export type EmifitSchema = {
             "by-time": DailyWithReferences["time"];
             "by-category": DailyWithReferences["category"];
             "by-program": DailyWithReferences["programId"];
+        };
+    };
+    group: {
+        key: Group["id"];
+        value: Group;
+        indexes: {
+            "by-name": Group["name"];
+        };
+    };
+    tag: {
+        key: Tag["id"];
+        value: Tag;
+        indexes: {
+            "by-name": Tag["name"];
+            "by-group": Tag["groupId"];
+        };
+    };
+    category: {
+        key: CategoryWithReferences["id"];
+        value: CategoryWithReferences;
+        indexes: {
+            "by-name": CategoryWithReferences["name"];
         };
     };
     exercise: {
@@ -116,7 +145,10 @@ const makeKeyValue = <T, Key extends string = string>(key: Key) => {
 export const orm = {
     db,
     version,
+    category: makeStore("category"),
+    tag: makeStore("tag"),
     exercise: makeStore("exercise"),
+    group: makeStore("group"),
     program: makeStore("program"),
     daily: makeStore("daily"),
     programListOrder: makeKeyValue<string[], "programListOrder">("programListOrder"),

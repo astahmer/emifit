@@ -1,6 +1,15 @@
-import { CategoriesTagsById } from "@/constants";
 import { orm } from "@/orm";
-import { Daily, Exercise, Program } from "@/orm-types";
+import {
+    Category,
+    CategoryWithReferences,
+    Daily,
+    Exercise,
+    Group,
+    GroupWithReferences,
+    Program,
+    Tag,
+    TagWithReferences,
+} from "@/orm-types";
 import { DailyWithReferences, ExerciseWithReferences, ProgramWithReferences } from "../orm-types";
 import { groupIn } from "./groupBy";
 
@@ -17,19 +26,24 @@ export const getDatabaseSnapshot = async () => {
 
 export function computeSnapshotFromExport(data: ExportedData): DatabaseSnapshot {
     const exerciseListById = groupIn(data.exerciseList, "id");
+    const tagListById = groupIn(data.tagList, "id");
+
     return {
         dailyList: data.dailyList.map((d) => ({
             ...d,
             date: new Date(d.date),
-            exerciseList: d.exerciseList.map(computeExerciseFromExoId(exerciseListById)),
+            exerciseList: d.exerciseList.map(computeExerciseFromExoId(exerciseListById, tagListById)),
         })) as Daily[],
-        exerciseList: data.exerciseList.map(computeExerciseFromIncompleteExo),
+        exerciseList: data.exerciseList.map((exo) => computeExerciseFromReferences(exo, tagListById)),
         programList: data.programList.map((p) => ({
             ...p,
             createdAt: new Date(p.createdAt),
             updatedAt: new Date(p.updatedAt),
-            exerciseList: p.exerciseList.map(computeExerciseFromExoId(exerciseListById)),
+            exerciseList: p.exerciseList.map(computeExerciseFromExoId(exerciseListById, tagListById)),
         })) as Program[],
+        tagList: data.tagList,
+        categoryList: data.categoryList.map((cat) => computeCategoryFromReferences(cat, tagListById)),
+        groupList: data.groupList,
         programListOrder: data.programListOrder,
     };
 }
@@ -53,6 +67,9 @@ export interface ExportedData {
     dailyList: DailyWithReferences[];
     programList: ProgramWithReferences[];
     exerciseList: ExerciseWithReferences[];
+    tagList: TagWithReferences[];
+    groupList: GroupWithReferences[];
+    categoryList: CategoryWithReferences[];
     programListOrder: Program["id"][];
     version: number;
 }
@@ -61,16 +78,33 @@ export interface DatabaseSnapshot {
     dailyList: Daily[];
     programList: Program[];
     exerciseList: Exercise[];
+    tagList: Tag[];
+    categoryList: Category[];
+    groupList: Group[];
     programListOrder: Program["id"][];
 }
 
-export function computeExerciseFromExoId(exerciseListById: Record<string, ExerciseWithReferences>) {
+export function computeExerciseFromExoId(
+    exerciseListById: Record<string, ExerciseWithReferences>,
+    tagListById: Record<string, Tag>
+) {
     return (id: Exercise["id"]): Exercise => {
         const exo = exerciseListById[id];
-        return { ...exo, tags: exo.tags.map((id) => CategoriesTagsById[id]) };
+        return { ...exo, tags: exo.tags.map((id) => tagListById[id]) };
     };
 }
-export const computeExerciseFromIncompleteExo = (exo: ExerciseWithReferences): Exercise => ({
+export const computeExerciseFromReferences = (
+    exo: ExerciseWithReferences,
+    tagListById: Record<string, Tag>
+): Exercise => ({
     ...exo,
-    tags: exo.tags.map((id) => CategoriesTagsById[id]),
+    tags: exo.tags.map((id) => tagListById[id]),
+});
+
+export const computeCategoryFromReferences = (
+    cat: CategoryWithReferences,
+    tagListById: Record<string, Tag>
+): Category => ({
+    ...cat,
+    tagList: cat.tagList.map((id) => tagListById[id]),
 });

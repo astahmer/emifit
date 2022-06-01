@@ -1,6 +1,6 @@
 import { MultiSelect, MultiSelectProps } from "@/components/MultiSelect";
-import { Categories } from "@/constants";
 import { mergeProps } from "@/functions/mergeProps";
+import { useCategoryQuery } from "@/orm-hooks";
 import { Tag } from "@/orm-types";
 import { PickOptional } from "@/types";
 import { FormControl, FormErrorMessage, FormLabel, Text } from "@chakra-ui/react";
@@ -32,8 +32,9 @@ export function TagMultiSelect({
     > &
     PickOptional<MultiSelectProps<Tag, true>, "onChange">) {
     const isInvalid = Boolean(error);
-    const category = Categories.find((cat) => cat.id === (catId as typeof Categories[number]["id"]));
-    const items = category.children as any as Array<Tag>;
+
+    const query = useCategoryQuery(catId);
+    const items = query.data.tagList || [];
 
     return (
         <FormControl isInvalid={isInvalid}>
@@ -45,8 +46,8 @@ export function TagMultiSelect({
                         defaultValue={defaultValue}
                         ref={ref}
                         getValue={(item) => item.id}
-                        itemToString={(item) => item.label}
-                        groupByKeyGetter={(item) => item.group}
+                        itemToString={(item) => item.name}
+                        groupByKeyGetter={(item) => item.groupId}
                         items={items}
                         label={(getLabelProps) => <FormLabel {...getLabelProps()}>Tags</FormLabel>}
                         getButtonProps={() => ({
@@ -57,7 +58,7 @@ export function TagMultiSelect({
                         renderButtonText={(selection) => (
                             <Text maxW="100%" textOverflow="ellipsis" overflow="hidden">
                                 {selection.length
-                                    ? `(${selection.length}) ${selection.map((item) => item.label).join(", ")}`
+                                    ? `(${selection.length}) ${selection.map((item) => item.name).join(", ")}`
                                     : "Select one or more tags"}
                             </Text>
                         )}

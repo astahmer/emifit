@@ -1,31 +1,32 @@
 import { RadioCard, RadioCardPicker, RadioCardPickerProps } from "@/components/RadioCard";
-import { Categories } from "@/constants";
+import { useCategoryList } from "@/orm-hooks";
+import { Category } from "@/orm-types";
 
-const options = Categories.map((cat) => cat);
 export const CategoryRadioPicker = ({
     isOptionDisabled,
     ...props
-}: { isOptionDisabled?: (option: typeof options[number]) => boolean } & Omit<
-    RadioCardPickerProps,
-    "renderOptions"
->) => (
-    <RadioCardPicker
-        {...props}
-        renderOptions={(getRadioProps) =>
-            options.map((option) => {
-                const value = option.id;
-                const radio = getRadioProps({ value });
+}: { isOptionDisabled?: (option: Category) => boolean } & Omit<RadioCardPickerProps, "renderOptions">) => {
+    const options = useCategoryList();
 
-                return (
-                    <RadioCard
-                        key={value}
-                        {...radio}
-                        isDisabled={radio.disabled || isOptionDisabled?.(option) || props.isDisabled}
-                    >
-                        {value}
-                    </RadioCard>
-                );
-            })
-        }
-    />
-);
+    return (
+        <RadioCardPicker
+            {...props}
+            renderOptions={(getRadioProps) =>
+                options.map((option) => {
+                    const value = option.id;
+                    const radio = getRadioProps({ value });
+
+                    return (
+                        <RadioCard
+                            key={value}
+                            {...radio}
+                            isDisabled={radio.disabled || isOptionDisabled?.(option) || props.isDisabled}
+                        >
+                            {value}
+                        </RadioCard>
+                    );
+                })
+            }
+        />
+    );
+};

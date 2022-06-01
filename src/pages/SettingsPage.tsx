@@ -1,16 +1,17 @@
+import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { DynamicTable } from "@/components/DynamicTable";
 import { HFlex } from "@/components/HFlex";
 import { SwitchInput } from "@/components/SwitchInput";
-import { CategoriesTags } from "@/constants";
 import { loadFromJSON, saveAsJSON } from "@/functions/json";
 import { computeSnapshotFromExport, ExportedData, getDatabaseSnapshot } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
-import { makeDb, orm } from "@/orm";
-import { Daily, Exercise, Program } from "@/orm-types";
+import { orm } from "@/orm";
+import { useCategoryList, useDailyList, useExerciseList, useGroupList, useProgramList, useTagList } from "@/orm-hooks";
+import { runMigrations } from "@/orm-migrations";
+import { Category, Daily, Exercise, Group, Program, Tag } from "@/orm-types";
+import { getMostRecentsExerciseById } from "@/orm-utils";
 import { ProgramCardExerciseList } from "@/Programs/ProgramCard";
 import { debugModeAtom } from "@/store";
-import { useDailyList, useExerciseList, useProgramList } from "@/orm-hooks";
-import { getMostRecentsExerciseById } from "@/orm-utils";
 import { AwaitFn } from "@/types";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
@@ -28,11 +29,9 @@ import {
     Stack,
 } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { ReactNode, useRef } from "react";
+import { useRef } from "react";
 import { BiExport, BiImport } from "react-icons/bi";
 import { useMutation } from "react-query";
-import { runMigrations } from "@/orm-migrations";
-import { ConfirmationButton } from "@/components/ConfirmationButton";
 
 export const SettingsPage = () => {
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
@@ -150,6 +149,9 @@ const ExportImportData = () => {
                         exerciseList={getMostRecentsExerciseById(loadMutation.data.exerciseList)}
                         programList={loadMutation.data.programList}
                         dailyList={loadMutation.data.dailyList}
+                        tagList={loadMutation.data.tagList}
+                        categoryList={loadMutation.data.categoryList}
+                        groupList={loadMutation.data.groupList}
                     />
                     <ConfirmationButton
                         onConfirm={importMutation.mutate.bind(undefined)}
@@ -175,25 +177,19 @@ const DebugModeOnly = () => {
     const exerciseList = useExerciseList();
     const programList = useProgramList();
     const dailyList = useDailyList();
+    const tagList = useTagList();
+    const categoryList = useCategoryList();
+    const groupList = useGroupList();
 
     return (
-        <>
-            <DataAccordions exerciseList={exerciseList} programList={programList} dailyList={dailyList}>
-                <AccordionItem>
-                    <h2>
-                        <AccordionButton>
-                            <Box flex="1" textAlign="left" fontSize="md">
-                                Show tag list ({CategoriesTags.length})
-                            </Box>
-                            <AccordionIcon />
-                        </AccordionButton>
-                    </h2>
-                    <AccordionPanel pb={4}>
-                        <DynamicTable columns={tagsColumns} data={CategoriesTags} />
-                    </AccordionPanel>
-                </AccordionItem>
-            </DataAccordions>
-        </>
+        <DataAccordions
+            exerciseList={exerciseList}
+            programList={programList}
+            dailyList={dailyList}
+            tagList={tagList}
+            categoryList={categoryList}
+            groupList={groupList}
+        />
     );
 };
 
@@ -201,12 +197,16 @@ const DataAccordions = ({
     exerciseList,
     programList,
     dailyList,
-    children,
+    tagList,
+    categoryList,
+    groupList,
 }: {
     exerciseList: Exercise[];
     programList: Program[];
     dailyList: Daily[];
-    children?: ReactNode;
+    tagList: Tag[];
+    categoryList: Category[];
+    groupList: Group[];
 }) => {
     return (
         <Accordion allowMultiple>
@@ -277,24 +277,82 @@ const DataAccordions = ({
                     </Box>
                 </AccordionPanel>
             </AccordionItem>
-            {children}
+            <AccordionItem>
+                <h2>
+                    <AccordionButton>
+                        <Box flex="1" textAlign="left" fontSize="md">
+                            Show tag list ({tagList.length})
+                        </Box>
+                        <AccordionIcon />
+                    </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                    <Box overflow="auto" maxH="600px">
+                        <DynamicTable columns={tagsColumns} data={tagList} isHeaderSticky />
+                    </Box>
+                </AccordionPanel>
+            </AccordionItem>
+            <AccordionItem>
+                <h2>
+                    <AccordionButton>
+                        <Box flex="1" textAlign="left" fontSize="md">
+                            Show category list ({categoryList.length})
+                        </Box>
+                        <AccordionIcon />
+                    </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                    <Box overflow="auto" maxH="600px">
+                        <DynamicTable columns={categoryColumns} data={categoryList} isHeaderSticky />
+                    </Box>
+                </AccordionPanel>
+            </AccordionItem>
+            <AccordionItem>
+                <h2>
+                    <AccordionButton>
+                        <Box flex="1" textAlign="left" fontSize="md">
+                            Show group list ({groupList.length})
+                        </Box>
+                        <AccordionIcon />
+                    </AccordionButton>
+                </h2>
+                <AccordionPanel pb={4}>
+                    <Box overflow="auto" maxH="600px">
+                        <DynamicTable columns={groupColumns} data={groupList} isHeaderSticky />
+                    </Box>
+                </AccordionPanel>
+            </AccordionItem>
         </Accordion>
     );
 };
 
 const tagsColumns = [
-    { Header: "name", accessor: "label" },
-    { Header: "group", accessor: "group" },
+    { Header: "id", accessor: "id" },
+    { Header: "name", accessor: "name" },
+    { Header: "group", accessor: "groupId" },
+];
+
+const categoryColumns = [
+    { Header: "id", accessor: "id" },
+    { Header: "name", accessor: "name" },
+    { Header: "tagList", accessor: "tagList", Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", ") },
+];
+
+const groupColumns = [
+    { Header: "id", accessor: "id" },
+    { Header: "name", accessor: "name" },
 ];
 
 const exerciseColumns = [
+    { Header: "id", accessor: "id" },
     { Header: "name", accessor: "name" },
     { Header: "category", accessor: "category" },
     { Header: "sets count", accessor: "series", Cell: (props) => props.value.length },
-    { Header: "tags", accessor: "tags", Cell: (props) => props.value.map((t) => t.label).join(", ") },
+    { Header: "tags", accessor: "tags", Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", ") },
 ];
 
 const programColumns = [
+    { Header: "id", accessor: "id" },
     { Header: "name", accessor: "name" },
     { Header: "category", accessor: "category" },
     { Header: "exo", accessor: "exerciseList", Cell: (props) => props.value.length },

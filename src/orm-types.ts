@@ -1,9 +1,19 @@
-import type { Category } from "./constants";
 import { LiteralUnion } from "./types";
+
+export interface Group {
+    id: string;
+    name: string;
+}
+
+export interface Category {
+    id: string;
+    name: string;
+    tagList: Tag[];
+}
 
 export interface Exercise {
     id: string;
-    category: Category;
+    category: Category["id"];
     name: string;
     tags: Tag[];
     series: Serie[];
@@ -23,14 +33,14 @@ export interface Serie {
 
 export interface Tag {
     id: string;
-    label: string;
-    group: string;
+    name: string;
+    groupId: Group["id"];
 }
 
 export interface Program {
     id: string;
     name: string;
-    category: Category;
+    category: Category["id"];
     exerciseList: Exercise[];
     createdAt: Date;
     updatedAt: Date;
@@ -41,7 +51,7 @@ export interface Daily {
     id: string;
     date: Date;
     time: number;
-    category: Category;
+    category: Category["id"];
     exerciseList: Exercise[];
     /** Completed exerciseId list */
     completedList: Array<Exercise["id"]>;
@@ -60,6 +70,13 @@ export interface ProgramWithReferences extends Omit<Program, "exerciseList"> {
 export interface ExerciseWithReferences extends Omit<Exercise, "tags"> {
     tags: Tag["id"][];
 }
+
+export interface CategoryWithReferences extends Omit<Category, "tagList"> {
+    tagList: Tag["id"][];
+}
+
+export interface TagWithReferences extends Tag {}
+export interface GroupWithReferences extends Group {}
 
 export interface WithExerciseList {
     exerciseList: Exercise[];

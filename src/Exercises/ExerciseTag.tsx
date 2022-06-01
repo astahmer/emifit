@@ -3,7 +3,7 @@ import { Badge, BadgeProps, Wrap, WrapItem, WrapProps } from "@chakra-ui/react";
 
 export const ExerciseTag = ({ tag, ...props }: { tag: Tag } & BadgeProps) => (
     <Badge key={tag.id} variant="subtle" colorScheme="pink" fontSize="xx-small" {...props}>
-        {tag.label}
+        {tag.name}
     </Badge>
 );
 
@@ -21,7 +21,7 @@ export const ExerciseTagList = ({
             ))}
             {isHidden && tagList.length > 2 ? (
                 <WrapItem>
-                    <ExerciseTag tag={{ id: "...", label: "...", group: "none" }} />
+                    <ExerciseTag tag={{ id: "...", name: "...", groupId: "none" }} />
                 </WrapItem>
             ) : null}
         </Wrap>
