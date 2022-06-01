@@ -250,12 +250,7 @@ const UseAsProgramButton = () => {
             when={showProgramNameInput}
             fallback={
                 <Box alignSelf="center">
-                    <RadioCardButton
-                        leftIcon={<IoListSharp />}
-                        py="4"
-                        mb="4"
-                        onClick={() => setShowProgramNameInput(true)}
-                    >
+                    <RadioCardButton py="4" mb="4" onClick={() => setShowProgramNameInput(true)}>
                         Use as program ?
                     </RadioCardButton>
                 </Box>
