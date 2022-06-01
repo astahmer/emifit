@@ -89,10 +89,12 @@ export const CalendarButton = ({
                                 <CalendarWeek />
                                 <EmiFitCalendarDays
                                     getVariant={(args) =>
-                                        dailyIdList.includes(printDate(args.day)) ? "filled" : args.variant
+                                        dailyList.find((d) => d.id === printDate(args.day))?.exerciseList?.length
+                                            ? "filled"
+                                            : args.variant
                                     }
                                     render={(args) =>
-                                        dailyIdList.includes(printDate(args.day)) ? (
+                                        dailyList.find((d) => d.id === printDate(args.day))?.exerciseList?.length ? (
                                             <Box d="flex" flexDirection="column" alignItems="center">
                                                 <div>{format(args.day, "d")}</div>
                                                 <Circle size="4px" bgColor="pink.300" />
