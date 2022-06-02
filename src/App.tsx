@@ -77,13 +77,13 @@ const Layout = () => {
                     <Outlet />
                 </ErrorBoundary>
             </Flex>
+            <DevTools />
             <Box as="footer" mt="auto" w="100%" flexShrink={0}>
                 <BottomTabs />
             </Box>
             <Box pos="fixed" bottom="70px">
                 <ReactQueryDevtools toggleButtonProps={{ style: { position: "absolute" } }} />
             </Box>
-            <DevTools />
         </Flex>
     );
 };

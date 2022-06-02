@@ -6,9 +6,11 @@ import { orm } from "./orm";
 import { currentDailyIdAtom, debugModeAtom, showSkeletonsAtom } from "./store";
 import { useCurrentDailyInvalidate } from "./orm-hooks";
 import { ConfirmationButton } from "./components/ConfirmationButton";
+import { useLocation } from "react-router-dom";
 
 export function DevTools() {
     const debugMode = useAtomValue(debugModeAtom);
+    const location = useLocation();
     if (!debugMode) return null;
 
     return (
@@ -17,7 +19,7 @@ export function DevTools() {
             mt="auto"
             w="100%"
             flexShrink={0}
-            position="fixed"
+            position={location.pathname.includes("/settings") ? "relative" : "fixed"}
             bottom="0"
             left="0"
             right="0"
