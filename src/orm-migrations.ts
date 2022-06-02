@@ -119,26 +119,30 @@ export const runMigrations: (
         migrationVersion++;
     }
 
-    if (migrationVersion >= 25) {
+    if (migrationVersion >= 25 && isVersionChange) {
         await run();
 
-        if (isVersionChange) {
-            const group = db.createObjectStore("group", { keyPath: "id" });
-            group.createIndex("by-name", "name");
+        const group = db.createObjectStore("group", { keyPath: "id" });
+        group.createIndex("by-name", "name");
 
-            const tag = db.createObjectStore("tag", { keyPath: "id" });
-            tag.createIndex("by-name", "name");
-            tag.createIndex("by-group", "groupId");
+        const tag = db.createObjectStore("tag", { keyPath: "id" });
+        tag.createIndex("by-name", "name");
+        tag.createIndex("by-group", "groupId");
 
-            const category = db.createObjectStore("category", { keyPath: "id" });
-            category.createIndex("by-name", "name");
-        }
+        const category = db.createObjectStore("category", { keyPath: "id" });
+        category.createIndex("by-name", "name");
 
         // Add default values
-        const group = tx.objectStore("group");
         await Promise.all([group.add({ id: "Type", name: "Type" }), group.add({ id: "Muscle", name: "Muscle" })]);
 
-        const tag = tx.objectStore("tag");
+        const SharedTags = [
+            { id: "Machine", name: "Machine", groupId: "Type" },
+            { id: "Freeweight", name: "Freeweight", groupId: "Type" },
+            { id: "Bodyweight", name: "Bodyweight", groupId: "Type" },
+            { id: "Barbell", name: "Barbell", groupId: "Type" },
+            { id: "Dumbbell", name: "Dumbbell", groupId: "Type" },
+            { id: "Poulie", name: "Poulie", groupId: "Type" },
+        ];
         const PushDayTags = [
             { id: "Chest", name: "Chest", groupId: "Muscle" },
             { id: "Triceps", name: "Triceps", groupId: "Muscle" },
@@ -153,24 +157,13 @@ export const runMigrations: (
             { id: "GlutesFocus", name: "Glutes focus", groupId: "Muscle" },
         ];
 
-        const defaultTagList: Tag[] = [
-            { id: "Machine", name: "Machine", groupId: "Type" },
-            { id: "Freeweight", name: "Freeweight", groupId: "Type" },
-            { id: "Bodyweight", name: "Bodyweight", groupId: "Type" },
-            { id: "Barbell", name: "Barbell", groupId: "Type" },
-            { id: "Dumbbell", name: "Dumbbell", groupId: "Type" },
-            { id: "Poulie", name: "Poulie", groupId: "Type" },
-            ...PushDayTags,
-            ...PullDayTags,
-            ...LegDayTags,
-        ];
+        const defaultTagList: Tag[] = [...SharedTags, ...PushDayTags, ...PullDayTags, ...LegDayTags];
         await Promise.all(defaultTagList.map((t) => tag.add(t)));
 
-        const category = tx.objectStore("category");
         await Promise.all([
-            category.add({ id: "PushDay", name: "Push day", tagList: PushDayTags.map((t) => t.id) }),
-            category.add({ id: "PullDay", name: "Pull day", tagList: PullDayTags.map((t) => t.id) }),
-            category.add({ id: "LegDay", name: "Leg day", tagList: LegDayTags.map((t) => t.id) }),
+            category.add({ id: "PushDay", name: "Push day", tagList: PushDayTags.concat(SharedTags).map((t) => t.id) }),
+            category.add({ id: "PullDay", name: "Pull day", tagList: PullDayTags.concat(SharedTags).map((t) => t.id) }),
+            category.add({ id: "LegDay", name: "Leg day", tagList: LegDayTags.concat(SharedTags).map((t) => t.id) }),
         ]);
 
         console.log("migrated to version", migrationVersion, "make object stores for Category/Tag");
