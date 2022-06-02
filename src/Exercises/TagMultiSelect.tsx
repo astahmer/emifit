@@ -34,7 +34,7 @@ export function TagMultiSelect({
     const isInvalid = Boolean(error);
 
     const query = useCategoryQuery(catId);
-    const items = query.data.tagList || [];
+    const items = query.data?.tagList || [];
 
     return (
         <FormControl isInvalid={isInvalid}>
