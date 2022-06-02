@@ -14,14 +14,27 @@ import { DailyWithReferences, ExerciseWithReferences, ProgramWithReferences } fr
 import { groupIn } from "./groupBy";
 
 export const getDatabaseSnapshot = async () => {
-    const [dailyList, programList, exerciseList, programListOrder] = await Promise.all([
-        orm.daily.get(),
-        orm.program.get(),
-        orm.exercise.get(),
-        orm.programListOrder.get(),
-    ]);
+    const [dailyList, programList, exerciseList, categoryList, tagList, groupList, programListOrder] =
+        await Promise.all([
+            orm.daily.get(),
+            orm.program.get(),
+            orm.exercise.get(),
+            orm.category.get(),
+            orm.tag.get(),
+            orm.group.get(),
+            orm.programListOrder.get(),
+        ]);
 
-    return { dailyList, programList, exerciseList, programListOrder, version: orm.version };
+    return {
+        dailyList,
+        programList,
+        exerciseList,
+        categoryList,
+        tagList,
+        groupList,
+        programListOrder,
+        version: orm.version,
+    };
 };
 
 export function computeSnapshotFromExport(data: ExportedData): DatabaseSnapshot {
