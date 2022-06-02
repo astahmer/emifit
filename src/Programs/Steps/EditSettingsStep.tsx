@@ -20,6 +20,7 @@ import { ExerciseListCombobox } from "@/Exercises/ExerciseCombobox";
 import { Link as ReactLink } from "react-router-dom";
 import { useRef } from "react";
 import { RadioCardButton } from "@/components/RadioCard";
+import { requiredRule } from "@/functions/utils";
 
 export function EditSettingsStep() {
     const interpret = useProgramInterpret();
@@ -92,7 +93,7 @@ export function EditSettingsStep() {
                     onSubmit={form.handleSubmit((v) => send({ type: "Submit", programName: v.programName }))}
                 >
                     <TextInput
-                        {...form.register("programName", { required: true })}
+                        {...form.register("programName", { required: requiredRule })}
                         label="Program name"
                         error={form.formState.errors.programName}
                     />

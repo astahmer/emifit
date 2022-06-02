@@ -3,6 +3,7 @@ import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { SwitchInput } from "@/components/SwitchInput";
 import { TextInput } from "@/components/TextInput";
 import { onError } from "@/functions/toasts";
+import { requiredRule } from "@/functions/utils";
 import { Exercise, Serie } from "@/orm-types";
 import { makeExercise, makeSerie } from "@/orm-utils";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
@@ -29,8 +30,6 @@ const formDefaultValues: Pick<Exercise, "name" | "tags" | "series"> & { nbSeries
 export type ExerciseFormValues = typeof formDefaultValues;
 
 type CreateExerciseParams = Omit<typeof formDefaultValues, "nbSeries"> & { category: string };
-
-const required = { value: true, message: "This field is required" };
 
 export const CreateExerciseForm = ({
     id,
@@ -84,7 +83,7 @@ export const CreateExerciseForm = ({
                 <Stack p="8" pt="4" overflow={shouldOverflow ? "auto" : undefined} h="100%" minH={0}>
                     {renderFormTop?.()}
                     <ExerciseCombobox
-                        {...form.register("name", { required })}
+                        {...form.register("name", { required: requiredRule })}
                         defaultValue={defaultValues.name}
                         initialSelectedItem={defaultValues.name ? (defaultValues as any as Exercise) : undefined}
                         onSelectedItemChange={(changes) => {
@@ -105,7 +104,7 @@ export const CreateExerciseForm = ({
                     <TagMultiSelect
                         control={form.control}
                         name="tags"
-                        rules={{ required }}
+                        rules={{ required: requiredRule }}
                         catId={category}
                         error={(form.formState.errors.tags as any)?.message}
                     />
