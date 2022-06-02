@@ -13,7 +13,7 @@ import {
     TableCellProps,
 } from "@chakra-ui/react";
 import { isDefined } from "@pastable/core";
-import { Fragment, ReactNode } from "react";
+import { Fragment, ReactNode, useEffect } from "react";
 import { Cell, Column, Row, TableOptions, UseExpandedOptions, useExpanded, useSortBy, useTable } from "react-table";
 
 export function DynamicTable({
@@ -25,12 +25,20 @@ export function DynamicTable({
     renderSubRow,
     isHeaderSticky,
     getRowProps,
+    hiddenColumns,
 }: DynamicTableProps) {
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, visibleColumns } = useTable(
-        { columns, data, autoResetExpanded: false, defaultColumn } as TableOptions<UseExpandedOptions<{}>>,
+    const table = useTable(
+        { columns, data, autoResetExpanded: false, defaultColumn, initialState: { hiddenColumns } } as TableOptions<
+            UseExpandedOptions<{}>
+        >,
         useSortBy,
         useExpanded
     );
+    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, visibleColumns } = table;
+
+    useEffect(() => {
+        table.setHiddenColumns(hiddenColumns);
+    }, [hiddenColumns]);
 
     return (
         <Table {...getTableProps()} size={size}>
@@ -100,6 +108,7 @@ export interface DynamicTableProps extends Pick<TableProps, "size"> {
     getCellProps?: (cell: Cell, rowIndex: number, cellIndex: number) => TableCellProps;
     renderSubRow?: ({ row }: { row: Row }) => ReactNode;
     isHeaderSticky?: boolean;
+    hiddenColumns?: string[];
 }
 
 const defaultColumn = { Cell: ({ cell: { value } }) => (isDefined(value) ? String(value) : "--") };

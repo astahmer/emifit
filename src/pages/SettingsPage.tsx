@@ -1,10 +1,16 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
+import { DotsIconButton } from "@/components/DotsIconButton";
 import { DynamicTable } from "@/components/DynamicTable";
 import { HFlex } from "@/components/HFlex";
+import { SelectInput } from "@/components/SelectInput";
 import { SwitchInput } from "@/components/SwitchInput";
+import { TextInput } from "@/components/TextInput";
+import { TagMultiSelect } from "@/Exercises/TagMultiSelect";
 import { loadFromJSON, saveAsJSON } from "@/functions/json";
+import { mergeProps } from "@/functions/mergeProps";
 import { computeSnapshotFromExport, ExportedData, getDatabaseSnapshot } from "@/functions/snapshot";
-import { toasts } from "@/functions/toasts";
+import { onError, toasts } from "@/functions/toasts";
+import { requiredRule, slugify } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCategoryList, useDailyList, useExerciseList, useGroupList, useProgramList, useTagList } from "@/orm-hooks";
 import { runMigrations } from "@/orm-migrations";
@@ -13,7 +19,7 @@ import { getMostRecentsExerciseById } from "@/orm-utils";
 import { ProgramCardExerciseList } from "@/Programs/ProgramCard";
 import { debugModeAtom } from "@/store";
 import { AwaitFn } from "@/types";
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import {
     Accordion,
     AccordionButton,
@@ -26,12 +32,18 @@ import {
     Flex,
     Heading,
     Icon,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
     Stack,
 } from "@chakra-ui/react";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { useRef } from "react";
+import { useForm } from "react-hook-form";
 import { BiExport, BiImport } from "react-icons/bi";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
+import { PersistModal } from "../components/PersistModal";
 
 export const SettingsPage = () => {
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
@@ -44,17 +56,29 @@ export const SettingsPage = () => {
                     EmiFIT v{import.meta.env.VITE_APP_VERSION} [{import.meta.env.DEV ? "dev" : "prod"}]
                 </chakra.span>
             </Flex>
-            <Stack mt="8" spacing="4" h="100%" minH="0" overflow="auto">
+            <Flex flexDirection="column" mt="8" h="100%" minH="0" overflow="auto">
                 {/* TODO theme colors */}
-                <ExportImportData />
-                <SwitchInput
-                    id="debugModeSwitch"
-                    label="Debug mode"
-                    onChange={(e) => setDebugMode(e.target.checked)}
-                    isChecked={debugMode}
-                />
-                {debugMode && <DebugModeOnly />}
-            </Stack>
+                <EditableList />
+                <Box mt="auto">
+                    <Stack spacing="4" mt="8" pt="8">
+                        <ExportImportData />
+                        <Box d="flex">
+                            <SwitchInput
+                                ml="auto"
+                                id="debugModeSwitch"
+                                label="Debug mode"
+                                onChange={(e) => setDebugMode(e.target.checked)}
+                                isChecked={debugMode}
+                            />
+                        </Box>
+                    </Stack>
+                </Box>
+                {debugMode && (
+                    <Box mt="4">
+                        <DebugModeOnly />
+                    </Box>
+                )}
+            </Flex>
         </Box>
     );
 };
@@ -121,9 +145,11 @@ const ExportImportData = () => {
         }
     );
 
+    const isDebugMode = useAtomValue(debugModeAtom);
+
     return (
         <Stack>
-            <Stack direction="row">
+            <Stack direction="row" ml="auto">
                 <Button
                     leftIcon={<Icon as={BiImport} />}
                     colorScheme="pink"
@@ -152,6 +178,7 @@ const ExportImportData = () => {
                         tagList={loadMutation.data.tagList}
                         categoryList={loadMutation.data.categoryList}
                         groupList={loadMutation.data.groupList}
+                        showIdColumn={isDebugMode}
                     />
                     <ConfirmationButton
                         onConfirm={importMutation.mutate.bind(undefined)}
@@ -177,170 +204,628 @@ const DebugModeOnly = () => {
     const exerciseList = useExerciseList();
     const programList = useProgramList();
     const dailyList = useDailyList();
+
+    return <DataAccordions exerciseList={exerciseList} programList={programList} dailyList={dailyList} showIdColumn />;
+};
+
+const EditableList = () => {
     const tagList = useTagList();
     const categoryList = useCategoryList();
     const groupList = useGroupList();
+    const isDebugMode = useAtomValue(debugModeAtom);
 
     return (
         <DataAccordions
-            exerciseList={exerciseList}
-            programList={programList}
-            dailyList={dailyList}
             tagList={tagList}
             categoryList={categoryList}
             groupList={groupList}
+            withActions
+            showIdColumn={isDebugMode}
         />
     );
 };
 
 const DataAccordions = ({
+    withActions,
     exerciseList,
     programList,
     dailyList,
     tagList,
     categoryList,
     groupList,
+    showIdColumn,
 }: {
-    exerciseList: Exercise[];
-    programList: Program[];
-    dailyList: Daily[];
-    tagList: Tag[];
-    categoryList: Category[];
-    groupList: Group[];
+    withActions?: boolean;
+    exerciseList?: Exercise[];
+    programList?: Program[];
+    dailyList?: Daily[];
+    tagList?: Tag[];
+    categoryList?: Category[];
+    groupList?: Group[];
+    showIdColumn?: boolean;
 }) => {
     return (
         <Accordion allowMultiple>
-            <AccordionItem>
-                <h2>
-                    <AccordionButton>
-                        <Box flex="1" textAlign="left" fontSize="md">
-                            Show exercise list ({exerciseList.length})
+            {exerciseList && (
+                <AccordionItem>
+                    <h2>
+                        <AccordionButton>
+                            <Box flex="1" textAlign="left" fontSize="md">
+                                Show exercise list ({exerciseList.length})
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                        <Box overflow="auto" maxH="600px">
+                            <DynamicTable
+                                columns={exerciseColumns}
+                                data={exerciseList}
+                                isHeaderSticky
+                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                            />
                         </Box>
-                        <AccordionIcon />
-                    </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                    <Box overflow="auto" maxH="600px">
-                        <DynamicTable columns={exerciseColumns} data={exerciseList} isHeaderSticky />
-                    </Box>
-                </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <h2>
-                    <AccordionButton>
-                        <Box flex="1" textAlign="left" fontSize="md">
-                            Show program list ({programList.length})
+                    </AccordionPanel>
+                </AccordionItem>
+            )}
+            {programList && (
+                <AccordionItem>
+                    <h2>
+                        <AccordionButton>
+                            <Box flex="1" textAlign="left" fontSize="md">
+                                Show program list ({programList.length})
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                        <Box overflow="auto" maxH="600px">
+                            <DynamicTable
+                                columns={programColumns}
+                                data={programList}
+                                isHeaderSticky
+                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                                getRowProps={(row) => ({ ...(row as any).getToggleRowExpandedProps() })}
+                                renderSubRow={({ row }) => (
+                                    <HFlex pb="4">
+                                        <Box>Exercise list:</Box>
+                                        <ProgramCardExerciseList program={row.original as Program} />
+                                    </HFlex>
+                                )}
+                            />
                         </Box>
-                        <AccordionIcon />
-                    </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                    <Box overflow="auto" maxH="600px">
-                        <DynamicTable
-                            columns={programColumns}
-                            data={programList}
-                            isHeaderSticky
-                            getRowProps={(row) => ({ ...row.getToggleRowExpandedProps() })}
-                            renderSubRow={({ row }) => (
-                                <HFlex pb="4">
-                                    <Box>Exercise list:</Box>
-                                    <ProgramCardExerciseList program={row.original} />
-                                </HFlex>
-                            )}
-                        />
-                    </Box>
-                </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <h2>
-                    <AccordionButton>
-                        <Box flex="1" textAlign="left" fontSize="md">
-                            Show daily list ({dailyList.length})
+                    </AccordionPanel>
+                </AccordionItem>
+            )}
+            {dailyList && (
+                <AccordionItem>
+                    <h2>
+                        <AccordionButton>
+                            <Box flex="1" textAlign="left" fontSize="md">
+                                Show daily list ({dailyList.length})
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                        <Box overflow="auto" maxH="600px">
+                            <DynamicTable
+                                columns={dailyColumns}
+                                data={dailyList}
+                                isHeaderSticky
+                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                                getRowProps={(row) => ({ ...(row as any).getToggleRowExpandedProps() })}
+                                renderSubRow={({ row }) => (
+                                    <HFlex pb="4">
+                                        <Box>Exercise list:</Box>
+                                        <ProgramCardExerciseList program={row.original as Program} />
+                                    </HFlex>
+                                )}
+                            />
                         </Box>
-                        <AccordionIcon />
-                    </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                    <Box overflow="auto" maxH="600px">
-                        <DynamicTable
-                            columns={dailyColumns}
-                            data={dailyList}
-                            isHeaderSticky
-                            getRowProps={(row) => ({ ...row.getToggleRowExpandedProps() })}
-                            renderSubRow={({ row }) => (
-                                <HFlex pb="4">
-                                    <Box>Exercise list:</Box>
-                                    <ProgramCardExerciseList program={row.original} />
-                                </HFlex>
-                            )}
-                        />
-                    </Box>
-                </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <h2>
-                    <AccordionButton>
-                        <Box flex="1" textAlign="left" fontSize="md">
-                            Show tag list ({tagList.length})
+                    </AccordionPanel>
+                </AccordionItem>
+            )}
+            {tagList && (
+                <AccordionItem>
+                    <h2>
+                        <AccordionButton>
+                            <Box flex="1" textAlign="left" fontSize="md">
+                                Show tag list ({tagList.length})
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                        <Box overflow="auto" maxH="600px">
+                            <DynamicTable
+                                columns={tagsColumns}
+                                data={tagList}
+                                isHeaderSticky
+                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                            />
                         </Box>
-                        <AccordionIcon />
-                    </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                    <Box overflow="auto" maxH="600px">
-                        <DynamicTable columns={tagsColumns} data={tagList} isHeaderSticky />
-                    </Box>
-                </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <h2>
-                    <AccordionButton>
-                        <Box flex="1" textAlign="left" fontSize="md">
-                            Show category list ({categoryList.length})
+                    </AccordionPanel>
+                    {withActions && (
+                        <Box px="4" py="2" w="100%">
+                            <PersistModal
+                                title="Add tag"
+                                formId="AddTagForm"
+                                renderTrigger={(onOpen) => (
+                                    <Button onClick={onOpen} w="100%" colorScheme="pink" variant="outline">
+                                        Add tag
+                                    </Button>
+                                )}
+                                renderBody={(onClose) => <AddTagForm onSuccess={onClose} />}
+                            />
                         </Box>
-                        <AccordionIcon />
-                    </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                    <Box overflow="auto" maxH="600px">
-                        <DynamicTable columns={categoryColumns} data={categoryList} isHeaderSticky />
-                    </Box>
-                </AccordionPanel>
-            </AccordionItem>
-            <AccordionItem>
-                <h2>
-                    <AccordionButton>
-                        <Box flex="1" textAlign="left" fontSize="md">
-                            Show group list ({groupList.length})
+                    )}
+                </AccordionItem>
+            )}
+            {categoryList && (
+                <AccordionItem>
+                    <h2>
+                        <AccordionButton>
+                            <Box flex="1" textAlign="left" fontSize="md">
+                                Show category list ({categoryList.length})
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                        <Box overflow="auto" maxH="600px">
+                            <DynamicTable
+                                columns={categoryColumns}
+                                data={categoryList}
+                                isHeaderSticky
+                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                            />
                         </Box>
-                        <AccordionIcon />
-                    </AccordionButton>
-                </h2>
-                <AccordionPanel pb={4}>
-                    <Box overflow="auto" maxH="600px">
-                        <DynamicTable columns={groupColumns} data={groupList} isHeaderSticky />
-                    </Box>
-                </AccordionPanel>
-            </AccordionItem>
+                    </AccordionPanel>
+                    {withActions && (
+                        <Box px="4" py="2" w="100%">
+                            <PersistModal
+                                title="Add category"
+                                formId="AddCategoryForm"
+                                renderTrigger={(onOpen) => (
+                                    <Button onClick={onOpen} w="100%" colorScheme="pink" variant="outline">
+                                        Add category
+                                    </Button>
+                                )}
+                                renderBody={(onClose) => <AddCategoryForm onSuccess={onClose} />}
+                            />
+                        </Box>
+                    )}
+                </AccordionItem>
+            )}
+            {groupList && (
+                <AccordionItem>
+                    <h2>
+                        <AccordionButton>
+                            <Box flex="1" textAlign="left" fontSize="md">
+                                Show group list ({groupList.length})
+                            </Box>
+                            <AccordionIcon />
+                        </AccordionButton>
+                    </h2>
+                    <AccordionPanel pb={4}>
+                        <Box overflow="auto" maxH="600px">
+                            <DynamicTable
+                                columns={groupColumns}
+                                data={groupList}
+                                isHeaderSticky
+                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                            />
+                        </Box>
+                    </AccordionPanel>
+                    {withActions && (
+                        <Box px="4" py="2" w="100%">
+                            <PersistModal
+                                title="Add group"
+                                formId="AddGroupForm"
+                                renderTrigger={(onOpen) => (
+                                    <Button onClick={onOpen} w="100%" colorScheme="pink" variant="outline">
+                                        Add group
+                                    </Button>
+                                )}
+                                renderBody={(onClose) => <AddGroupForm onSuccess={onClose} />}
+                            />
+                        </Box>
+                    )}
+                </AccordionItem>
+            )}
         </Accordion>
     );
+};
+
+const defaultTagValues: Tag = { id: "", name: "", groupId: "", color: "" };
+const TagForm = ({
+    defaultValues,
+    onSubmit,
+    formId,
+}: {
+    formId: string;
+    defaultValues?: Tag;
+    onSubmit: (values: typeof defaultTagValues) => void;
+}) => {
+    const form = useForm({ defaultValues: defaultValues || defaultTagValues });
+    const groupList = useGroupList();
+
+    const hasUpdatedManually = useRef(false);
+
+    return (
+        <Stack as="form" id={formId} onSubmit={form.handleSubmit(onSubmit)} spacing="2">
+            <TextInput
+                {...mergeProps(form.register("name", { required: requiredRule }), {
+                    onChange: defaultValues?.id
+                        ? undefined
+                        : (e) => void (!hasUpdatedManually.current && form.setValue("id", slugify(e.target.value))),
+                })}
+                label="Name *"
+                error={form.formState.errors.name}
+            />
+            <SelectInput
+                {...form.register("groupId", { required: requiredRule })}
+                label="Group *"
+                error={form.formState.errors.groupId}
+                defaultValue=""
+            >
+                <option value="" disabled hidden>
+                    Pick one
+                </option>
+                {groupList.map((group) => (
+                    <option key={group.id} value={group.id}>
+                        {group.name}
+                    </option>
+                ))}
+            </SelectInput>
+            <TextInput
+                {...form.register("id", { required: requiredRule })}
+                isDisabled={Boolean(defaultValues?.id)}
+                onChange={(e) => (hasUpdatedManually.current = true)}
+                label="Id"
+                error={form.formState.errors.id}
+                placeholder="Auto-generated unless overriden"
+                size="sm"
+            />
+        </Stack>
+    );
+};
+
+const AddTagForm = ({ onSuccess }: { onSuccess: () => void }) => {
+    const queryClient = useQueryClient();
+    const mutation = useMutation(
+        (values: typeof defaultTagValues) => {
+            return orm.tag.add(values);
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries(orm.tag.name);
+                toasts.success("Tag added");
+                onSuccess();
+            },
+        }
+    );
+
+    return <TagForm formId="AddTagForm" onSubmit={(values) => mutation.mutate(values)} />;
+};
+
+const defaultCategoryValues: Category = { id: "", name: "", tagList: [] };
+const CategoryForm = ({
+    defaultValues,
+    onSubmit,
+    formId,
+}: {
+    formId: string;
+    defaultValues?: Category;
+    onSubmit: (values: typeof defaultCategoryValues) => void;
+}) => {
+    const form = useForm({ defaultValues: defaultValues || defaultCategoryValues });
+    const tagList = useTagList();
+
+    const hasUpdatedManually = useRef(false);
+
+    return (
+        <Stack as="form" id={formId} onSubmit={form.handleSubmit(onSubmit)} spacing="2">
+            <TextInput
+                {...mergeProps(form.register("name", { required: requiredRule }), {
+                    onChange: defaultValues?.id
+                        ? undefined
+                        : (e) => void (!hasUpdatedManually.current && form.setValue("id", slugify(e.target.value))),
+                })}
+                label="Name *"
+                error={form.formState.errors.name}
+            />
+            <TagMultiSelect
+                control={form.control}
+                name="tagList"
+                rules={{ required: requiredRule }}
+                items={tagList}
+                error={(form.formState.errors.tagList as any)?.message}
+                defaultValue={form.getValues()?.tagList || []}
+            />
+            <TextInput
+                {...form.register("id", { required: requiredRule })}
+                isDisabled={Boolean(defaultValues?.id)}
+                onChange={(e) => (hasUpdatedManually.current = true)}
+                label="Id"
+                error={form.formState.errors.id}
+                placeholder="Auto-generated unless overriden"
+                size="sm"
+            />
+        </Stack>
+    );
+};
+
+const AddCategoryForm = ({ onSuccess }: { onSuccess: () => void }) => {
+    const queryClient = useQueryClient();
+    const mutation = useMutation(
+        (values: typeof defaultCategoryValues) => {
+            return orm.category.add({ ...values, tagList: values.tagList.map((tag) => tag.id) });
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries(orm.category.name);
+                toasts.success("Category added");
+                onSuccess();
+            },
+        }
+    );
+
+    return <CategoryForm formId="AddCategoryForm" onSubmit={(values) => mutation.mutate(values)} />;
+};
+
+const defaultGroupValues: Group = { id: "", name: "" };
+const GroupForm = ({
+    defaultValues,
+    onSubmit,
+    formId,
+}: {
+    formId: string;
+    defaultValues?: Group;
+    onSubmit: (values: typeof defaultGroupValues) => void;
+}) => {
+    const form = useForm({ defaultValues: defaultValues || defaultGroupValues });
+
+    const hasUpdatedManually = useRef(false);
+
+    return (
+        <Stack as="form" id={formId} onSubmit={form.handleSubmit(onSubmit)} spacing="2">
+            <TextInput
+                {...mergeProps(form.register("name", { required: requiredRule }), {
+                    onChange: defaultValues?.id
+                        ? undefined
+                        : (e) => void (!hasUpdatedManually.current && form.setValue("id", slugify(e.target.value))),
+                })}
+                label="Name *"
+                error={form.formState.errors.name}
+            />
+            <TextInput
+                {...form.register("id", { required: requiredRule })}
+                isDisabled={Boolean(defaultValues?.id)}
+                onChange={(e) => (hasUpdatedManually.current = true)}
+                label="Id"
+                error={form.formState.errors.id}
+                placeholder="Auto-generated unless overriden"
+                size="sm"
+            />
+        </Stack>
+    );
+};
+
+const AddGroupForm = ({ onSuccess }: { onSuccess: () => void }) => {
+    const queryClient = useQueryClient();
+    const mutation = useMutation(
+        (values: typeof defaultGroupValues) => {
+            return orm.group.add(values);
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries(orm.group.name);
+                toasts.success("Group added");
+                onSuccess();
+            },
+        }
+    );
+
+    return <GroupForm formId="AddGroupForm" onSubmit={(values) => mutation.mutate(values)} />;
 };
 
 const tagsColumns = [
     { Header: "id", accessor: "id" },
     { Header: "name", accessor: "name" },
     { Header: "group", accessor: "groupId" },
+    {
+        Header: "",
+        accessor: "__actions",
+        Cell: ({ row }) => {
+            const tag = row.original as Tag;
+
+            const queryClient = useQueryClient();
+            const deleteMutation = useMutation(async () => orm.tag.delete(tag.id), {
+                onSuccess: () => {
+                    queryClient.invalidateQueries(orm.tag.name);
+                    toasts.success(`Tag <${tag.name}> deleted !`);
+                },
+                onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+            });
+
+            const editMutation = useMutation(async (values: Tag) => orm.tag.put(values), {
+                onSuccess: () => {
+                    queryClient.invalidateQueries([orm.tag.name]);
+                    toasts.success(`Tag <${tag.name}> updated !`);
+                },
+                onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+            });
+
+            return (
+                <Menu strategy="absolute">
+                    <MenuButton as={DotsIconButton} />
+                    <MenuList>
+                        <PersistModal
+                            title="Edit tag"
+                            formId="EditTagForm"
+                            renderTrigger={(onOpen) => (
+                                <MenuItem icon={<EditIcon />} onClick={onOpen}>
+                                    Edit
+                                </MenuItem>
+                            )}
+                            renderBody={(onClose) => (
+                                <TagForm
+                                    formId="EditTagForm"
+                                    defaultValues={tag}
+                                    onSubmit={(values) => editMutation.mutate(values, { onSuccess: onClose })}
+                                />
+                            )}
+                        />
+                        {/* TODO handle cascade delete */}
+                        {false && (
+                            <ConfirmationButton
+                                renderTrigger={(onOpen) => (
+                                    <MenuItem icon={<DeleteIcon />} onClick={onOpen}>
+                                        Delete
+                                    </MenuItem>
+                                )}
+                                onConfirm={() => deleteMutation.mutate()}
+                            />
+                        )}
+                    </MenuList>
+                </Menu>
+            );
+        },
+    },
 ];
 
 const categoryColumns = [
     { Header: "id", accessor: "id" },
     { Header: "name", accessor: "name" },
     { Header: "tagList", accessor: "tagList", Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", ") },
+    {
+        Header: "",
+        accessor: "__actions",
+        Cell: ({ row }) => {
+            const category = row.original as Category;
+
+            const queryClient = useQueryClient();
+            const deleteMutation = useMutation(async () => orm.category.delete(category.id), {
+                onSuccess: () => {
+                    queryClient.invalidateQueries(orm.category.name);
+                    toasts.success(`Category <${category.name}> deleted !`);
+                },
+                onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+            });
+
+            const editMutation = useMutation(
+                async (values: Category) => orm.category.put({ ...values, tagList: values.tagList.map((t) => t.id) }),
+                {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries([orm.category.name]);
+                        toasts.success(`Category <${category.name}> updated !`);
+                    },
+                    onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+                }
+            );
+
+            return (
+                <Menu strategy="absolute">
+                    <MenuButton as={DotsIconButton} />
+                    <MenuList>
+                        <PersistModal
+                            title="Edit category"
+                            formId="EditCategoryForm"
+                            renderTrigger={(onOpen) => (
+                                <MenuItem icon={<EditIcon />} onClick={onOpen}>
+                                    Edit
+                                </MenuItem>
+                            )}
+                            renderBody={(onClose) => (
+                                <CategoryForm
+                                    formId="EditCategoryForm"
+                                    defaultValues={category}
+                                    onSubmit={(values) => editMutation.mutate(values, { onSuccess: onClose })}
+                                />
+                            )}
+                        />
+                        {/* TODO handle cascade delete */}
+                        {false && (
+                            <ConfirmationButton
+                                renderTrigger={(onOpen) => (
+                                    <MenuItem icon={<DeleteIcon />} onClick={onOpen}>
+                                        Delete
+                                    </MenuItem>
+                                )}
+                                onConfirm={() => deleteMutation.mutate()}
+                            />
+                        )}
+                    </MenuList>
+                </Menu>
+            );
+        },
+    },
 ];
 
 const groupColumns = [
     { Header: "id", accessor: "id" },
     { Header: "name", accessor: "name" },
+    {
+        Header: "",
+        accessor: "__actions",
+        Cell: ({ row }) => {
+            const group = row.original as Group;
+
+            const queryClient = useQueryClient();
+            const deleteMutation = useMutation(async () => orm.group.delete(group.id), {
+                onSuccess: () => {
+                    queryClient.invalidateQueries(orm.group.name);
+                    toasts.success(`Group <${group.name}> deleted !`);
+                },
+                onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+            });
+
+            const editMutation = useMutation(async (values: Group) => orm.group.put(values), {
+                onSuccess: () => {
+                    queryClient.invalidateQueries([orm.group.name]);
+                    toasts.success(`Group <${group.name}> updated !`);
+                },
+                onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+            });
+
+            return (
+                <Menu strategy="absolute">
+                    <MenuButton as={DotsIconButton} />
+                    <MenuList>
+                        <PersistModal
+                            title="Edit group"
+                            formId="EditGroupForm"
+                            renderTrigger={(onOpen) => (
+                                <MenuItem icon={<EditIcon />} onClick={onOpen}>
+                                    Edit
+                                </MenuItem>
+                            )}
+                            renderBody={(onClose) => (
+                                <GroupForm
+                                    formId="EditGroupForm"
+                                    defaultValues={group}
+                                    onSubmit={(values) => editMutation.mutate(values, { onSuccess: onClose })}
+                                />
+                            )}
+                        />
+                        {/* TODO handle cascade delete */}
+                        {false && (
+                            <ConfirmationButton
+                                renderTrigger={(onOpen) => (
+                                    <MenuItem icon={<DeleteIcon />} onClick={onOpen}>
+                                        Delete
+                                    </MenuItem>
+                                )}
+                                onConfirm={() => deleteMutation.mutate()}
+                            />
+                        )}
+                    </MenuList>
+                </Menu>
+            );
+        },
+    },
 ];
 
 const exerciseColumns = [

@@ -1,13 +1,12 @@
 import { MultiSelect, MultiSelectProps } from "@/components/MultiSelect";
 import { mergeProps } from "@/functions/mergeProps";
-import { useCategoryQuery } from "@/orm-hooks";
 import { Tag } from "@/orm-types";
 import { PickOptional } from "@/types";
 import { FormControl, FormErrorMessage, FormLabel, Text } from "@chakra-ui/react";
 import { Controller, ControllerProps } from "react-hook-form";
 
 export function TagMultiSelect({
-    catId,
+    items,
     error,
     name,
     control,
@@ -16,25 +15,14 @@ export function TagMultiSelect({
     rules,
     ...props
 }: Omit<ControllerProps<any>, "render"> & {
-    catId: string;
     error?: string;
     required?: boolean;
 } & Omit<
         MultiSelectProps<Tag, true>,
-        | "getValue"
-        | "itemToString"
-        | "groupByKeyGetter"
-        | "items"
-        | "label"
-        | "getButtonProps"
-        | "renderButtonText"
-        | "onChange"
+        "getValue" | "itemToString" | "groupByKeyGetter" | "label" | "getButtonProps" | "renderButtonText" | "onChange"
     > &
     PickOptional<MultiSelectProps<Tag, true>, "onChange">) {
     const isInvalid = Boolean(error);
-
-    const query = useCategoryQuery(catId);
-    const items = query.data?.tagList || [];
 
     return (
         <FormControl isInvalid={isInvalid}>

@@ -4,6 +4,7 @@ import { SwitchInput } from "@/components/SwitchInput";
 import { TextInput } from "@/components/TextInput";
 import { onError } from "@/functions/toasts";
 import { requiredRule } from "@/functions/utils";
+import { useCategoryQuery } from "@/orm-hooks";
 import { Exercise, Serie } from "@/orm-types";
 import { makeExercise, makeSerie } from "@/orm-utils";
 import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
@@ -69,6 +70,9 @@ export const CreateExerciseForm = ({
         return () => sub.unsubscribe();
     }, [onChange, form.watch]);
 
+    const query = useCategoryQuery(category);
+    const tagList = query.data?.tagList || [];
+
     return (
         <FormProvider {...form}>
             <Box
@@ -105,7 +109,7 @@ export const CreateExerciseForm = ({
                         control={form.control}
                         name="tags"
                         rules={{ required: requiredRule }}
-                        catId={category}
+                        items={tagList}
                         error={(form.formState.errors.tags as any)?.message}
                     />
                     <TextInput

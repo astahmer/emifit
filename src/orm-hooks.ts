@@ -13,7 +13,7 @@ import { getMostRecentsExerciseById } from "./orm-utils";
 import { currentDailyIdAtom } from "./store";
 
 export const useDailyQuery = (id: DailyWithReferences["id"]) => {
-    const query = useQuery(["daily", id], async () => {
+    const query = useQuery(["daily", "single", id], async () => {
         const daily = await orm.daily.find(id);
         if (!daily) return null;
 
@@ -34,14 +34,14 @@ export const useCurrentDailyInvalidate = () => {
     const id = useAtomValue(currentDailyIdAtom);
     const queryClient = useQueryClient();
 
-    return () => void queryClient.invalidateQueries(["daily", id]);
+    return () => void queryClient.invalidateQueries(["daily", "single", id]);
 };
 
 export const useDailyListQuery = <Index extends StoreIndex<"daily"> = undefined>(
     params: StoreQueryParams<"daily", Index> = {}
 ) => {
     const query = useQuery(
-        ["dailyList"],
+        ["daily", "list", params],
         async () => {
             const [list, exerciseList, tagList] = await Promise.all([
                 orm.daily.get(params),
@@ -72,7 +72,7 @@ export const useCategoryListQuery = <Index extends StoreIndex<"category"> = unde
     params: StoreQueryParams<"category", Index> = {}
 ) => {
     const query = useQuery(
-        ["categoryList"],
+        [orm.category.name, "list", params],
         async () => {
             const [list, tagList] = await Promise.all([orm.category.get(params), orm.tag.get()]);
             const tagListById = groupIn(tagList, "id");
@@ -91,7 +91,7 @@ export const useCategoryList = <Index extends StoreIndex<"category"> = undefined
 
 export const useCategoryQuery = (id: Category["id"]) => {
     const query = useQuery(
-        ["category", id],
+        [orm.category.name, "single", id],
         async () => {
             const [category, tagList] = await Promise.all([orm.category.find(id), orm.tag.get()]);
             const tagListById = groupIn(tagList, "id");
@@ -108,7 +108,7 @@ export const useGroupListQuery = <Index extends StoreIndex<"group"> = undefined>
     params: StoreQueryParams<"group", Index> = {}
 ) => {
     const query = useQuery(
-        ["groupList"],
+        [orm.group.name, "list", params],
         async () => {
             const list = await orm.group.get(params);
             return list;
@@ -127,7 +127,7 @@ export const useTagListQuery = <Index extends StoreIndex<"tag"> = undefined>(
     params: StoreQueryParams<"tag", Index> = {}
 ) => {
     const query = useQuery(
-        ["tagList"],
+        [orm.tag.name, "list", params],
         async () => {
             const list = await orm.tag.get(params);
             return list;

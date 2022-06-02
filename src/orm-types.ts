@@ -35,6 +35,7 @@ export interface Tag {
     id: string;
     name: string;
     groupId: Group["id"];
+    color?: string; // TODO
 }
 
 export interface Program {
