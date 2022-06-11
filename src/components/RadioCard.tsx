@@ -29,40 +29,32 @@ export const RadioCardButton = (props: ButtonProps) => (
     />
 );
 
-export const RadioCard = forwardRef(
-    (
-        {
-            children,
-            getButtonProps,
-            getLabelProps,
-            ...props
-        }: UseRadioProps &
-            WithChildren & {
-                getButtonProps?: (state: UseRadioReturn["state"]) => ButtonProps;
-                getLabelProps?: (state: UseRadioReturn["state"]) => HTMLChakraProps<"label">;
-            },
-        ref
-    ) => {
-        const { state, getInputProps, getCheckboxProps } = useRadio(props);
+export type RadioCardProps = UseRadioProps &
+    WithChildren & {
+        getButtonProps?: (state: UseRadioReturn["state"]) => ButtonProps;
+        getLabelProps?: (state: UseRadioReturn["state"]) => HTMLChakraProps<"label">;
+    };
 
-        return (
-            <Box {...(getLabelProps?.(state) as any)} as="label" ref={ref}>
-                <input {...getInputProps()} />
-                <RadioCardButton
-                    as="div"
-                    {...getCheckboxProps()}
-                    opacity="0.6"
-                    _checked={{ opacity: 1 }}
-                    _disabled={{ opacity: 0.3 }}
-                    variant={state.isChecked ? "solid" : "outline"}
-                    {...getButtonProps?.(state)}
-                >
-                    {children}
-                </RadioCardButton>
-            </Box>
-        );
-    }
-);
+export const RadioCard = forwardRef(({ children, getButtonProps, getLabelProps, ...props }: RadioCardProps, ref) => {
+    const { state, getInputProps, getCheckboxProps } = useRadio(props);
+
+    return (
+        <Box {...(getLabelProps?.(state) as any)} as="label" ref={ref}>
+            <input {...getInputProps()} />
+            <RadioCardButton
+                as="div"
+                {...getCheckboxProps()}
+                opacity="0.6"
+                _checked={{ opacity: 1 }}
+                _disabled={{ opacity: 0.3 }}
+                variant={state.isChecked ? "solid" : "outline"}
+                {...getButtonProps?.(state)}
+            >
+                {children}
+            </RadioCardButton>
+        </Box>
+    );
+});
 
 export function RadioCardPicker({ renderOptions, ...props }: RadioCardPickerProps) {
     const { getRootProps, getRadioProps } = useRadioGroup({ ...props, name: "category" });
