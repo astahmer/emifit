@@ -28,7 +28,7 @@ interface MultiSelectBaseProps<Item, IsMulti extends boolean = undefined> {
     items: Item[];
     onChange: (items: undefined extends Item ? Item[] : true extends IsMulti ? Item[] : Item) => void;
     label?: (getLabelProps: UseSelectReturnValue<Item>["getLabelProps"]) => ReactNode;
-    getValue?: (item: Item) => string | number;
+    getValue?: (item: Item) => string;
     getButtonProps?: () => ButtonProps;
     isMulti?: IsMulti;
     renderButton?: (props: {
@@ -38,9 +38,10 @@ interface MultiSelectBaseProps<Item, IsMulti extends boolean = undefined> {
     renderButtonText?: (selection: undefined extends Item ? Item[] : true extends IsMulti ? Item[] : Item) => ReactNode;
     renderList?: (props: ListComponentProps<IsMulti, Item> & { ListComponent: typeof ListComponent }) => ReactNode;
     isOpen?: boolean;
-    groupByKeyGetter?: (item: Item) => string | number;
+    groupByKeyGetter?: (item: Item) => string;
     defaultValue?: true extends IsMulti ? Item[] : Item;
     value?: true extends IsMulti ? Item[] : Item;
+    renderAfterOptionText?: (itemValue: string) => ReactNode;
 }
 
 export type MultiSelectProps<Item, IsMulti extends boolean = undefined> = MultiSelectBaseProps<Item, IsMulti> & {
@@ -66,6 +67,7 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
     groupByKeyGetter,
     defaultValue,
     value,
+    renderAfterOptionText,
 }: MultiSelectProps<Item, IsMulti>) {
     const [innerSelection, setSelection] = useState((value ?? defaultValue ?? (isMulti ? [] : null)) as any[]);
     const isControlled = isDefined(value);
@@ -139,6 +141,7 @@ function MultiSelectBase<IsMulti extends boolean, Item = any>({
         getItemProps,
         values,
         groups,
+        renderAfterOptionText,
     };
 
     return (
@@ -190,6 +193,7 @@ interface ListComponentProps<IsMulti extends boolean, Item = any>
     values: string[];
     groups: string[];
     itemsWithGroups: (Item | string)[];
+    renderAfterOptionText?: (item: Item | string) => ReactNode;
 }
 
 function ListComponent<IsMulti extends boolean, Item = any>({
@@ -206,6 +210,7 @@ function ListComponent<IsMulti extends boolean, Item = any>({
     values,
     groups,
     itemsWithGroups,
+    renderAfterOptionText,
 }: ListComponentProps<IsMulti, Item>) {
     const rows = rowVirtualizer.virtualItems;
 
@@ -261,6 +266,7 @@ function ListComponent<IsMulti extends boolean, Item = any>({
                             key={value}
                             cursor="pointer"
                             bg={itemIndex === highlightedIndex ? "twitter.100" : null}
+                            pos="relative"
                             {...getItemProps({
                                 item,
                                 index: itemIndex,
@@ -278,6 +284,7 @@ function ListComponent<IsMulti extends boolean, Item = any>({
                                 <Checkbox isChecked={values.includes(value)} value={value} pointerEvents="none" />
                             ) : null}
                             <Text>{label}</Text>
+                            {renderAfterOptionText ? renderAfterOptionText(value) : null}
                         </SelectListItem>
                     );
                 })}
