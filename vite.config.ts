@@ -1,7 +1,7 @@
 import react from "@vitejs/plugin-react";
 import jotaiDebugLabel from "jotai/babel/plugin-debug-label";
 import jotaiReactRefresh from "jotai/babel/plugin-react-refresh";
-import { defineConfig } from "vite";
+import { defineConfig, PluginOption } from "vite";
 import { ManifestOptions, VitePWA, VitePWAOptions } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import replace from "@rollup/plugin-replace";
@@ -71,8 +71,8 @@ export default defineConfig({
         // https://jotai.org/docs/guides/vite
         react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } }),
         VitePWA(pwaOptions),
-        replace(replaceOptions),
-        checker({ typescript: true }),
+        replace(replaceOptions) as PluginOption,
+        // checker({ typescript: true }),
     ],
     resolve: {
         alias: [
