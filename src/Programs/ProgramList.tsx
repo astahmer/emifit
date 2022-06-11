@@ -1,15 +1,17 @@
 import { orm } from "@/orm";
-import { useProgramList } from "@/orm-hooks";
 import { Box } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { EditableProgramCard, EditableProgramCardProps } from "./ProgramCard";
 import { ReorderItemBox } from "../components/ReorderItemBox";
+import { Program } from "@/orm-types";
 
-export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">) {
-    const programs = useProgramList();
-    const programIdList = useMemo(() => programs.map((p) => p.id), [programs]);
+export function ProgramList({
+    onEdit,
+    programList,
+}: Pick<EditableProgramCardProps, "onEdit"> & { programList: Program[] }) {
+    const programIdList = useMemo(() => programList.map((p) => p.id), [programList]);
     const [items, setItems] = useState(programIdList);
 
     // Keep items up to date with programIdList whenever a program is created/deleted
@@ -36,11 +38,11 @@ export function ProgramList({ onEdit }: Pick<EditableProgramCardProps, "onEdit">
             mb="6"
         >
             {items
-                .filter((id) => programs.some((p) => p.id === id))
+                .filter((id) => programList.some((p) => p.id === id))
                 .map((item) => (
                     <ReorderProgramCardItem
                         key={item}
-                        program={programs.find((p) => p.id === item)}
+                        program={programList.find((p) => p.id === item)}
                         onEdit={onEdit}
                         onAnimationComplete={() => mutation.mutate(items)}
                     />
