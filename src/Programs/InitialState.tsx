@@ -31,7 +31,6 @@ export function InitialState() {
                         getValue={(item) => item.id}
                         itemToString={(item) => item.name}
                         items={pickableCategoryList}
-                        // label={(getLabelProps) => <FormLabel {...getLabelProps()}>Tags</FormLabel>}
                         getButtonProps={() => ({ w: "100%" })}
                         renderButtonText={(selection) => (
                             <Text maxW="100%" textOverflow="ellipsis" overflow="hidden">

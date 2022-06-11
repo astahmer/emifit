@@ -2,6 +2,7 @@ import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
 import { DynamicTable } from "@/components/DynamicTable";
 import { HFlex } from "@/components/HFlex";
+import { MultiSelect } from "@/components/MultiSelect";
 import { SelectInput } from "@/components/SelectInput";
 import { SwitchInput } from "@/components/SwitchInput";
 import { TextInput } from "@/components/TextInput";
@@ -30,6 +31,7 @@ import {
     Button,
     chakra,
     Flex,
+    FormLabel,
     Heading,
     Icon,
     Menu,
@@ -37,10 +39,13 @@ import {
     MenuItem,
     MenuList,
     Stack,
+    Tag as ChakraTag,
+    Text,
 } from "@chakra-ui/react";
+import { getDiff } from "@pastable/core";
 import { useAtom, useAtomValue } from "jotai";
-import { useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { BiExport, BiImport } from "react-icons/bi";
 import { useMutation, useQueryClient } from "react-query";
 import { PersistModal } from "../components/PersistModal";
@@ -438,20 +443,40 @@ const DataAccordions = ({
     );
 };
 
-const defaultTagValues: Tag = { id: "", name: "", groupId: "", color: "" };
+type TagFormValues = Tag & {
+    categoryList: Category[];
+    addedCategoryList: Array<Category["id"]>;
+    removedCategoryList: Array<Category["id"]>;
+};
+const defaultTagValues: TagFormValues = {
+    id: "",
+    name: "",
+    groupId: "",
+    color: "",
+    categoryList: [],
+    addedCategoryList: [],
+    removedCategoryList: [],
+};
 const TagForm = ({
     defaultValues,
     onSubmit,
     formId,
 }: {
     formId: string;
-    defaultValues?: Tag;
-    onSubmit: (values: typeof defaultTagValues) => void;
+    defaultValues?: TagFormValues;
+    onSubmit: (values: TagFormValues) => void;
 }) => {
-    const form = useForm({ defaultValues: defaultValues || defaultTagValues });
+    const form = useForm({ defaultValues: (defaultValues as TagFormValues) || defaultTagValues });
     const groupList = useGroupList();
 
-    const hasUpdatedManually = useRef(false);
+    const hasUpdatedIdManually = useRef(false);
+    const [initialCategoryList] = useState(() => (defaultValues?.categoryList || []).map((c) => c.id));
+
+    const categoryList = useCategoryList();
+    const [addedCategoryList, removedCategoryList] = useWatch({
+        control: form.control,
+        name: ["addedCategoryList", "removedCategoryList"],
+    });
 
     return (
         <Stack as="form" id={formId} onSubmit={form.handleSubmit(onSubmit)} spacing="2">
@@ -459,7 +484,7 @@ const TagForm = ({
                 {...mergeProps(form.register("name", { required: requiredRule }), {
                     onChange: defaultValues?.id
                         ? undefined
-                        : (e) => void (!hasUpdatedManually.current && form.setValue("id", slugify(e.target.value))),
+                        : (e) => void (!hasUpdatedIdManually.current && form.setValue("id", slugify(e.target.value))),
                 })}
                 label="Name *"
                 error={form.formState.errors.name}
@@ -479,10 +504,61 @@ const TagForm = ({
                     </option>
                 ))}
             </SelectInput>
+            <Box mt="2">
+                <MultiSelect
+                    onChange={(items) => {
+                        form.setValue("categoryList", items);
+                        form.setValue(
+                            "addedCategoryList",
+                            getDiff(
+                                items.map((c) => c.id),
+                                initialCategoryList
+                            )
+                        );
+                        form.setValue(
+                            "removedCategoryList",
+                            getDiff(
+                                initialCategoryList,
+                                items.map((c) => c.id)
+                            )
+                        );
+                    }}
+                    isOpen
+                    defaultValue={defaultValues?.categoryList || []}
+                    getValue={(item) => item.id}
+                    itemToString={(item) => item.name}
+                    items={categoryList}
+                    label={(getLabelProps) => <FormLabel {...getLabelProps()}>Used in categories:</FormLabel>}
+                    getButtonProps={() => ({ w: "100%" })}
+                    renderAfterOptionText={(catId) => {
+                        if (addedCategoryList.includes(catId)) {
+                            return (
+                                <ChakraTag size="sm" variant="subtle" colorScheme="whatsapp" transform="scale(0.85)">
+                                    <Text>New !</Text>
+                                </ChakraTag>
+                            );
+                        }
+                        if (removedCategoryList.includes(catId)) {
+                            return (
+                                <ChakraTag size="sm" variant="subtle" colorScheme="red" transform="scale(0.85)">
+                                    <Text>Removed</Text>
+                                </ChakraTag>
+                            );
+                        }
+                    }}
+                    renderButtonText={(selection) => (
+                        <Text maxW="100%" textOverflow="ellipsis" overflow="hidden">
+                            {selection.length
+                                ? `(${selection.length}) ${selection.map((item) => item.name).join(", ")}`
+                                : "none"}
+                        </Text>
+                    )}
+                />
+            </Box>
             <TextInput
                 {...form.register("id", { required: requiredRule })}
                 isDisabled={Boolean(defaultValues?.id)}
-                onChange={(e) => (hasUpdatedManually.current = true)}
+                onChange={(e) => (hasUpdatedIdManually.current = true)}
                 label="Id"
                 error={form.formState.errors.id}
                 placeholder="Auto-generated unless overriden"
@@ -495,8 +571,17 @@ const TagForm = ({
 const AddTagForm = ({ onSuccess }: { onSuccess: () => void }) => {
     const queryClient = useQueryClient();
     const mutation = useMutation(
-        (values: typeof defaultTagValues) => {
-            return orm.tag.add(values);
+        (values: TagFormValues) => {
+            const { categoryList, addedCategoryList, removedCategoryList, ...tag } = values;
+            return Promise.all([
+                orm.tag.add(tag),
+                ...addedCategoryList.map((catId) => {
+                    orm.category.upsert(catId, (current) => ({
+                        ...current,
+                        tagList: current.tagList.concat(tag.id),
+                    }));
+                }),
+            ]);
         },
         {
             onSuccess: () => {
@@ -523,7 +608,7 @@ const CategoryForm = ({
     const form = useForm({ defaultValues: defaultValues || defaultCategoryValues });
     const tagList = useTagList();
 
-    const hasUpdatedManually = useRef(false);
+    const hasUpdatedIdManually = useRef(false);
 
     return (
         <Stack as="form" id={formId} onSubmit={form.handleSubmit(onSubmit)} spacing="2">
@@ -531,7 +616,7 @@ const CategoryForm = ({
                 {...mergeProps(form.register("name", { required: requiredRule }), {
                     onChange: defaultValues?.id
                         ? undefined
-                        : (e) => void (!hasUpdatedManually.current && form.setValue("id", slugify(e.target.value))),
+                        : (e) => void (!hasUpdatedIdManually.current && form.setValue("id", slugify(e.target.value))),
                 })}
                 label="Name *"
                 error={form.formState.errors.name}
@@ -547,7 +632,7 @@ const CategoryForm = ({
             <TextInput
                 {...form.register("id", { required: requiredRule })}
                 isDisabled={Boolean(defaultValues?.id)}
-                onChange={(e) => (hasUpdatedManually.current = true)}
+                onChange={(e) => (hasUpdatedIdManually.current = true)}
                 label="Id"
                 error={form.formState.errors.id}
                 placeholder="Auto-generated unless overriden"
@@ -587,7 +672,7 @@ const GroupForm = ({
 }) => {
     const form = useForm({ defaultValues: defaultValues || defaultGroupValues });
 
-    const hasUpdatedManually = useRef(false);
+    const hasUpdatedIdManually = useRef(false);
 
     return (
         <Stack as="form" id={formId} onSubmit={form.handleSubmit(onSubmit)} spacing="2">
@@ -595,7 +680,7 @@ const GroupForm = ({
                 {...mergeProps(form.register("name", { required: requiredRule }), {
                     onChange: defaultValues?.id
                         ? undefined
-                        : (e) => void (!hasUpdatedManually.current && form.setValue("id", slugify(e.target.value))),
+                        : (e) => void (!hasUpdatedIdManually.current && form.setValue("id", slugify(e.target.value))),
                 })}
                 label="Name *"
                 error={form.formState.errors.name}
@@ -603,7 +688,7 @@ const GroupForm = ({
             <TextInput
                 {...form.register("id", { required: requiredRule })}
                 isDisabled={Boolean(defaultValues?.id)}
-                onChange={(e) => (hasUpdatedManually.current = true)}
+                onChange={(e) => (hasUpdatedIdManually.current = true)}
                 label="Id"
                 error={form.formState.errors.id}
                 placeholder="Auto-generated unless overriden"
@@ -640,6 +725,9 @@ const tagsColumns = [
         accessor: "__actions",
         Cell: ({ row }) => {
             const tag = row.original as Tag;
+            const categoryList = useCategoryList().filter((category) =>
+                category.tagList.map((tag) => tag.id).includes(tag.id)
+            );
 
             const queryClient = useQueryClient();
             const deleteMutation = useMutation(async () => orm.tag.delete(tag.id), {
@@ -650,13 +738,33 @@ const tagsColumns = [
                 onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
             });
 
-            const editMutation = useMutation(async (values: Tag) => orm.tag.put(values), {
-                onSuccess: () => {
-                    queryClient.invalidateQueries([orm.tag.name]);
-                    toasts.success(`Tag <${tag.name}> updated !`);
+            const editMutation = useMutation(
+                async (values: TagFormValues) => {
+                    const { categoryList, addedCategoryList, removedCategoryList, ...tag } = values;
+                    return Promise.all([
+                        orm.tag.put(tag),
+                        ...addedCategoryList.map((catId) => {
+                            orm.category.upsert(catId, (current) => ({
+                                ...current,
+                                tagList: current.tagList.concat(tag.id),
+                            }));
+                        }),
+                        ...removedCategoryList.map((catId) => {
+                            orm.category.upsert(catId, (current) => ({
+                                ...current,
+                                tagList: current.tagList.filter((tagId) => tagId !== tag.id),
+                            }));
+                        }),
+                    ]);
                 },
-                onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
-            });
+                {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries([orm.tag.name]);
+                        toasts.success(`Tag <${tag.name}> updated !`);
+                    },
+                    onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+                }
+            );
 
             return (
                 <Menu strategy="absolute">
@@ -673,7 +781,12 @@ const tagsColumns = [
                             renderBody={(onClose) => (
                                 <TagForm
                                     formId="EditTagForm"
-                                    defaultValues={tag}
+                                    defaultValues={{
+                                        ...tag,
+                                        categoryList,
+                                        addedCategoryList: [],
+                                        removedCategoryList: [],
+                                    }}
                                     onSubmit={(values) => editMutation.mutate(values, { onSuccess: onClose })}
                                 />
                             )}
@@ -699,7 +812,11 @@ const tagsColumns = [
 const categoryColumns = [
     { Header: "id", accessor: "id" },
     { Header: "name", accessor: "name" },
-    { Header: "tagList", accessor: "tagList", Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", ") },
+    {
+        Header: "tagList",
+        accessor: "tagList",
+        Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", "),
+    },
     {
         Header: "",
         accessor: "__actions",
