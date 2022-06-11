@@ -179,15 +179,17 @@ export function useHasProgram<Index extends StoreIndex<"program"> = undefined>(
     );
 }
 
-export const useProgramReferenceListUnSorted = () =>
-    useQuery<ProgramWithReferences[]>([orm.program.name], () => orm.program.get());
+// export const useProgramReferenceListUnSorted = () =>
+//     useQuery<ProgramWithReferences[]>([orm.program.name], () => orm.program.get());
 
-export const useProgramQuery = () => {
+export const useProgramQuery = <Index extends StoreIndex<"program"> = undefined>(
+    params: StoreQueryParams<"program", Index> = {}
+) => {
     return useQuery<Program[]>(
-        [orm.program.name, "list"],
+        [orm.program.name, "list", params],
         async () => {
             const [programList, exerciseList, tagList, programListOrder] = await Promise.all([
-                orm.program.get(),
+                orm.program.get(params),
                 orm.exercise.get(),
                 orm.tag.get(),
                 orm.programListOrder.get(),
@@ -207,4 +209,6 @@ export const useProgramQuery = () => {
     );
 };
 
-export const useProgramList = () => useProgramQuery().data;
+export const useProgramList = <Index extends StoreIndex<"program"> = undefined>(
+    params: StoreQueryParams<"program", Index> = {}
+) => useProgramQuery(params).data;
