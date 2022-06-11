@@ -12,6 +12,7 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon, DeleteIcon, DragHandleIcon, 
 import {
     Badge,
     Box,
+    Button,
     chakra,
     Collapse,
     Icon,
@@ -33,6 +34,9 @@ import { useProgramForDailyMutation } from "./useProgramForDailyMutation";
 export type ProgramCardProps = { program: Program; headerRight?: () => ReactNode; defaultIsOpen?: boolean };
 export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCardProps) => {
     const { isOpen, onToggle } = useDisclosure({ defaultIsOpen });
+    const isDailyToday = useAtomValue(isDailyTodayAtom);
+    const daily = useCurrentDaily();
+    const programMutation = useProgramForDailyMutation();
 
     return (
         <HFlex w="100%" bgColor="white">
@@ -56,6 +60,17 @@ export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCard
             <Collapse in={isOpen} animateOpacity>
                 <Stack p="4" pl="2" w="100%" pos="relative">
                     <ProgramCardExerciseList program={program} />
+                    {isDailyToday && program.category === daily.category && (
+                        <ConfirmationButton
+                            onConfirm={() => programMutation.mutate(program)}
+                            colorScheme="whatsapp"
+                            renderTrigger={(onOpen) => (
+                                <Button leftIcon={<CheckIcon />} onClick={onOpen} variant="outline" colorScheme="pink">
+                                    Use program
+                                </Button>
+                            )}
+                        />
+                    )}
                 </Stack>
             </Collapse>
         </HFlex>
