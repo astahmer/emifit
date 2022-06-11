@@ -37,7 +37,7 @@ export const ExerciseAddPage = () => {
         },
         {
             onSuccess: (_, vars) => {
-                queryClient.invalidateQueries(orm.exercise.name);
+                queryClient.invalidateQueries([orm.exercise.name]);
                 invalidate();
                 navigate(routeMap.home);
                 toasts.success(`Exercise <${vars.name}> added !`);
@@ -68,7 +68,7 @@ export const ExerciseAddPage = () => {
         },
         {
             onSuccess: () => {
-                queryClient.invalidateQueries(orm.exercise.name);
+                queryClient.invalidateQueries([orm.exercise.name]);
                 invalidate();
                 navigate(routeMap.home);
             },

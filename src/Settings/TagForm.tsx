@@ -157,7 +157,7 @@ export const AddTagForm = ({ onSuccess }: { onSuccess: () => void }) => {
         },
         {
             onSuccess: () => {
-                queryClient.invalidateQueries(orm.tag.name);
+                queryClient.invalidateQueries([orm.tag.name]);
                 toasts.success("Tag added");
                 onSuccess();
             },

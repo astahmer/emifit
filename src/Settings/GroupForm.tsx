@@ -56,7 +56,7 @@ export const AddGroupForm = ({ onSuccess }: { onSuccess: () => void }) => {
         },
         {
             onSuccess: () => {
-                queryClient.invalidateQueries(orm.group.name);
+                queryClient.invalidateQueries([orm.group.name]);
                 toasts.success("Group added");
                 onSuccess();
             },

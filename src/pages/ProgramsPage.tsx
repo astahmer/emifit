@@ -64,7 +64,7 @@ export const ProgramsPage = () => {
                 navigate(routeMap.home);
                 confetti();
                 successToast(`Program <${ctx.programName}> ${isEditing ? "updated" : "created"}`);
-                queryClient.invalidateQueries(orm.program.name);
+                queryClient.invalidateQueries([orm.program.name]);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
         }

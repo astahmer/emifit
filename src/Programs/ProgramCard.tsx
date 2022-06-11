@@ -97,7 +97,7 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
     const queryClient = useQueryClient();
     const deleteMutation = useMutation(async (program: Program) => orm.program.delete(program.id), {
         onSuccess: () => {
-            queryClient.invalidateQueries(orm.program.name);
+            queryClient.invalidateQueries([orm.program.name]);
             successToast(`Program <${program.name}> deleted`);
         },
         onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
@@ -134,7 +134,7 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
         },
         {
             onSuccess: () => {
-                queryClient.invalidateQueries(orm.program.name);
+                queryClient.invalidateQueries([orm.program.name]);
                 successToast(`Program <${program.name}> cloned`);
             },
             onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),

@@ -255,7 +255,7 @@ const tagsColumns = [
             const queryClient = useQueryClient();
             const deleteMutation = useMutation(async () => orm.tag.delete(tag.id), {
                 onSuccess: () => {
-                    queryClient.invalidateQueries(orm.tag.name);
+                    queryClient.invalidateQueries([orm.tag.name]);
                     toasts.success(`Tag <${tag.name}> deleted !`);
                 },
                 onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
@@ -348,7 +348,7 @@ const categoryColumns = [
             const queryClient = useQueryClient();
             const deleteMutation = useMutation(async () => orm.category.delete(category.id), {
                 onSuccess: () => {
-                    queryClient.invalidateQueries(orm.category.name);
+                    queryClient.invalidateQueries([orm.category.name]);
                     toasts.success(`Category <${category.name}> deleted !`);
                 },
                 onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
@@ -414,7 +414,7 @@ const groupColumns = [
             const queryClient = useQueryClient();
             const deleteMutation = useMutation(async () => orm.group.delete(group.id), {
                 onSuccess: () => {
-                    queryClient.invalidateQueries(orm.group.name);
+                    queryClient.invalidateQueries([orm.group.name]);
                     toasts.success(`Group <${group.name}> deleted !`);
                 },
                 onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),

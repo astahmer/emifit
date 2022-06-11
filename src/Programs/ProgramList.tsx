@@ -24,7 +24,7 @@ export function ProgramList({
 
     const queryClient = useQueryClient();
     const mutation = useMutation((ordered: string[]) => orm.programListOrder.set(ordered), {
-        onSuccess: () => queryClient.invalidateQueries(orm.program.name),
+        onSuccess: () => queryClient.invalidateQueries([orm.program.name]),
     });
 
     return (

@@ -67,7 +67,7 @@ export const AddCategoryForm = ({ onSuccess }: { onSuccess: () => void }) => {
         },
         {
             onSuccess: () => {
-                queryClient.invalidateQueries(orm.category.name);
+                queryClient.invalidateQueries([orm.category.name]);
                 toasts.success("Category added");
                 onSuccess();
             },

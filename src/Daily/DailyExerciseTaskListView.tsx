@@ -224,7 +224,7 @@ const UseAsProgramButton = () => {
         {
             onSuccess: () => {
                 const programName = nameRef.current.value;
-                queryClient.invalidateQueries(orm.program.name);
+                queryClient.invalidateQueries([orm.program.name]);
                 toasts.success(`Program <${programName}> cloned`);
 
                 setShowProgramNameInput(false);
