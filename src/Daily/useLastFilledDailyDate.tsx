@@ -15,7 +15,7 @@ export const useLastFilledDailyDate = () => {
             // (x) < currentDate
             .openCursor(IDBKeyRange.upperBound(new Date(currentDate).getTime()), "prev");
 
-        let lastDate: Date | undefined;
+        let lastDate: Date | null = null;
         while (cursor) {
             if (cursor.value.date < currentDate && cursor.value.exerciseList.length) {
                 lastDate = cursor.value.date;
