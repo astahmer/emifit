@@ -98,7 +98,7 @@ export const useCategoryQuery = (id: Category["id"]) => {
 
             return computeCategoryFromReferences(category, tagListById);
         },
-        { initialData: null }
+        { enabled: Boolean(id), initialData: null }
     );
 
     return query;
@@ -144,10 +144,15 @@ export const useTagList = <Index extends StoreIndex<"tag"> = undefined>(params: 
 function useExerciseUnsorted<Index extends StoreIndex<"exercise"> = undefined>(
     params: StoreQueryParams<"exercise", Index> = {}
 ) {
+    const catQuery = useCategoryQuery(params.index === "by-category" ? (params.query as string) : undefined);
+    const canSeeEveryExercises = catQuery.data?.canSeeEveryExercises || false;
+
     return useQuery<Exercise[]>(
-        [orm.exercise.name, params],
+        [orm.exercise.name, params, { canSeeEveryExercises }],
         async () => {
-            const [list, tagList] = await Promise.all([orm.exercise.get(params), orm.tag.get()]);
+            const exerciseParams =
+                params.index === "by-category" ? (canSeeEveryExercises ? undefined : params) : params;
+            const [list, tagList] = await Promise.all([orm.exercise.get(exerciseParams), orm.tag.get()]);
             const tagListById = groupIn(tagList, "id");
             return list.map((exo) => computeExerciseFromReferences(exo, tagListById));
         },
@@ -158,7 +163,8 @@ function useExerciseUnsorted<Index extends StoreIndex<"exercise"> = undefined>(
 export function useExerciseList<Index extends StoreIndex<"exercise"> = undefined>(
     params: StoreQueryParams<"exercise", Index> = {}
 ) {
-    const list = useExerciseUnsorted(params).data || [];
+    const query = useExerciseUnsorted(params);
+    const list = query.data || [];
     const mostRecents = getMostRecentsExerciseById(list);
     return mostRecents;
 }

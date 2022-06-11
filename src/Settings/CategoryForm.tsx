@@ -1,3 +1,4 @@
+import { SwitchInput } from "@/components/SwitchInput";
 import { TextInput } from "@/components/TextInput";
 import { TagMultiSelect } from "@/Exercises/TagMultiSelect";
 import { mergeProps } from "@/functions/mergeProps";
@@ -6,7 +7,7 @@ import { requiredRule, slugify } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useTagList } from "@/orm-hooks";
 import { Category } from "@/orm-types";
-import { Stack } from "@chakra-ui/react";
+import { Box, Stack } from "@chakra-ui/react";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
@@ -46,6 +47,9 @@ export const CategoryForm = ({
                 error={(form.formState.errors.tagList as any)?.message}
                 defaultValue={form.getValues()?.tagList || []}
             />
+            <Box>
+                <SwitchInput my="4" {...form.register("canSeeEveryExercises")} label="Includes all exercises ?" />
+            </Box>
             <TextInput
                 {...form.register("id", { required: requiredRule })}
                 isDisabled={Boolean(defaultValues?.id)}

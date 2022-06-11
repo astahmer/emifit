@@ -3,7 +3,7 @@ import { DotsIconButton } from "@/components/DotsIconButton";
 import { DynamicTable } from "@/components/DynamicTable";
 import { HFlex } from "@/components/HFlex";
 import { onError, toasts } from "@/functions/toasts";
-import { orm } from "@/orm";
+import { orm, StoreQueryParams } from "@/orm";
 import { useCategoryList } from "@/orm-hooks";
 import { Category, Daily, Exercise, Group, Program, Tag } from "@/orm-types";
 import { ProgramCardExerciseList } from "@/Programs/ProgramCard";
@@ -357,8 +357,18 @@ const categoryColumns = [
             const editMutation = useMutation(
                 async (values: Category) => orm.category.put({ ...values, tagList: values.tagList.map((t) => t.id) }),
                 {
-                    onSuccess: () => {
-                        queryClient.invalidateQueries([orm.category.name]);
+                    onSuccess: async () => {
+                        await queryClient.invalidateQueries([orm.category.name]);
+                        await queryClient.invalidateQueries({
+                            predicate: (query) => {
+                                const params = query.queryKey[1] as StoreQueryParams<"exercise">;
+                                return (
+                                    query.queryKey[0] === orm.exercise.name &&
+                                    params?.index === "by-category" &&
+                                    params?.query === category.id
+                                );
+                            },
+                        });
                         toasts.success(`Category <${category.name}> updated !`);
                     },
                     onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),

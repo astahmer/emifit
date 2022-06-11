@@ -9,6 +9,7 @@ export interface Category {
     id: string;
     name: string;
     tagList: Tag[];
+    canSeeEveryExercises?: boolean;
 }
 
 export interface Exercise {
