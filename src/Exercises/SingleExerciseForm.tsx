@@ -6,7 +6,7 @@ import { Box, Button, Divider } from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { match } from "ts-pattern";
 import { useExerciseFormMachine } from "./ExerciseFormMachine";
-import { getRouteTypeFromPathname } from "./ExercisePageLayout";
+import { getRouteTypeFromPathname } from "../pages/ExercisePageLayout";
 
 export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => void | Promise<void> }) {
     const query = useCurrentDailyQuery();

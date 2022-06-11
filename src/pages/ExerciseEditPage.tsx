@@ -8,8 +8,8 @@ import { useInterpret } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "./ExerciseFormMachine";
-import { SingleExerciseForm } from "./SingleExerciseForm";
+import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
+import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
 
 export const ExerciseEditPage = () => {
     const params = useParams<{ dailyId: string; exoId: string }>();

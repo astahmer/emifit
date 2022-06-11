@@ -1,3 +1,4 @@
+import { SupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
@@ -6,8 +7,7 @@ import { useInterpret } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "./ExerciseFormMachine";
-import { SupersetForm } from "./SupersetForm";
+import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
 
 export const ExerciseSupersetEditPage = () => {
     const params = useParams<{ dailyId: string; supersetId: string }>();

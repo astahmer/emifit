@@ -1,5 +1,6 @@
 import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
 import { useCurrentDailyQuery } from "@/orm-hooks";
+import { getRouteTypeFromPathname } from "@/pages/ExercisePageLayout";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Heading, Stack } from "@chakra-ui/react";
 import { makeArrayOf } from "@pastable/core";
@@ -7,7 +8,6 @@ import { useSelector } from "@xstate/react";
 import { Fragment } from "react";
 import { match } from "ts-pattern";
 import { useExerciseFormMachine } from "./ExerciseFormMachine";
-import { getRouteTypeFromPathname } from "./ExercisePageLayout";
 
 export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void> }) {
     const query = useCurrentDailyQuery();

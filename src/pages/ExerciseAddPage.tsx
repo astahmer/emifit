@@ -11,9 +11,9 @@ import { Box } from "@chakra-ui/react";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
-import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "./ExerciseFormMachine";
-import { SingleExerciseForm } from "./SingleExerciseForm";
-import { SupersetForm } from "./SupersetForm";
+import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
+import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
+import { SupersetForm } from "@/Exercises/SupersetForm";
 
 export const ExerciseAddPage = () => {
     const query = useCurrentDailyQuery();
