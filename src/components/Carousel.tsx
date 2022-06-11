@@ -12,6 +12,7 @@ export function Carousel<T = any>({
     items,
     renderItems,
     config,
+    defaultIndex,
 }: {
     items: T[];
     renderItems: (props: {
@@ -20,6 +21,7 @@ export function Carousel<T = any>({
         isDragging: boolean;
     }) => ReactNode;
     config?: CarouselConfig;
+    defaultIndex?: number;
 }) {
     const parentRef = useRef<HTMLDivElement>();
     const initialPosRef = useRef<DOMRect>();
@@ -59,6 +61,10 @@ export function Carousel<T = any>({
     const [activeIndex, setActiveIndex] = useState(initialIndex);
     const [isDragging, setIsDragging] = useState(false);
 
+    // useLayoutEffect(() => {
+
+    // }, [])
+
     return (
         <MotionBox
             aria-label="carousel"
@@ -66,6 +72,21 @@ export function Carousel<T = any>({
                 if (!ref) return;
                 parentRef.current = ref;
                 initialPosRef.current = ref.getBoundingClientRect();
+
+                if (defaultIndex !== undefined) {
+                    const positions = [...itemRefMap.current.values()].map((el) => el.getBoundingClientRect().x);
+                    const itemWidths = [...itemRefMap.current.values()].map((el) => el.offsetWidth);
+
+                    const dimensions = {
+                        left: positions[0],
+                        right: positions[positions.length - 1] + itemWidths[positions.length - 1],
+                    };
+                    const carouselWidth = dimensions.left + dimensions.right;
+                    const carouselCenter = carouselWidth / 2;
+                    const offset = carouselCenter - itemWidths[defaultIndex] / 2;
+
+                    controls.start({ x: (positions[defaultIndex] - offset) * -1 });
+                }
             }}
             d="flex"
             drag="x"
@@ -78,7 +99,6 @@ export function Carousel<T = any>({
 
                 positionsRef.current = positions;
                 dragStartPositionRef.current = currentPos;
-                // setIsDragging(true);
             }}
             onDrag={(_e, info) => {
                 const closest = getClosest(info);
@@ -87,17 +107,9 @@ export function Carousel<T = any>({
             onDragEnd={(_e, info) => {
                 const closest = getClosest(info);
                 const positions = [...itemRefMap.current.values()].map((el) => el.getBoundingClientRect().x);
-                // const positions = positionsRef.current;
-
-                const rect = parentRef.current.getBoundingClientRect();
                 const itemWidths = [...itemRefMap.current.values()].map((el) => el.offsetWidth);
 
                 const dimensions = {
-                    parent: rect,
-                    parentRef,
-                    firstRef: itemRefMap.current.get(0),
-                    first: itemRefMap.current.get(0).getBoundingClientRect(),
-                    width: rect.width,
                     left: positions[0],
                     right: positions[positions.length - 1] + itemWidths[positions.length - 1],
                 };
@@ -137,8 +149,6 @@ export function Carousel<T = any>({
                 setTimeout(() => {
                     setIsDragging(false);
                 }, 100);
-
-                // positionsRef.current = undefined;
             }}
         >
             {renderItems({ itemRefMap: itemRefMap.current, isDragging, activeIndex })}
@@ -150,7 +160,7 @@ const defaultConfig = {
     multiplier: 0.3,
     transitionProps: { stiffness: 400, type: "spring", damping: 60, mass: 3 },
     spaceThreshold: 30,
-    useAvailableSpace: true,
+    useAvailableSpace: false,
 };
 interface CarouselConfig {
     multiplier?: number;

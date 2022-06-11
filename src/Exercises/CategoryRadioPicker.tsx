@@ -15,6 +15,7 @@ export const CategoryRadioPicker = ({
         <Stack direction="row" {...getRootProps()} textAlign="center" justifyContent="space-around" w="100%">
             <Carousel
                 items={options}
+                defaultIndex={props.defaultValue && options.findIndex((opt) => opt.id === props.defaultValue)}
                 renderItems={({ isDragging, activeIndex, itemRefMap }) => (
                     <Stack direction="row">
                         {options.map((option, index) => {
