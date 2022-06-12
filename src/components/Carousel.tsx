@@ -106,6 +106,10 @@ export function Carousel<T = any>({
                 positionsRef.current = positions;
                 dragStartPositionRef.current = currentPos;
                 isSwipingCarouselRef.current = true;
+
+                if (defaultIndex !== undefined) {
+                    animateToIndex(defaultIndex);
+                }
             }}
             onDrag={(_e, info) => {
                 const closest = getClosest(info);
