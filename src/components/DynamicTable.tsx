@@ -25,7 +25,7 @@ export function DynamicTable({
     renderSubRow,
     isHeaderSticky,
     getRowProps,
-    hiddenColumns,
+    hiddenColumns = [],
 }: DynamicTableProps) {
     const table = useTable(
         { columns, data, autoResetExpanded: false, defaultColumn, initialState: { hiddenColumns } } as TableOptions<
@@ -37,7 +37,9 @@ export function DynamicTable({
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, visibleColumns } = table;
 
     useEffect(() => {
-        table.setHiddenColumns(hiddenColumns);
+        if (hiddenColumns?.length) {
+            table.setHiddenColumns(hiddenColumns);
+        }
     }, [hiddenColumns]);
 
     return (
