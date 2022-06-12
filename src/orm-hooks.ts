@@ -142,7 +142,7 @@ export const useTagListQuery = <Index extends StoreIndex<"tag"> = undefined>(
 export const useTagList = <Index extends StoreIndex<"tag"> = undefined>(params: StoreQueryParams<"tag", Index> = {}) =>
     useTagListQuery(params).data;
 
-function useExerciseUnsorted<Index extends StoreIndex<"exercise"> = undefined>(
+export function useExerciseUnsortedList<Index extends StoreIndex<"exercise"> = undefined>(
     params: StoreQueryParams<"exercise", Index> = {}
 ) {
     const catQuery = useCategoryQuery(params.index === "by-category" ? (params.query as string) : undefined);
@@ -164,7 +164,7 @@ function useExerciseUnsorted<Index extends StoreIndex<"exercise"> = undefined>(
 export function useExerciseList<Index extends StoreIndex<"exercise"> = undefined>(
     params: StoreQueryParams<"exercise", Index> = {}
 ) {
-    const query = useExerciseUnsorted(params);
+    const query = useExerciseUnsortedList(params);
     const list = query.data || [];
     const mostRecents = getMostRecentsExerciseById(list);
     return mostRecents;
