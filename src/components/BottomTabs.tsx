@@ -20,7 +20,7 @@ export const BottomTabs = () => {
     const hasCreatedTodaysDaily = Boolean(todaysDaily.data?.id);
     const addExerciseLink = `/daily/entry/${printDailyDate(new Date())}${hasCreatedTodaysDaily ? `/exercise/add` : ""}`;
 
-    const defaultIndex = getDefaultTabIndex(location.pathname);
+    const index = getDefaultTabIndex(location.pathname);
 
     return (
         <>
@@ -31,7 +31,7 @@ export const BottomTabs = () => {
                 borderTop="1px solid"
                 borderTopColor="gray.300"
                 bgColor="gray.50"
-                defaultIndex={defaultIndex}
+                index={index}
             >
                 <TabList>
                     <Tab as={ReactLink} to="/" w="100%" h="58px">
@@ -106,4 +106,4 @@ const getDefaultTabIndex = (pathname: string) =>
             (path) => path.startsWith("/settings"),
             () => 4
         )
-        .run();
+        .otherwise(() => -1);
