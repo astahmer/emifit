@@ -1,7 +1,7 @@
 import { Box, BoxProps, ChakraComponent } from "@chakra-ui/react";
 import { getClosestNbIn } from "@pastable/core";
 import { ForwardRefComponent, HTMLMotionProps, motion, PanInfo, useAnimation, useMotionValue } from "framer-motion";
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useLayoutEffect, useRef, useState } from "react";
 
 const MotionBox = motion<BoxProps>(Box) as ChakraComponent<
     ForwardRefComponent<HTMLDivElement, HTMLMotionProps<"div">>,
@@ -12,6 +12,7 @@ export function Carousel<T = any>({
     items,
     renderItems,
     config,
+    controlledIndex,
     defaultIndex,
 }: {
     items: T[];
@@ -21,6 +22,7 @@ export function Carousel<T = any>({
         isDragging: boolean;
     }) => ReactNode;
     config?: CarouselConfig;
+    controlledIndex?: number;
     defaultIndex?: number;
 }) {
     const parentRef = useRef<HTMLDivElement>();
@@ -61,19 +63,7 @@ export function Carousel<T = any>({
     const [activeIndex, setActiveIndex] = useState(initialIndex);
     const [isDragging, setIsDragging] = useState(false);
 
-    // useLayoutEffect(() => {
-
-    // }, [])
-
-    return (
-        <MotionBox
-            aria-label="carousel"
-            ref={(ref) => {
-                if (!ref) return;
-                parentRef.current = ref;
-                initialPosRef.current = ref.getBoundingClientRect();
-
-                if (defaultIndex !== undefined) {
+    const animateToIndex = (index: number) => {
                     const positions = [...itemRefMap.current.values()].map((el) => el.getBoundingClientRect().x);
                     const itemWidths = [...itemRefMap.current.values()].map((el) => el.offsetWidth);
 
@@ -83,10 +73,26 @@ export function Carousel<T = any>({
                     };
                     const carouselWidth = dimensions.left + dimensions.right;
                     const carouselCenter = carouselWidth / 2;
-                    const offset = carouselCenter - itemWidths[defaultIndex] / 2;
+        const offset = carouselCenter - itemWidths[index] / 2;
 
-                    controls.start({ x: (positions[defaultIndex] - offset) * -1 });
+        controls.start({ x: (positions[index] - offset) * -1, transition: mergedConfig.transitionProps });
+    };
+
+    useLayoutEffect(() => {
+        console.log(controlledIndex, defaultIndex);
+        if (controlledIndex !== undefined) {
+            animateToIndex(controlledIndex);
                 }
+    }, [controlledIndex]);
+
+    return (
+        <MotionBox
+            aria-label="carousel"
+            className="SwipableElement"
+            ref={(ref) => {
+                if (!ref) return;
+                parentRef.current = ref;
+                initialPosRef.current = ref.getBoundingClientRect();
             }}
             d="flex"
             drag="x"

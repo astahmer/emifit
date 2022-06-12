@@ -53,7 +53,7 @@ export const WithDaily = () => {
     return (
         <>
             <CategoryRadioPicker
-                defaultValue={daily.category}
+                value={daily.category}
                 onChange={updateDailyCategory.mutate}
                 isDisabled={!isDailyToday || hasAtLeastOneExercise}
             />
