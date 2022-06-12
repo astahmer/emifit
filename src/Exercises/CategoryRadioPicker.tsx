@@ -48,7 +48,7 @@ export const CategoryRadioPicker = ({
                                         };
                                     }}
                                 >
-                                    {value}
+                                    {option.name}
                                 </RadioCard>
                             );
                         })}
