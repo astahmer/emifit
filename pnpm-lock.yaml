@@ -18,6 +18,7 @@ specifiers:
   axios: ^0.25.0
   browser-fs-access: ^0.25.3
   canvas-confetti: ^1.5.1
+  chakra-color-picker: ^0.0.6
   click-to-react-component: ^1.0.8
   date-fns: ^2.28.0
   dotenv: ^16.0.1
@@ -65,6 +66,7 @@ dependencies:
   '@xstate/react': 2.0.1_77a8c849dc909c63ef04927ff04f529b
   browser-fs-access: 0.25.3
   canvas-confetti: 1.5.1
+  chakra-color-picker: 0.0.6_3556ecb74c5fb731ff4e56af74e743e0
   click-to-react-component: 1.0.8_569957a51d469c962fcce166a59b9f78
   date-fns: 2.28.0
   downshift: 6.1.7_react@17.0.2
@@ -2922,6 +2924,17 @@ packages:
 
   /canvas-confetti/1.5.1:
     resolution: {integrity: sha512-Ncz+oZJP6OvY7ti4E1slxVlyAV/3g7H7oQtcCDXgwGgARxPnwYY9PW5Oe+I8uvspYNtuHviAdgA0LfcKFWJfpg==}
+    dev: false
+
+  /chakra-color-picker/0.0.6_3556ecb74c5fb731ff4e56af74e743e0:
+    resolution: {integrity: sha512-QQ/PWjeOiBICWgbs5Bc30LURaxKM1rsVVZ9h9JdE7W7dkyzmCf+rquaIqSlNsKCSyphMpqL31QTQjKS/Ap38vQ==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      '@chakra-ui/react': '>=1.6.5'
+      react: '>=16'
+    dependencies:
+      '@chakra-ui/react': 1.8.8_4545b83a0fb49b554924721d24bf4083
+      react: 17.0.2
     dev: false
 
   /chalk/2.4.2:

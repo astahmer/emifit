@@ -21,6 +21,7 @@
         "@xstate/react": "^2.0.1",
         "browser-fs-access": "^0.25.3",
         "canvas-confetti": "^1.5.1",
+        "chakra-color-picker": "^0.0.6",
         "click-to-react-component": "^1.0.8",
         "date-fns": "^2.28.0",
         "downshift": "^6.1.7",

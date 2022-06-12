@@ -8,7 +8,8 @@ export const CategoryRadioPicker = ({
     isOptionDisabled,
     ...props
 }: { isOptionDisabled?: (option: Category) => boolean } & Omit<RadioCardPickerProps, "renderOptions">) => {
-    const { getRootProps, getRadioProps } = useRadioGroup({ ...props, name: "category" });
+    const radioGroup = useRadioGroup({ ...props, name: "category" });
+    const { getRootProps, getRadioProps } = radioGroup;
     const options = useCategoryList();
 
     return (
@@ -28,15 +29,24 @@ export const CategoryRadioPicker = ({
                                     {...radio}
                                     isDisabled={radio.disabled || isOptionDisabled?.(option) || props.isDisabled}
                                     ref={(ref) => itemRefMap.set(index, ref)}
-                                    getButtonProps={() => ({
-                                        mx: "1",
-                                        style: {
-                                            transform: isDragging
-                                                ? `scale(${activeIndex === index ? 1.2 : 1})`
-                                                : undefined,
-                                            opacity: isDragging && activeIndex === index ? 1 : undefined,
-                                        },
-                                    })}
+                                    getButtonProps={() => {
+                                        return {
+                                            mx: "1",
+                                            ...(radio.isChecked && {
+                                                bgColor: option.color,
+                                                borderColor: option.color,
+                                                _focus: { bgColor: option.color, borderColor: option.color },
+                                                _active: { bgColor: option.color, borderColor: option.color },
+                                                _hover: { bgColor: option.color, borderColor: option.color },
+                                            }),
+                                            style: {
+                                                transform: isDragging
+                                                    ? `scale(${activeIndex === index ? 1.2 : 1})`
+                                                    : undefined,
+                                                opacity: isDragging && activeIndex === index ? 1 : undefined,
+                                            },
+                                        };
+                                    }}
                                 >
                                     {value}
                                 </RadioCard>

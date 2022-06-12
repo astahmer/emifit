@@ -11,8 +11,9 @@ import { Box, Stack } from "@chakra-ui/react";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
+import { ColorPicker } from "chakra-color-picker";
 
-const defaultCategoryValues: Category = { id: "", name: "", tagList: [] };
+const defaultCategoryValues: Category = { id: "", name: "", tagList: [], color: "" };
 
 export const CategoryForm = ({
     defaultValues,
@@ -47,9 +48,11 @@ export const CategoryForm = ({
                 error={(form.formState.errors.tagList as any)?.message}
                 defaultValue={form.getValues()?.tagList || []}
             />
+            <ColorPicker defaultColor="pink.300" onChange={(color) => form.setValue("color", color)} />
             <Box>
                 <SwitchInput my="4" {...form.register("canSeeEveryExercises")} label="Includes all exercises ?" />
             </Box>
+            {/* https://themera.vercel.app/ */}
             <TextInput
                 {...form.register("id", { required: requiredRule })}
                 isDisabled={Boolean(defaultValues?.id)}

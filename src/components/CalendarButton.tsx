@@ -1,5 +1,6 @@
 import { printDate } from "@/functions/utils";
-import { useDailyList } from "@/orm-hooks";
+import { useCategoryList, useCategoryQuery, useDailyList } from "@/orm-hooks";
+import { Category, Daily } from "@/orm-types";
 import { isDailyTodayAtom } from "@/store";
 import {
     Box,
@@ -9,6 +10,7 @@ import {
     PopoverBody,
     PopoverContent,
     PopoverTrigger,
+    Text,
     useDisclosure,
     useOutsideClick,
 } from "@chakra-ui/react";
@@ -47,7 +49,7 @@ export const CalendarButton = ({
 
     const isDailyToday = useAtomValue(isDailyTodayAtom);
     const dailyList = useDailyList();
-    const dailyIdList = dailyList.map((daily) => daily.id);
+    const categoryList = useCategoryList();
 
     return (
         <Popover placement="auto-start" isOpen={isOpen} onClose={onClose} isLazy>
@@ -93,17 +95,13 @@ export const CalendarButton = ({
                                             ? "filled"
                                             : args.variant
                                     }
-                                    render={(args) =>
-                                        dailyList.find((d) => d.id === printDate(args.day))?.exerciseList?.length ? (
-                                            <Box d="flex" flexDirection="column" alignItems="center">
-                                                <div>{format(args.day, "d")}</div>
-                                                <Circle size="4px" bgColor="pink.300" />
-                                                {/* <Box w="100%" h="2px" bgColor="pink.300" /> */}
-                                            </Box>
-                                        ) : (
-                                            format(args.day, "d")
-                                        )
-                                    }
+                                    render={(day) => (
+                                        <DailyCalendarDay
+                                            day={day.day}
+                                            dailyList={dailyList}
+                                            categoryList={categoryList}
+                                        />
+                                    )}
                                 />
                             </CalendarMonth>
                         </CalendarMonths>
@@ -113,3 +111,20 @@ export const CalendarButton = ({
         </Popover>
     );
 };
+
+function DailyCalendarDay({ day, dailyList }: { day: CalendarDate; dailyList: Daily[]; categoryList: Category[] }) {
+    const daily = dailyList.find((d) => d.id === printDate(day));
+    const hasSomeExerciseThatDay = daily?.exerciseList?.length;
+
+    const catQuery = useCategoryQuery(daily?.category);
+    const bgColor = catQuery?.data?.color || "pink.300";
+
+    if (!hasSomeExerciseThatDay) return <>{format(day, "d")}</>;
+
+    return (
+        <Box d="flex" flexDirection="column" alignItems="center">
+            <Text color={bgColor}>{format(day, "d")}</Text>
+            <Circle size="4px" bgColor={bgColor} />
+        </Box>
+    );
+}

@@ -16,10 +16,12 @@ import {
     AccordionPanel,
     Box,
     Button,
+    Flex,
     Menu,
     MenuButton,
     MenuItem,
     MenuList,
+    Text,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "react-query";
 import { PersistModal } from "../components/PersistModal";
@@ -333,7 +335,24 @@ const tagsColumns = [
 ];
 const categoryColumns = [
     { Header: "id", accessor: "id" },
-    { Header: "name", accessor: "name" },
+    {
+        Header: "name",
+        accessor: "name",
+        Cell: (props) => (
+            <Flex alignItems="center">
+                <Box
+                    mr="2"
+                    borderRadius="md"
+                    h="10px"
+                    w="10px"
+                    p={0}
+                    minW="10px"
+                    bg={props.row.original.color || "pink.300"}
+                />
+                <Text>{props.value}</Text>
+            </Flex>
+        ),
+    },
     {
         Header: "tagList",
         accessor: "tagList",
