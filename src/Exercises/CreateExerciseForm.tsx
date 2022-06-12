@@ -113,18 +113,30 @@ export const CreateExerciseForm = ({
                         error={(form.formState.errors.tags as any)?.message}
                     />
                     <TextInput
-                        {...form.register("nbSeries", { valueAsNumber: true })}
-                        min={1}
-                        max={10}
                         label="Nb of series"
-                        type="number"
-                        inputMode="decimal"
                         error={form.formState.errors.nbSeries}
-                        onWheel={() => {
-                            if ((document.activeElement as HTMLInputElement).type === "number") {
-                                (document.activeElement as HTMLInputElement).blur();
-                            }
-                        }}
+                        render={() => (
+                            <MobileNumberInput
+                                {...form.register("nbSeries")}
+                                onChange={(_, value) => {
+                                    form.setValue("nbSeries", value);
+                                }}
+                                type="number"
+                                inputMode="decimal"
+                                min={1}
+                                max={20}
+                                isRequired
+                                inputProps={{
+                                    min: 1,
+                                    max: 20,
+                                    onWheel: () => {
+                                        if ((document.activeElement as HTMLInputElement).type === "number") {
+                                            (document.activeElement as HTMLInputElement).blur();
+                                        }
+                                    },
+                                }}
+                            />
+                        )}
                     />
                     <div>
                         <Divider my="4" />
