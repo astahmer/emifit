@@ -103,7 +103,7 @@ export function computeExerciseFromExoId(
 ) {
     return (id: Exercise["id"]): Exercise => {
         const exo = exerciseListById[id];
-        return { ...exo, tags: exo.tags.map((id) => tagListById[id]) };
+        return { ...exo, tags: exo.tags.map((id) => tagListById[id]).filter(Boolean) };
     };
 }
 export const computeExerciseFromReferences = (
@@ -111,7 +111,7 @@ export const computeExerciseFromReferences = (
     tagListById: Record<string, Tag>
 ): Exercise => ({
     ...exo,
-    tags: exo.tags.map((id) => tagListById[id]),
+    tags: exo.tags.map((id) => tagListById[id]).filter(Boolean),
 });
 
 export const computeCategoryFromReferences = (
@@ -119,5 +119,5 @@ export const computeCategoryFromReferences = (
     tagListById: Record<string, Tag>
 ): Category => ({
     ...cat,
-    tagList: cat.tagList.map((id) => tagListById[id]),
+    tagList: cat.tagList.map((id) => tagListById[id]).filter(Boolean),
 });
