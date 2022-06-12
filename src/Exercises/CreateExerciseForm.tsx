@@ -249,16 +249,26 @@ const SeriesForm = ({
             ) : null}
             <Stack direction="row">
                 <TextInput
-                    {...form.register(`series.${index}.kg`, { valueAsNumber: true })}
+                    {...form.register(`series.${index}.kg`, {
+                        valueAsNumber: true,
+                        onChange: (e) => {
+                            const rawValue = e.target.value;
+                            const value = [".", ","].some((sep) => rawValue.endsWith(sep))
+                                ? parseFloat(rawValue.slice(0, rawValue.length - 1))
+                                : e.target.valueAsNumber;
+                            if (isNaN(value)) {
+                                return;
+                            }
+                            form.setValue(`series.${index}.kg`, value || 0);
+                        },
+                    })}
                     type="number"
                     inputMode="decimal"
                     defaultValue={serie.kg}
                     min={1}
                     max={800}
+                    step={0.25}
                     label="kgs"
-                    onChange={(e) => {
-                        form.setValue(`series.${index}.kg`, e.target.valueAsNumber);
-                    }}
                     isRequired
                 />
                 <TextInput
