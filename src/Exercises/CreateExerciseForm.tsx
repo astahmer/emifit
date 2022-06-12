@@ -252,10 +252,15 @@ const SeriesForm = ({
                     {...form.register(`series.${index}.kg`, {
                         valueAsNumber: true,
                         onChange: (e) => {
+                            if (e.nativeEvent.inputType === "deleteContentBackward") {
+                                return;
+                            }
+
                             const rawValue = e.target.value;
                             const value = [".", ","].some((sep) => rawValue.endsWith(sep))
-                                ? parseFloat(rawValue.slice(0, rawValue.length - 1))
+                                ? parseFloat(rawValue.slice(0, rawValue.length - 1) + ".5")
                                 : e.target.valueAsNumber;
+
                             if (isNaN(value)) {
                                 return;
                             }
