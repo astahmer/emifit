@@ -53,19 +53,25 @@ export const ExportImportData = () => {
                 orm.db.clear(orm.daily.name),
                 orm.db.clear(orm.exercise.name),
                 orm.db.clear(orm.program.name),
+                orm.db.clear(orm.tag.name),
+                orm.db.clear(orm.category.name),
             ]);
 
             const tx = orm.db.transaction(orm.db.objectStoreNames, "readwrite");
             await runMigrations(orm.db, snapshot.version, orm.version, tx, async () => {
+                const categoryStore = tx.objectStore(orm.category.name);
+                const tagStore = tx.objectStore(orm.tag.name);
                 const exoStore = tx.objectStore(orm.exercise.name);
                 const dailyStore = tx.objectStore(orm.daily.name);
                 const programStore = tx.objectStore(orm.program.name);
 
+                const tagList = snapshot.tagList.map((tag) => tagStore.add(tag));
+                const categoryList = snapshot.categoryList.map((category) => categoryStore.add(category));
                 const exerciseList = snapshot.exerciseList.map((exo) => exoStore.add(exo));
                 const dailyList = snapshot.dailyList.map((daily) => dailyStore.add(daily));
                 const programList = snapshot.programList.map((program) => programStore.add(program));
                 // TODO programListOrder
-                await Promise.all([...exerciseList, ...dailyList, ...programList]);
+                await Promise.all([...tagList, ...categoryList, ...exerciseList, ...dailyList, ...programList]);
             });
             await tx.done;
         },

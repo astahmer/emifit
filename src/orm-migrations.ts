@@ -171,6 +171,7 @@ export const runMigrations: (
     }
 
     if (oldVersion === newVersion) await run();
+    else if (!isVersionChange) await run();
 
     console.log("done migrating");
 };
