@@ -5,6 +5,7 @@ import { defineConfig, PluginOption } from "vite";
 import { ManifestOptions, VitePWA, VitePWAOptions } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import replace from "@rollup/plugin-replace";
+import { qrcode } from "vite-plugin-qrcode";
 
 const replaceOptions = { __DATE__: new Date().toISOString() };
 const pwaOptions: Partial<VitePWAOptions> = {
@@ -73,6 +74,7 @@ export default defineConfig({
         VitePWA(pwaOptions),
         replace(replaceOptions) as PluginOption,
         // checker({ typescript: true }),
+        qrcode(),
     ],
     resolve: {
         alias: [
