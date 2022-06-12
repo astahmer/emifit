@@ -32,6 +32,7 @@ export const ExportImportData = () => {
     const loadMutation = useMutation(
         async () => {
             const imported = await loadFromJSON<ExportedData>();
+            console.log(imported);
             snapshotRef.current = imported;
             return computeSnapshotFromExport(imported);
         },
@@ -78,6 +79,7 @@ export const ExportImportData = () => {
     );
 
     const isDebugMode = useAtomValue(debugModeAtom);
+    loadMutation.data && console.log(loadMutation.data);
 
     return (
         <Stack>
