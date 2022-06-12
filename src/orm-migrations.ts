@@ -119,7 +119,7 @@ export const runMigrations: (
         migrationVersion++;
     }
 
-    if (migrationVersion >= 25 && isVersionChange) {
+    if (migrationVersion === 25 && isVersionChange) {
         await run();
 
         const group = db.createObjectStore("group", { keyPath: "id" });
