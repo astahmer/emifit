@@ -1,6 +1,7 @@
 import {
     Box,
     Button,
+    ButtonGroup,
     chakra,
     Divider,
     Flex,
@@ -12,7 +13,7 @@ import {
     useDisclosure,
     UseDisclosureReturn,
 } from "@chakra-ui/react";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { ErrorBoundary } from "react-error-boundary";
 import { useHotkeys } from "react-hotkeys-hook";
 import { ReactQueryDevtools } from "react-query/devtools";
@@ -20,7 +21,7 @@ import { Outlet } from "react-router-dom";
 import { BottomTabs } from "./components/BottomTabs";
 import { ErrorFallback } from "./components/ErrorFallback";
 import { DevTools } from "./DevTools";
-import { debugModeAtom, isSwipingCarouselRef } from "./store";
+import { currentDateAtom, debugModeAtom, isDailyTodayAtom, isSwipingCarouselRef } from "./store";
 
 import {
     Drawer,
@@ -37,10 +38,15 @@ import { IoHome, IoLibraryOutline, IoListSharp } from "react-icons/io5";
 import { AiFillHome } from "react-icons/ai";
 import { GiProgression } from "react-icons/gi";
 import { FiSettings } from "react-icons/fi";
-import { Link as ReactLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useCurrentDaily, useCurrentDailyCategory } from "./orm-hooks";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { createContextWithHook } from "./functions/createContextWithHook";
+import { GoBackToTodayEntryButton } from "./Daily/GoBackToTodayEntryButton";
+import { printDailyDate } from "./orm-utils";
+import { match } from "ts-pattern";
+import { GoToClosestPreviousDailyEntryButton } from "./Daily/GoToClosestPreviousDailyEntryButton";
+import { useLastFilledDailyDate } from "./Daily/useLastFilledDailyDate";
 
 export const Layout = () => {
     const setDebugMode = useSetAtom(debugModeAtom);
@@ -90,6 +96,9 @@ export const Layout = () => {
                             <DrawerBody>
                                 <SidebarContent />
                             </DrawerBody>
+                            <DrawerFooter>
+                                <SidebarFooter />
+                            </DrawerFooter>
                         </SidebarProvider>
                     </DrawerContent>
                 </div>
@@ -101,36 +110,36 @@ export const Layout = () => {
 const [SidebarProvider, useSidebar] = createContextWithHook<Pick<UseDisclosureReturn, "onClose">>("Sidebar");
 
 const SidebarHeader = () => {
-    const daily = useCurrentDaily();
+    const currentDate = useAtomValue(currentDateAtom);
     const category = useCurrentDailyCategory();
 
     return (
         <Stack>
             <Flex alignItems="flex-start">
-                <Text>EmiFIT</Text>
-                <Text ml="auto" mr="6" fontSize="x-small">
+                <Text fontSize="2xl" fontWeight="bold" color="pink.300">
+                    EmiFIT
+                </Text>
+                <Text ml="auto" mr="6" fontSize="small">
                     v{import.meta.env.VITE_APP_VERSION} [{import.meta.env.DEV ? "dev" : "prod"}]
                 </Text>
             </Flex>
-            {daily && (
-                <Box fontSize="sm">
-                    <span>{daily.id}</span>
-                    {category && (
-                        <Box display="flex" alignItems="center">
-                            <Box
-                                mr="2"
-                                borderRadius="md"
-                                h="10px"
-                                w="10px"
-                                p={0}
-                                minW="10px"
-                                bg={category.color || "pink.300"}
-                            />
-                            <span>{category.name}</span>
-                        </Box>
-                    )}
-                </Box>
-            )}
+            <Box fontSize="sm">
+                <span>Current daily: {new Date(currentDate).toLocaleDateString()}</span>
+                {category && (
+                    <Box display="flex" alignItems="center" fontSize="xs">
+                        <Box
+                            mr="2"
+                            borderRadius="md"
+                            h="10px"
+                            w="10px"
+                            p={0}
+                            minW="10px"
+                            bg={category.color || "pink.300"}
+                        />
+                        <span>{category.name}</span>
+                    </Box>
+                )}
+            </Box>
         </Stack>
     );
 };
@@ -140,41 +149,88 @@ const SidebarContent = () => {
 
     return (
         <Stack as={List} mt="auto" fontSize="xl" spacing={2}>
-            <ReactLink to="/" onClick={onClose}>
-                <Flex as={ListItem} alignItems="center">
-                    <Icon as={AiFillHome} mr="4" />
-                    <Text>Home / edit daily</Text>
-                    <ChevronRightIcon ml="auto" />
-                </Flex>
-            </ReactLink>
-            <ReactLink to="/progress" onClick={onClose}>
-                <Flex as={ListItem} alignItems="center">
-                    <Icon as={GiProgression} mr="4" />
-                    <Text>Progress</Text>
-                    <ChevronRightIcon ml="auto" />
-                </Flex>
-            </ReactLink>
-            <ReactLink to="/programs" onClick={onClose}>
-                <Flex as={ListItem} alignItems="center">
-                    <Icon as={IoListSharp} mr="4" />
-                    <Text>Programs</Text>
-                    <ChevronRightIcon ml="auto" />
-                </Flex>
-            </ReactLink>
-            <ReactLink to="/exercise-library" onClick={onClose}>
-                <Flex as={ListItem} alignItems="center">
-                    <Icon as={IoLibraryOutline} mr="4" />
-                    <Text>Exercise library</Text>
-                    <ChevronRightIcon ml="auto" />
-                </Flex>
-            </ReactLink>
-            <ReactLink to="/settings" onClick={onClose}>
-                <Flex as={ListItem} alignItems="center">
-                    <Icon as={FiSettings} mr="4" />
-                    <Text>Settings</Text>
-                    <ChevronRightIcon ml="auto" />
-                </Flex>
-            </ReactLink>
+            <NavLink to="/" onClick={onClose}>
+                {({ isActive }) => (
+                    <Flex
+                        as={ListItem}
+                        alignItems="center"
+                        aria-selected={isActive}
+                        _selected={{ color: "pink.300", fontWeight: "bold" }}
+                    >
+                        <Icon as={AiFillHome} mr="4" />
+                        <Text>Home / edit daily</Text>
+                        <ChevronRightIcon ml="auto" />
+                    </Flex>
+                )}
+            </NavLink>
+            <NavLink to="/progress" onClick={onClose}>
+                {({ isActive }) => (
+                    <Flex
+                        as={ListItem}
+                        alignItems="center"
+                        aria-selected={isActive}
+                        _selected={{ color: "pink.300", fontWeight: "bold" }}
+                    >
+                        <Icon as={GiProgression} mr="4" />
+                        <Text>Progress</Text>
+                        <ChevronRightIcon ml="auto" />
+                    </Flex>
+                )}
+            </NavLink>
+            <NavLink to="/programs" onClick={onClose}>
+                {({ isActive }) => (
+                    <Flex
+                        as={ListItem}
+                        alignItems="center"
+                        aria-selected={isActive}
+                        _selected={{ color: "pink.300", fontWeight: "bold" }}
+                    >
+                        <Icon as={IoListSharp} mr="4" />
+                        <Text>Programs</Text>
+                        <ChevronRightIcon ml="auto" />
+                    </Flex>
+                )}
+            </NavLink>
+            <NavLink to="/exercise-library" onClick={onClose}>
+                {({ isActive }) => (
+                    <Flex
+                        as={ListItem}
+                        alignItems="center"
+                        aria-selected={isActive}
+                        _selected={{ color: "pink.300", fontWeight: "bold" }}
+                    >
+                        <Icon as={IoLibraryOutline} mr="4" />
+                        <Text>Exercise library</Text>
+                        <ChevronRightIcon ml="auto" />
+                    </Flex>
+                )}
+            </NavLink>
+            <NavLink to="/settings" onClick={onClose}>
+                {({ isActive }) => (
+                    <Flex
+                        as={ListItem}
+                        alignItems="center"
+                        aria-selected={isActive}
+                        _selected={{ color: "pink.300", fontWeight: "bold" }}
+                    >
+                        <Icon as={FiSettings} mr="4" />
+                        <Text>Settings</Text>
+                        <ChevronRightIcon ml="auto" />
+                    </Flex>
+                )}
+            </NavLink>
+        </Stack>
+    );
+};
+
+const SidebarFooter = () => {
+    const isDailyToday = useAtomValue(isDailyTodayAtom);
+    const lastFilledDaily = useLastFilledDailyDate();
+
+    return (
+        <Stack>
+            {!isDailyToday && lastFilledDaily && <GoToClosestPreviousDailyEntryButton size="sm" fontSize="xs" />}
+            {!isDailyToday && <GoBackToTodayEntryButton size="sm" fontSize="xs" />}
         </Stack>
     );
 };

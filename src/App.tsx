@@ -21,6 +21,7 @@ import { ExerciseSupersetEditPage } from "./pages/ExerciseSupersetEditPage";
 import { ExercisePageLayout } from "./pages/ExercisePageLayout";
 import { appTheme } from "./theme";
 import { Layout } from "./Layout";
+import { ExerciseLibraryPage } from "./pages/ExerciseLibraryPage";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ function App() {
                                     <Route path={routeMap.progress} element={<ProgressPage />} />
                                     <Route path={routeMap.settings} element={<SettingsPage />} />
                                     <Route path={routeMap.programs} element={<ProgramsPage />} />
+                                    <Route path={routeMap.exerciseLibrary} element={<ExerciseLibraryPage />} />
                                 </Route>
                             </Routes>
                             <ReloadPrompt />
