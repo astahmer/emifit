@@ -10,7 +10,7 @@ export interface Category {
     name: string;
     tagList: Tag[];
     canSeeEveryExercises?: boolean;
-    color: string;
+    color?: string;
 }
 
 export interface Exercise {
