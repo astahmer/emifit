@@ -27,7 +27,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { PersistModal } from "../components/PersistModal";
 import { AddCategoryForm, CategoryForm } from "./CategoryForm";
 import { AddGroupForm, GroupForm } from "./GroupForm";
-import { AddTagForm, TagFormValues, TagForm } from "./TagForm";
+import { AddTagForm, TagForm, TagFormValues } from "./TagForm";
 
 export const DataAccordions = ({
     withActions,
@@ -66,7 +66,7 @@ export const DataAccordions = ({
                                 columns={exerciseColumns}
                                 data={exerciseList}
                                 isHeaderSticky
-                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                                hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
                             />
                         </Box>
                     </AccordionPanel>
@@ -88,7 +88,7 @@ export const DataAccordions = ({
                                 columns={programColumns}
                                 data={programList}
                                 isHeaderSticky
-                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                                hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
                                 getRowProps={(row) => ({ ...(row as any).getToggleRowExpandedProps() })}
                                 renderSubRow={({ row }) => (
                                     <HFlex pb="4">
@@ -117,7 +117,7 @@ export const DataAccordions = ({
                                 columns={dailyColumns}
                                 data={dailyList}
                                 isHeaderSticky
-                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                                hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
                                 getRowProps={(row) => ({ ...(row as any).getToggleRowExpandedProps() })}
                                 renderSubRow={({ row }) => (
                                     <HFlex pb="4">
@@ -146,7 +146,7 @@ export const DataAccordions = ({
                                 columns={tagsColumns}
                                 data={tagList}
                                 isHeaderSticky
-                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                                hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
                             />
                         </Box>
                     </AccordionPanel>
@@ -182,7 +182,7 @@ export const DataAccordions = ({
                                 columns={categoryColumns}
                                 data={categoryList}
                                 isHeaderSticky
-                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                                hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
                             />
                         </Box>
                     </AccordionPanel>
@@ -218,7 +218,7 @@ export const DataAccordions = ({
                                 columns={groupColumns}
                                 data={groupList}
                                 isHeaderSticky
-                                hiddenColumns={!showIdColumn ? ["id"] : []}
+                                hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
                             />
                         </Box>
                     </AccordionPanel>
