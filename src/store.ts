@@ -96,3 +96,5 @@ store.sub(currentDateAtom, () => {
     log("atom 3", dailyId, browserHistory.location.pathname);
     browserHistory.push(dailyEntryPath);
 });
+
+export const isSwipingCarouselRef = { current: false };

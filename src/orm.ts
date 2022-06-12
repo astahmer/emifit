@@ -73,6 +73,7 @@ export type EmifitSchema = {
             "by-category": ProgramWithReferences["category"];
         };
     };
+    // TODO color
     keyval: {
         value: any;
         key: number;

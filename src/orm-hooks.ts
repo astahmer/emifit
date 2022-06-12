@@ -36,6 +36,7 @@ export const useCurrentDailyInvalidate = () => {
 
     return () => void queryClient.invalidateQueries(["daily", "single", id]);
 };
+export const useCurrentDailyCategory = () => useCategoryQuery(useCurrentDaily()?.category).data;
 
 export const useDailyListQuery = <Index extends StoreIndex<"daily"> = undefined>(
     params: StoreQueryParams<"daily", Index> = {}

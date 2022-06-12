@@ -1,3 +1,4 @@
+import { isSwipingCarouselRef } from "@/store";
 import { Box, BoxProps, ChakraComponent } from "@chakra-ui/react";
 import { getClosestNbIn } from "@pastable/core";
 import { ForwardRefComponent, HTMLMotionProps, motion, PanInfo, useAnimation, useMotionValue } from "framer-motion";
@@ -64,25 +65,24 @@ export function Carousel<T = any>({
     const [isDragging, setIsDragging] = useState(false);
 
     const animateToIndex = (index: number) => {
-                    const positions = [...itemRefMap.current.values()].map((el) => el.getBoundingClientRect().x);
-                    const itemWidths = [...itemRefMap.current.values()].map((el) => el.offsetWidth);
+        const positions = [...itemRefMap.current.values()].map((el) => el.getBoundingClientRect().x);
+        const itemWidths = [...itemRefMap.current.values()].map((el) => el.offsetWidth);
 
-                    const dimensions = {
-                        left: positions[0],
-                        right: positions[positions.length - 1] + itemWidths[positions.length - 1],
-                    };
-                    const carouselWidth = dimensions.left + dimensions.right;
-                    const carouselCenter = carouselWidth / 2;
+        const dimensions = {
+            left: positions[0],
+            right: positions[positions.length - 1] + itemWidths[positions.length - 1],
+        };
+        const carouselWidth = dimensions.left + dimensions.right;
+        const carouselCenter = carouselWidth / 2;
         const offset = carouselCenter - itemWidths[index] / 2;
 
         controls.start({ x: (positions[index] - offset) * -1, transition: mergedConfig.transitionProps });
     };
 
     useLayoutEffect(() => {
-        console.log(controlledIndex, defaultIndex);
         if (controlledIndex !== undefined) {
             animateToIndex(controlledIndex);
-                }
+        }
     }, [controlledIndex]);
 
     return (
@@ -105,6 +105,7 @@ export function Carousel<T = any>({
 
                 positionsRef.current = positions;
                 dragStartPositionRef.current = currentPos;
+                isSwipingCarouselRef.current = true;
             }}
             onDrag={(_e, info) => {
                 const closest = getClosest(info);
@@ -154,6 +155,7 @@ export function Carousel<T = any>({
 
                 setTimeout(() => {
                     setIsDragging(false);
+                    isSwipingCarouselRef.current = false;
                 }, 100);
             }}
         >

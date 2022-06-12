@@ -1,16 +1,10 @@
-import { Box, ChakraProvider, Flex } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { WithChildren } from "@pastable/core";
-import { Provider, useSetAtom } from "jotai";
+import { Provider } from "jotai";
 import { useEffect, useState } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { useHotkeys } from "react-hotkeys-hook";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
-import { Outlet, Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
-import { BottomTabs } from "./components/BottomTabs";
+import { Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import { DailyEntry } from "./Daily/DailyEntry";
-import { DevTools } from "./DevTools";
-import { ErrorFallback } from "./components/ErrorFallback";
 import { makeDb } from "./orm";
 import { ExerciseAddPage } from "./pages/ExerciseAddPage";
 import { ExerciseEditPage } from "./pages/ExerciseEditPage";
@@ -20,14 +14,16 @@ import { ProgressPage } from "./pages/ProgressPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import ReloadPrompt from "./ReloadPrompt";
 import { routeMap } from "./routes";
-import { browserHistory, debugModeAtom, store } from "./store";
+import { browserHistory, store } from "./store";
 import { ClickToComponent } from "click-to-react-component";
 import "./App.css";
 import { ExerciseSupersetEditPage } from "./pages/ExerciseSupersetEditPage";
 import { ExercisePageLayout } from "./pages/ExercisePageLayout";
 import { appTheme } from "./theme";
+import { Layout } from "./Layout";
 
 const queryClient = new QueryClient();
+
 function App() {
     return (
         <DbProvider>
@@ -65,28 +61,6 @@ function App() {
         </DbProvider>
     );
 }
-
-const Layout = () => {
-    const setDebugMode = useSetAtom(debugModeAtom);
-    useHotkeys("cmd+k", () => setDebugMode((current) => !current));
-
-    return (
-        <Flex as="main" direction="column" boxSize="100%">
-            <Flex as="section" id="View" direction="column" h="100%" overflow="hidden">
-                <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <Outlet />
-                </ErrorBoundary>
-            </Flex>
-            <DevTools />
-            <Box as="footer" mt="auto" w="100%" flexShrink={0}>
-                <BottomTabs />
-            </Box>
-            <Box pos="fixed" bottom="70px">
-                <ReactQueryDevtools toggleButtonProps={{ style: { position: "absolute" } }} />
-            </Box>
-        </Flex>
-    );
-};
 
 const DbProvider = (props: WithChildren) => {
     const [isDatabaseReady, setIsDatabaseReady] = useState(false);
