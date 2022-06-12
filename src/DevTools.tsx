@@ -55,6 +55,8 @@ const DevToolsContent = () => {
                         orm.db.clear(orm.daily.name),
                         orm.db.clear(orm.exercise.name),
                         orm.db.clear(orm.program.name),
+                        orm.db.clear(orm.tag.name),
+                        orm.db.clear(orm.category.name),
                     ]);
                     toasts.success("Database cleared");
                     toasts.close(info);
