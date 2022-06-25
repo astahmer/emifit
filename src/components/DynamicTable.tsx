@@ -35,7 +35,7 @@ export function DynamicTable({
             data,
             autoResetExpanded: false,
             defaultColumn,
-            initialState: { hiddenColumns, sortBy: initialSortBy },
+            initialState: { hiddenColumns, sortBy: initialSortBy || [] },
         } as TableOptions<UseExpandedOptions<{}>>,
         useSortBy,
         useExpanded
