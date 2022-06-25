@@ -1,4 +1,5 @@
 import { DynamicTable } from "@/components/DynamicTable";
+import { Show } from "@/components/Show";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { useCategoryList, useExerciseList, useExerciseUnsortedList } from "@/orm-hooks";
@@ -9,12 +10,14 @@ import {
     AccordionIcon,
     AccordionItem,
     AccordionPanel,
+    Badge,
     Box,
     Divider,
     Flex,
     Heading,
     Stack,
     Text,
+    useAccordionContext,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
@@ -41,8 +44,8 @@ export const ExerciseLibraryPage = () => {
             <Flex flexDirection="column" mt="4" h="100%" minH="0" overflow="auto">
                 <Accordion allowToggle w="100%">
                     {/* TODO virtual */}
-                    {exerciseList.map((exo) => (
-                        <ExerciseLibraryItem key={exo.id} exercise={exo} />
+                    {exerciseList.map((exo, index) => (
+                        <ExerciseLibraryItem key={exo.id} exercise={exo} index={index} />
                     ))}
                 </Accordion>
                 <Divider my="2" />
@@ -51,9 +54,10 @@ export const ExerciseLibraryPage = () => {
     );
 };
 
-const ExerciseLibraryItem = ({ exercise }: { exercise: Exercise }) => {
+const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: number }) => {
     const query = useExerciseUnsortedList({ index: "by-name", query: exercise.name });
     const exerciseList = (query.data || []).filter((exo) => !Boolean(exo.programId));
+    const ctx = useAccordionContext();
 
     return (
         <AccordionItem w="100%" isDisabled={!exerciseList.length}>
@@ -67,6 +71,16 @@ const ExerciseLibraryItem = ({ exercise }: { exercise: Exercise }) => {
                         {Boolean(exercise.tags?.length) && <ExerciseTagList tagList={exercise.tags} />}
                     </Stack>
                 </Stack>
+                <Show when={ctx.index === index}>
+                    <Stack mx="2">
+                        <Badge variant="outline" colorScheme="pink" fontSize="x-small">
+                            Top kg {Math.max(...exercise.series.map((set) => set.kg))}
+                        </Badge>
+                        <Badge variant="outline" colorScheme="pink" fontSize="x-small">
+                            Top reps {Math.max(...exercise.series.map((set) => set.reps))}
+                        </Badge>
+                    </Stack>
+                </Show>
                 {Boolean(exerciseList.length) && <AccordionIcon ml="auto" />}
             </AccordionButton>
             <AccordionPanel
