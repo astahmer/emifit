@@ -5,6 +5,7 @@ import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { useCategoryList, useCategoryQuery, useExerciseList, useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
+import { printDailyDate } from "@/orm-utils";
 import {
     Accordion,
     AccordionButton,
@@ -21,6 +22,7 @@ import {
     useAccordionContext,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { Link as ReactLink } from "react-router-dom";
 
 export const ExerciseLibraryPage = () => {
     const categoryList = useCategoryList();
@@ -129,7 +131,13 @@ const columns = [
     {
         Header: "Date",
         accessor: "createdAt",
-        Cell: (props) => <Text>{new Date(props.value).toLocaleDateString()}</Text>,
+        Cell: (props) => (
+            <ReactLink to={`/daily/entry/${printDailyDate(new Date(props.value))}`}>
+                <Text color="pink.300" fontWeight="bold">
+                    {new Date(props.value).toLocaleDateString()}
+                </Text>
+            </ReactLink>
+        ),
     },
     {
         Header: "top kg",
