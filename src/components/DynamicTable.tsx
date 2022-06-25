@@ -11,20 +11,11 @@ import {
     TableRowProps,
     TableColumnHeaderProps,
     TableCellProps,
+    Box,
 } from "@chakra-ui/react";
 import { isDefined } from "@pastable/core";
 import { Fragment, ReactNode, useEffect } from "react";
-import {
-    Cell,
-    Column,
-    Row,
-    TableOptions,
-    UseExpandedOptions,
-    useExpanded,
-    useSortBy,
-    useTable,
-    UseSortByColumnOptions,
-} from "react-table";
+import { Cell, Column, Row, TableOptions, UseExpandedOptions, useExpanded, useSortBy, useTable } from "react-table";
 
 export function DynamicTable({
     columns,
@@ -74,18 +65,20 @@ export function DynamicTable({
                                         : undefined
                                 }
                             >
-                                {column.render("Header", getHeaderProps?.(column, colIndex))}
-                                {(column as any).canBeSorted !== false && (
-                                    <chakra.span pl="4">
-                                        {(column as any).isSorted ? (
-                                            (column as any).isSortedDesc ? (
-                                                <TriangleDownIcon aria-label="sorted descending" />
-                                            ) : (
-                                                <TriangleUpIcon aria-label="sorted ascending" />
-                                            )
-                                        ) : null}
-                                    </chakra.span>
-                                )}
+                                <Box display="flex" alignItems="flex-end">
+                                    {column.render("Header", getHeaderProps?.(column, colIndex))}
+                                    {(column as any).canBeSorted !== false && (
+                                        <chakra.span pl="2" transform="translateY(-1px)">
+                                            {(column as any).isSorted ? (
+                                                (column as any).isSortedDesc ? (
+                                                    <TriangleDownIcon aria-label="sorted descending" />
+                                                ) : (
+                                                    <TriangleUpIcon aria-label="sorted ascending" />
+                                                )
+                                            ) : null}
+                                        </chakra.span>
+                                    )}
+                                </Box>
                             </Th>
                         ))}
                     </Tr>
