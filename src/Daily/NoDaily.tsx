@@ -53,7 +53,7 @@ const EmptyTodayDaily = () => {
                 )}
             </Box>
             <Divider mb="4" />
-            <Box alignSelf="center">
+            <Box alignSelf="center" w="100%">
                 <CategoryRadioPicker onChange={createDaily.mutate} />
             </Box>
         </>
