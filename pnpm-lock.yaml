@@ -42,6 +42,7 @@ specifiers:
   react-router-dom: ^6.3.0
   react-swipeable: ^7.0.0
   react-table: ^7.8.0
+  react-textarea-autosize: ^8.3.4
   react-virtual: ^2.10.4
   ts-pattern: ^4.0.3
   ts-toolbelt: ^9.6.0
@@ -88,6 +89,7 @@ dependencies:
   react-router-dom: 6.3.0_react-dom@17.0.2+react@17.0.2
   react-swipeable: 7.0.0_react@17.0.2
   react-table: 7.8.0_react@17.0.2
+  react-textarea-autosize: 8.3.4_3df41e700a554c2356b362be396a0af4
   react-virtual: 2.10.4_react@17.0.2
   ts-pattern: 4.0.3
   valtio: 1.6.1_react@17.0.2+vite@2.9.12
@@ -4741,6 +4743,20 @@ packages:
       react: 17.0.2
     dev: false
 
+  /react-textarea-autosize/8.3.4_3df41e700a554c2356b362be396a0af4:
+    resolution: {integrity: sha512-CdtmP8Dc19xL8/R6sWvtknD/eCXkQr30dtvC4VmGInhRsfF8X/ihXCq6+9l9qbxmKRiq407/7z5fxE7cVWQNgQ==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@babel/runtime': 7.18.3
+      react: 17.0.2
+      use-composed-ref: 1.3.0_react@17.0.2
+      use-latest: 1.2.1_3df41e700a554c2356b362be396a0af4
+    transitivePeerDependencies:
+      - '@types/react'
+    dev: false
+
   /react-virtual/2.10.4_react@17.0.2:
     resolution: {integrity: sha512-Ir6+oPQZTVHfa6+JL9M7cvMILstFZH/H3jqeYeKI4MSUX+rIruVwFC6nGVXw9wqAw8L0Kg2KvfXxI85OvYQdpQ==}
     peerDependencies:
@@ -5242,6 +5258,14 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /use-composed-ref/1.3.0_react@17.0.2:
+    resolution: {integrity: sha512-GLMG0Jc/jiKov/3Ulid1wbv3r54K9HlMW29IWcDFPEqFkSO2nS0MuefWgMJpeHQ9YJeXDL3ZUF+P3jdXlZX/cQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 17.0.2
+    dev: false
+
   /use-isomorphic-layout-effect/1.1.2_3df41e700a554c2356b362be396a0af4:
     resolution: {integrity: sha512-49L8yCO3iGT/ZF9QttjwLF/ZD9Iwto5LnH5LmEdk/6cFmXddqi2ulF0edxTwjj+7mqvpVVGQWvbXZdn32wRSHA==}
     peerDependencies:
@@ -5253,6 +5277,20 @@ packages:
     dependencies:
       '@types/react': 17.0.45
       react: 17.0.2
+    dev: false
+
+  /use-latest/1.2.1_3df41e700a554c2356b362be396a0af4:
+    resolution: {integrity: sha512-xA+AVm/Wlg3e2P/JiItTziwS7FK92LWrDB0p+hgXloIMuVCeJJ8v6f0eeHyPZaJrM+usM1FkFfbNCrJGs8A/zw==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@types/react': 17.0.45
+      react: 17.0.2
+      use-isomorphic-layout-effect: 1.1.2_3df41e700a554c2356b362be396a0af4
     dev: false
 
   /use-sidecar/1.1.2_3df41e700a554c2356b362be396a0af4:

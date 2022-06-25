@@ -12,8 +12,9 @@ import {
     Textarea,
     TextareaProps,
 } from "@chakra-ui/react";
-import { MutableRefObject, ReactNode, forwardRef } from "react";
+import { MutableRefObject, ReactNode, forwardRef, ComponentPropsWithoutRef } from "react";
 import { FieldError } from "react-hook-form";
+import ResizeTextarea from "react-textarea-autosize";
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     ({ label, render, renderLeft, renderRight, formControlRef, error, labelProps, ...props }, ref) => {
@@ -58,7 +59,7 @@ const TextInputBase = forwardRef<HTMLInputElement, InputProps>((props, ref) => (
     <Input {...appInputProps} {...props} ref={ref} />
 ));
 
-export type TextInputProps = InputProps & {
+export type TextInputBaseProps = {
     label?: string | ReactNode;
     labelProps?: FormLabelProps;
     formControlRef?: MutableRefObject<HTMLDivElement>;
@@ -67,6 +68,7 @@ export type TextInputProps = InputProps & {
     renderRight?: () => ReactNode;
     error?: { message: string } | FieldError;
 };
+export type TextInputProps = InputProps & TextInputBaseProps;
 
 export const TextareaInput = forwardRef<HTMLTextAreaElement, TextareaInputProps>(({ children, ...props }, ref) => (
     <TextInput {...(props as any)} render={() => <Textarea {...appInputProps} ref={ref} {...props} />}>
@@ -74,7 +76,26 @@ export const TextareaInput = forwardRef<HTMLTextAreaElement, TextareaInputProps>
     </TextInput>
 ));
 
-export interface TextareaInputProps extends Pick<TextInputProps, "label" | "error">, TextareaProps {}
+export const AutoResizeTextarea = forwardRef<
+    HTMLTextAreaElement,
+    TextareaInputProps & ComponentPropsWithoutRef<typeof ResizeTextarea>
+>((props, ref) => {
+    return (
+        <TextareaInput
+            minH="unset"
+            overflow="hidden"
+            w="100%"
+            resize="none"
+            ref={ref}
+            minRows={3}
+            as={ResizeTextarea}
+            {...props}
+        />
+    );
+});
+export interface TextareaInputProps
+    extends Omit<TextInputBaseProps, "render" | "renderLeft" | "renderRight">,
+        TextareaProps {}
 
 export type RightButtonProps = ButtonProps & { label: string; rightElementProps?: InputProps };
 export const RightButton = ({ label, rightElementProps, ...props }: RightButtonProps) => {
