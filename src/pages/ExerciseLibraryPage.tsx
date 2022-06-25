@@ -1,8 +1,9 @@
 import { DynamicTable } from "@/components/DynamicTable";
+import { MultiSelect } from "@/components/MultiSelect";
 import { Show } from "@/components/Show";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
-import { useCategoryList, useExerciseList, useExerciseUnsortedList } from "@/orm-hooks";
+import { useCategoryList, useCategoryQuery, useExerciseList, useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import {
     Accordion,
@@ -25,21 +26,42 @@ export const ExerciseLibraryPage = () => {
     const categoryList = useCategoryList();
     const [byCategory, setByCategory] = useState<string>();
 
+    // auto-select 1st category  so that there is always one selected
     useEffect(() => {
         if (!byCategory && categoryList.length) {
             setByCategory(categoryList[0].id);
         }
     }, [categoryList, byCategory]);
 
-    const exerciseList = useExerciseList({ index: "by-category", query: byCategory });
+    const tagQuery = useCategoryQuery(byCategory);
+    const tagList = tagQuery.data?.tagList || [];
+    const [byTags, setByTags] = useState<string[]>([]);
+
+    const exerciseListByCategory = useExerciseList({ index: "by-category", query: byCategory });
+    const exerciseList = byTags.length
+        ? exerciseListByCategory.filter((exo) => byTags.every((tagId) => exo.tags.some((t) => t.id === tagId)))
+        : exerciseListByCategory;
 
     return (
         <Box id="ExerciseLibraryPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
             <Heading as="h1">Exercise Library</Heading>
             {byCategory && (
-                <Box mt="4">
+                <Stack mt="4" w="100%">
                     <CategoryRadioPicker defaultValue={byCategory} onChange={setByCategory} />
-                </Box>
+                    <MultiSelect
+                        onChange={(selecteds) => setByTags(selecteds.map((tag) => tag.id))}
+                        items={tagList}
+                        getValue={(item) => item.id}
+                        itemToString={(item) => item.name}
+                        renderButtonText={(selection) => (
+                            <Text maxW="100%" textOverflow="ellipsis" overflow="hidden">
+                                {selection.length
+                                    ? `(${selection.length}) ${selection.map((item) => item.name).join(", ")}`
+                                    : "Filter by tags"}
+                            </Text>
+                        )}
+                    />
+                </Stack>
             )}
             <Flex flexDirection="column" mt="4" h="100%" minH="0" overflow="auto">
                 <Accordion allowToggle w="100%">
