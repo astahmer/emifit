@@ -1,15 +1,31 @@
 import { CheckboxButton } from "@/components/CheckboxCircle";
-import { useProgramInterpret } from "@/Programs/useProgramInterpret";
-import { useExerciseList } from "@/orm-hooks";
-import { ArrowForwardIcon } from "@chakra-ui/icons";
-import { Box, Button, Heading } from "@chakra-ui/react";
+import { FloatingButton } from "@/components/FloatingButton";
 import { ExerciseAccordionList } from "@/Exercises/ExerciseAccordionList";
+import { ExerciseListCombobox } from "@/Exercises/ExerciseCombobox";
+import { useExerciseList } from "@/orm-hooks";
+import { Exercise } from "@/orm-types";
+import { useProgramInterpret } from "@/Programs/useProgramInterpret";
+import { ArrowForwardIcon, SearchIcon } from "@chakra-ui/icons";
+import { Box, Button, Heading, IconButton } from "@chakra-ui/react";
+import { useSelector } from "@xstate/react";
+import { useState } from "react";
 
 export function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercises: boolean }) {
     const interpret = useProgramInterpret();
     const send = interpret.send;
 
-    const exercises = useExerciseList();
+    const catId = useSelector(interpret, (s) => s.context.categoryId);
+    const exerciseListByCategory = useExerciseList({ index: "by-category", query: catId });
+
+    const [byNameList, setByNameList] = useState<Exercise[]>([]);
+    console.log(byNameList);
+
+    let exerciseList = exerciseListByCategory;
+    if (byNameList.length) {
+        exerciseList = exerciseList.filter((exo) =>
+            byNameList.map((exo) => exo.name).some((name) => name.toLowerCase() === exo.name.toLowerCase())
+        );
+    }
 
     return (
         <>
@@ -27,10 +43,11 @@ export function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercis
             {interpret.state.matches("creating.selectingExercises") && (
                 <Box p="4" overflow="auto" minH={0} h="100%">
                     <ExerciseAccordionList
+                        exerciseList={exerciseList}
                         onChange={(ids) =>
                             send({
                                 type: "UpdateSelection",
-                                selection: ids.map((id) => exercises.find((exo) => exo.id === id)),
+                                selection: ids.map((id) => exerciseList.find((exo) => exo.id === id)),
                             })
                         }
                     />
@@ -50,6 +67,28 @@ export function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercis
                     Edit program settings
                 </Button>
             )}
+            <FloatingButton
+                renderButton={(props) => (
+                    <IconButton
+                        aria-label="Search"
+                        icon={<SearchIcon />}
+                        colorScheme="pink"
+                        rounded="full"
+                        size="lg"
+                        onClick={props.onOpen}
+                    />
+                )}
+                renderModalContent={() => (
+                    <Box py="4">
+                        <ExerciseListCombobox
+                            initialSelectedItems={byNameList}
+                            onSelectedItemsChange={(changes) => setByNameList(changes.selectedItems || [])}
+                            params={{ index: "by-category", query: catId }}
+                            placeholder="Search for some exercise..."
+                        />
+                    </Box>
+                )}
+            />
         </>
     );
 }

@@ -66,7 +66,7 @@ export const Layout = () => {
 
     return (
         <Flex as="main" direction="column" boxSize="100%" {...mainDragProps} style={{ touchAction: "none" }}>
-            <Flex as="section" id="View" direction="column" h="100%" overflow="hidden">
+            <Flex as="section" id="View" direction="column" h="100%" overflow="hidden" pos="relative">
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
                     <Outlet />
                 </ErrorBoundary>

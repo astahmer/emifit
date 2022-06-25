@@ -22,12 +22,14 @@ import { useSelector } from "@xstate/react";
 import { CheckboxSquare } from "../components/CheckboxCircle";
 import { ExerciseTagList } from "./ExerciseTag";
 
-export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[]>) => {
+export const ExerciseAccordionList = ({
+    exerciseList,
+    onChange,
+}: WithOnChange<StringOrNumber[]> & { exerciseList: Exercise[] }) => {
     const interpret = useProgramInterpret();
     const catId = useSelector(interpret, (s) => s.context.categoryId);
     const selectedExerciseList = useSelector(interpret, (s) => s.context.exerciseList);
 
-    const exercises = useExerciseList({ index: "by-category", query: catId });
     const names = selectedExerciseList.map((exo) => exo.name);
 
     const { getCheckboxProps } = useCheckboxGroup({ onChange, defaultValue: selectedExerciseList.map((ex) => ex.id) });
@@ -35,9 +37,9 @@ export const ExerciseAccordionList = ({ onChange }: WithOnChange<StringOrNumber[
     return (
         <Accordion allowToggle w="100%">
             {sortArrayOfObjectByPropFromArray(
-                exercises.filter((exo) => !names.includes(exo.name)).concat(selectedExerciseList),
+                exerciseList.filter((exo) => !names.includes(exo.name)).concat(selectedExerciseList),
                 "id",
-                exercises.map((exo) => exo.id)
+                exerciseList.map((exo) => exo.id)
             ).map((exercise) => (
                 <ExerciseAccordion key={exercise.id} exercise={exercise} getCheckboxProps={getCheckboxProps} />
             ))}

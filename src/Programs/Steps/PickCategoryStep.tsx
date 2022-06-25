@@ -7,10 +7,11 @@ import { useSelector } from "@xstate/react";
 
 export function PickCategoryStep() {
     const interpret = useProgramInterpret();
-    const exercises = useExerciseList();
 
     const category = useSelector(interpret, (s) => s.context.categoryId);
     const isCategorySelected = Boolean(category);
+
+    const exerciseList = useExerciseList({ index: "by-category", query: category });
 
     return (
         <>
@@ -32,12 +33,12 @@ export function PickCategoryStep() {
                         interpret.send({
                             type: "SelectCategory",
                             categoryId,
-                            hasExercises: exercises.some((ex) => ex.category === categoryId),
+                            hasExercises: exerciseList.some((ex) => ex.category === categoryId),
                         })
                     }
                     isOptionDisabled={
                         interpret.state.matches("creating.selectingExercises")
-                            ? (option) => !exercises.some((ex) => ex.category === option.id)
+                            ? (option) => !exerciseList.some((ex) => ex.category === option.id)
                             : undefined
                     }
                 />
