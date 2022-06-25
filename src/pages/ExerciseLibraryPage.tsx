@@ -76,6 +76,7 @@ const ExerciseLibraryItem = ({ exercise }: { exercise: Exercise }) => {
                 borderRadius="md"
                 borderTopLeftRadius={0}
                 borderTopRightRadius={0}
+                sx={{ th: { whiteSpace: "nowrap" } }}
             >
                 <DynamicTable
                     columns={columns}
