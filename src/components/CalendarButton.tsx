@@ -78,6 +78,7 @@ export const CalendarButton = ({
                     singleDateSelection
                     disableFutureDates
                     highlightToday
+                    weekStartsOn={1}
                 >
                     <PopoverBody p={0}>
                         <CalendarControls>
