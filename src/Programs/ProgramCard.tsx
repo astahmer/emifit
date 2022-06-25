@@ -46,7 +46,7 @@ export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCard
                     <HFlex justifyContent="space-around" p="4">
                         {isOpen ? <ChevronUpIcon fontSize="20px" /> : <ChevronDownIcon fontSize="20px" />}
                     </HFlex>
-                    <HFlex alignItems="flex-start">
+                    <HFlex alignItems="flex-start" py="4">
                         <chakra.span color="pink.300" fontWeight="bold">
                             {program.name}
                         </chakra.span>
