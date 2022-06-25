@@ -13,13 +13,14 @@ export function TagMultiSelect({
     defaultValue,
     required,
     rules,
+    label,
     ...props
 }: Omit<ControllerProps<any>, "render"> & {
     error?: string;
     required?: boolean;
 } & Omit<
         MultiSelectProps<Tag, true>,
-        "getValue" | "itemToString" | "groupByKeyGetter" | "label" | "getButtonProps" | "renderButtonText" | "onChange"
+        "getValue" | "itemToString" | "groupByKeyGetter" | "getButtonProps" | "renderButtonText" | "onChange"
     > &
     PickOptional<MultiSelectProps<Tag, true>, "onChange">) {
     const isInvalid = Boolean(error);
@@ -37,7 +38,12 @@ export function TagMultiSelect({
                         itemToString={(item) => item.name}
                         groupByKeyGetter={(item) => item.groupId}
                         items={items}
-                        label={(getLabelProps) => <FormLabel {...getLabelProps()}>Tags</FormLabel>}
+                        label={
+                            label ||
+                            ((getLabelProps) => (
+                                <FormLabel {...getLabelProps()}>Tags{required || rules?.required ? "*" : ""}</FormLabel>
+                            ))
+                        }
                         getButtonProps={() => ({
                             w: "100%",
                             "aria-invalid": isInvalid,

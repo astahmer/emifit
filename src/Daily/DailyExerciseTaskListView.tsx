@@ -136,6 +136,16 @@ function ExerciseTaskItem({ exo }: { exo: Exercise }) {
                 <ExerciseSetListOverview setList={exo.series} />
                 <ExerciseTagList mt="2" tagList={exo.tags} />
                 <ExerciseSetList mt="2" fontSize="sm" setList={exo.series} />
+                <Show when={Boolean(exo.note)}>
+                    <Box mt="2" fontWeight="normal" fontSize="xs" color="gray.500">
+                        <Text as="span" fontWeight="bold">
+                            Note:
+                        </Text>
+                        <Text ml="1" as="span">
+                            {exo.note}
+                        </Text>
+                    </Box>
+                </Show>
             </Flex>
         </Flex>
     );

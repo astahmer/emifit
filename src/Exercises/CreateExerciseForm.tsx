@@ -1,7 +1,7 @@
 import { ConfirmationButton } from "@/components/ConfirmationButton";
 import { MobileNumberInput } from "@/components/MobileNumberInput";
 import { SwitchInput } from "@/components/SwitchInput";
-import { TextInput } from "@/components/TextInput";
+import { AutoResizeTextarea, TextInput } from "@/components/TextInput";
 import { onError } from "@/functions/toasts";
 import { requiredRule } from "@/functions/utils";
 import { useCategoryQuery } from "@/orm-hooks";
@@ -22,11 +22,12 @@ import { useMutation } from "react-query";
 import { ExerciseCombobox } from "./ExerciseCombobox";
 import { TagMultiSelect } from "./TagMultiSelect";
 
-const formDefaultValues: Pick<Exercise, "name" | "tags" | "series"> & { nbSeries: number } = {
+const formDefaultValues: Pick<Exercise, "name" | "tags" | "series" | "note"> & { nbSeries: number } = {
     name: "",
     nbSeries: 1,
     tags: [],
     series: [makeSerie(0)] as Serie[],
+    note: "",
 };
 export type ExerciseFormValues = typeof formDefaultValues;
 
@@ -88,6 +89,7 @@ export const CreateExerciseForm = ({
                     {renderFormTop?.()}
                     <ExerciseCombobox
                         {...form.register("name", { required: requiredRule })}
+                        isRequired
                         defaultValue={defaultValues.name}
                         initialSelectedItem={defaultValues.name ? (defaultValues as any as Exercise) : undefined}
                         onSelectedItemChange={(changes) => {
@@ -154,6 +156,12 @@ export const CreateExerciseForm = ({
                         >
                             Add serie
                         </Button>
+                    </div>
+                    <div>
+                        <Divider my="4" />
+                    </div>
+                    <div>
+                        <AutoResizeTextarea {...form.register("note")} labelProps={{ mt: "2" }} label="Note" />
                     </div>
                 </Stack>
                 <Box mb="2" flexShrink={0}>

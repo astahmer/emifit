@@ -24,7 +24,9 @@ export const ExerciseCombobox = forwardRef(
         return (
             <FormControl isInvalid={Boolean(error)}>
                 <Combobox
-                    label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise name</FormLabel>}
+                    label={(getLabelProps) => (
+                        <FormLabel {...getLabelProps()}>Exercise name{props.isRequired ? "*" : ""}</FormLabel>
+                    )}
                     {...props}
                     ref={ref}
                     getValue={(item: Exercise) => item.id}
