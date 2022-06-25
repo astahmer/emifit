@@ -2,10 +2,12 @@ import { DynamicTable } from "@/components/DynamicTable";
 import { MultiSelect } from "@/components/MultiSelect";
 import { Show } from "@/components/Show";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
+import { ExerciseCombobox } from "@/Exercises/ExerciseCombobox";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { useCategoryList, useCategoryQuery, useExerciseList, useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
+import { SearchIcon } from "@chakra-ui/icons";
 import {
     Accordion,
     AccordionButton,
@@ -17,12 +19,14 @@ import {
     Divider,
     Flex,
     Heading,
+    IconButton,
     Stack,
     Text,
     useAccordionContext,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Link as ReactLink } from "react-router-dom";
+import { FloatingButton } from "@/components/FloatingButton";
 
 export const ExerciseLibraryPage = () => {
     const categoryList = useCategoryList();
@@ -38,14 +42,22 @@ export const ExerciseLibraryPage = () => {
     const tagQuery = useCategoryQuery(byCategory);
     const tagList = tagQuery.data?.tagList || [];
     const [byTags, setByTags] = useState<string[]>([]);
+    const [byName, setByName] = useState<string>();
 
     const exerciseListByCategory = useExerciseList({ index: "by-category", query: byCategory });
-    const exerciseList = byTags.length
-        ? exerciseListByCategory.filter((exo) => byTags.every((tagId) => exo.tags.some((t) => t.id === tagId)))
-        : exerciseListByCategory;
+    let exerciseList = exerciseListByCategory;
+
+    if (byTags.length) {
+        exerciseList = exerciseListByCategory.filter((exo) =>
+            byTags.every((tagId) => exo.tags.some((t) => t.id === tagId))
+        );
+    }
+    if (byName) {
+        exerciseList = exerciseList.filter((exo) => exo.name.toLowerCase() === byName.toLowerCase());
+    }
 
     return (
-        <Box id="ExerciseLibraryPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
+        <Box id="ExerciseLibraryPage" d="flex" flexDirection="column" h="100%" p="4" w="100%" pos="relative">
             <Heading as="h1">Exercise Library</Heading>
             {byCategory && (
                 <Stack mt="4" w="100%">
@@ -74,6 +86,30 @@ export const ExerciseLibraryPage = () => {
                 </Accordion>
                 <Divider my="2" />
             </Flex>
+            <FloatingButton
+                renderButton={(props) => (
+                    <IconButton
+                        aria-label="Search"
+                        icon={<SearchIcon />}
+                        colorScheme="pink"
+                        rounded="full"
+                        size="lg"
+                        onClick={props.onOpen}
+                    />
+                )}
+                renderModalContent={() => (
+                    <Box py="4">
+                        <ExerciseCombobox
+                            onSelectedItemChange={(changes) => setByName(changes.selectedItem?.name || null)}
+                            params={{ index: "by-category", query: byCategory }}
+                            getItems={(items) =>
+                                items.filter((exo) => byTags.every((tagId) => exo.tags.some((t) => t.id === tagId)))
+                            }
+                            placeholder="Search for an exercise..."
+                        />
+                    </Box>
+                )}
+            />
         </Box>
     );
 };
