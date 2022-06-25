@@ -14,7 +14,17 @@ import {
 } from "@chakra-ui/react";
 import { isDefined } from "@pastable/core";
 import { Fragment, ReactNode, useEffect } from "react";
-import { Cell, Column, Row, TableOptions, UseExpandedOptions, useExpanded, useSortBy, useTable } from "react-table";
+import {
+    Cell,
+    Column,
+    Row,
+    TableOptions,
+    UseExpandedOptions,
+    useExpanded,
+    useSortBy,
+    useTable,
+    UseSortByColumnOptions,
+} from "react-table";
 
 export function DynamicTable({
     columns,
@@ -25,12 +35,17 @@ export function DynamicTable({
     renderSubRow,
     isHeaderSticky,
     getRowProps,
+    initialSortBy,
     hiddenColumns = [],
 }: DynamicTableProps) {
     const table = useTable(
-        { columns, data, autoResetExpanded: false, defaultColumn, initialState: { hiddenColumns } } as TableOptions<
-            UseExpandedOptions<{}>
-        >,
+        {
+            columns,
+            data,
+            autoResetExpanded: false,
+            defaultColumn,
+            initialState: { hiddenColumns, sortBy: initialSortBy },
+        } as TableOptions<UseExpandedOptions<{}>>,
         useSortBy,
         useExpanded
     );
@@ -111,6 +126,9 @@ export interface DynamicTableProps extends Pick<TableProps, "size"> {
     renderSubRow?: ({ row }: { row: Row }) => ReactNode;
     isHeaderSticky?: boolean;
     hiddenColumns?: string[];
+    initialSortBy?: ReactTableSortBy[];
 }
+
+type ReactTableSortBy = { id: string; desc?: boolean };
 
 const defaultColumn = { Cell: ({ cell: { value } }) => (isDefined(value) ? String(value) : "--") };

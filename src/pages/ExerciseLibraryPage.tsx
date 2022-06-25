@@ -17,7 +17,6 @@ import {
     Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useVirtual } from "react-virtual";
 
 export const ExerciseLibraryPage = () => {
     const categoryList = useCategoryList();
@@ -78,7 +77,12 @@ const ExerciseLibraryItem = ({ exercise }: { exercise: Exercise }) => {
                 borderTopLeftRadius={0}
                 borderTopRightRadius={0}
             >
-                <DynamicTable columns={columns} data={exerciseList} isHeaderSticky />
+                <DynamicTable
+                    columns={columns}
+                    data={exerciseList}
+                    isHeaderSticky
+                    initialSortBy={[{ id: "createdAt", desc: true }]}
+                />
             </AccordionPanel>
         </AccordionItem>
     );
