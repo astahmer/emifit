@@ -41,6 +41,8 @@ export function TagMultiSelect({
                         getButtonProps={() => ({
                             w: "100%",
                             "aria-invalid": isInvalid,
+                            // colorScheme: "pink",
+                            // variant: "outline",
                             _invalid: { borderWidth: "1px", borderColor: "red.500", boxShadow: `0 0 0 1px #e53e3e` },
                         })}
                         renderButtonText={(selection) => (
