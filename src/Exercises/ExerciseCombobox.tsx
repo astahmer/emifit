@@ -12,7 +12,7 @@ export const ExerciseCombobox = forwardRef(
             getItems,
             params,
             ...props
-        }: Omit<ComboboxProps<Exercise>, "items" | "getValue" | "itemToString" | "label"> & {
+        }: Omit<ComboboxProps<Exercise>, "items" | "getValue" | "itemToString"> & {
             error?: string;
             getItems?: (items: Exercise[]) => Exercise[];
             params?: StoreQueryParams<"exercise">;
@@ -24,12 +24,12 @@ export const ExerciseCombobox = forwardRef(
         return (
             <FormControl isInvalid={Boolean(error)}>
                 <Combobox
+                    label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise name</FormLabel>}
                     {...props}
                     ref={ref}
                     getValue={(item: Exercise) => item.id}
                     itemToString={(item) => (item ? `${item.name}` : "")}
                     items={getItems?.(items) || items}
-                    label={(getLabelProps) => <FormLabel {...getLabelProps()}>Exercise name</FormLabel>}
                 />
 
                 {error && <FormErrorMessage>{error}</FormErrorMessage>}
