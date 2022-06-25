@@ -1,8 +1,5 @@
 import {
     Box,
-    Button,
-    ButtonGroup,
-    chakra,
     Divider,
     Flex,
     Icon,
@@ -23,6 +20,7 @@ import { ErrorFallback } from "./components/ErrorFallback";
 import { DevTools } from "./DevTools";
 import { currentDateAtom, debugModeAtom, isDailyTodayAtom, isSwipingCarouselRef } from "./store";
 
+import { ChevronRightIcon } from "@chakra-ui/icons";
 import {
     Drawer,
     DrawerBody,
@@ -33,20 +31,17 @@ import {
     DrawerOverlay,
 } from "@chakra-ui/react";
 import { useRef } from "react";
-import { useSwipeable } from "react-swipeable";
-import { IoHome, IoLibraryOutline, IoListSharp } from "react-icons/io5";
 import { AiFillHome } from "react-icons/ai";
-import { GiProgression } from "react-icons/gi";
 import { FiSettings } from "react-icons/fi";
-import { NavLink, useLocation } from "react-router-dom";
-import { useCurrentDaily, useCurrentDailyCategory } from "./orm-hooks";
-import { ChevronRightIcon } from "@chakra-ui/icons";
-import { createContextWithHook } from "./functions/createContextWithHook";
+import { GiProgression } from "react-icons/gi";
+import { IoLibraryOutline, IoListSharp } from "react-icons/io5";
+import { NavLink } from "react-router-dom";
+import { useSwipeable } from "react-swipeable";
 import { GoBackToTodayEntryButton } from "./Daily/GoBackToTodayEntryButton";
-import { printDailyDate } from "./orm-utils";
-import { match } from "ts-pattern";
 import { GoToClosestPreviousDailyEntryButton } from "./Daily/GoToClosestPreviousDailyEntryButton";
 import { useLastFilledDailyDate } from "./Daily/useLastFilledDailyDate";
+import { createContextWithHook } from "./functions/createContextWithHook";
+import { useCurrentDailyCategory } from "./orm-hooks";
 
 export const Layout = () => {
     const setDebugMode = useSetAtom(debugModeAtom);
