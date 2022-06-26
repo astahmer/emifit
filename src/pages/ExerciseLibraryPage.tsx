@@ -1,4 +1,5 @@
 import { DynamicTable } from "@/components/DynamicTable";
+import { FloatingButton } from "@/components/FloatingButton";
 import { MultiSelect } from "@/components/MultiSelect";
 import { Show } from "@/components/Show";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
@@ -16,17 +17,20 @@ import {
     AccordionPanel,
     Badge,
     Box,
+    ButtonGroup,
     Divider,
     Flex,
     Heading,
     IconButton,
+    Portal,
     Stack,
     Text,
     useAccordionContext,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { sortBy } from "@pastable/core";
+import { useEffect, useRef, useState } from "react";
+import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { Link as ReactLink } from "react-router-dom";
-import { FloatingButton } from "@/components/FloatingButton";
 
 export const ExerciseLibraryPage = () => {
     const categoryList = useCategoryList();
@@ -48,12 +52,17 @@ export const ExerciseLibraryPage = () => {
     let exerciseList = exerciseListByCategory;
 
     if (byTags.length) {
-        exerciseList = exerciseListByCategory.filter((exo) =>
-            byTags.every((tagId) => exo.tags.some((t) => t.id === tagId))
-        );
+        exerciseList = exerciseList.filter((exo) => byTags.every((tagId) => exo.tags.some((t) => t.id === tagId)));
     }
     if (byName) {
         exerciseList = exerciseList.filter((exo) => exo.name.toLowerCase() === byName.toLowerCase());
+    }
+
+    const containerRef = useRef();
+    const [sortByDirection, setSortByDirection] = useState<"asc" | "desc">("asc");
+
+    if (sortByDirection) {
+        exerciseList = sortBy(exerciseList, "name", sortByDirection);
     }
 
     return (
@@ -62,19 +71,33 @@ export const ExerciseLibraryPage = () => {
             {byCategory && (
                 <Stack mt="4" w="100%">
                     <CategoryRadioPicker defaultValue={byCategory} onChange={setByCategory} />
-                    <MultiSelect
-                        onChange={(selecteds) => setByTags(selecteds.map((tag) => tag.id))}
-                        items={tagList}
-                        getValue={(item) => item.id}
-                        itemToString={(item) => item.name}
-                        renderButtonText={(selection) => (
-                            <Text maxW="100%" textOverflow="ellipsis" overflow="hidden">
-                                {selection.length
-                                    ? `(${selection.length}) ${selection.map((item) => item.name).join(", ")}`
-                                    : "Filter by tags"}
-                            </Text>
-                        )}
-                    />
+                    <ButtonGroup isAttached variant="outline">
+                        <MultiSelect
+                            onChange={(selecteds) => setByTags(selecteds.map((tag) => tag.id))}
+                            items={tagList}
+                            getValue={(item) => item.id}
+                            itemToString={(item) => item.name}
+                            renderList={({ ListComponent, ...props }) => (
+                                <Portal containerRef={containerRef}>
+                                    <ListComponent {...props} />
+                                </Portal>
+                            )}
+                            getButtonProps={() => ({ w: "100%" })}
+                            renderButtonText={(selection) => (
+                                <Text maxW="100%" textOverflow="ellipsis" overflow="hidden">
+                                    {selection.length
+                                        ? `(${selection.length}) ${selection.map((item) => item.name).join(", ")}`
+                                        : "Filter by tags"}
+                                </Text>
+                            )}
+                        />
+                        <IconButton
+                            aria-label="Sort"
+                            icon={sortByDirection === "desc" ? <HiSortAscending /> : <HiSortDescending />}
+                            onClick={() => setSortByDirection((current) => (current === "asc" ? "desc" : "asc"))}
+                        />
+                    </ButtonGroup>
+                    <div ref={containerRef} />
                 </Stack>
             )}
             <Flex flexDirection="column" mt="4" h="100%" minH="0" overflow="auto">
