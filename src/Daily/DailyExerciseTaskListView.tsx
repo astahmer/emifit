@@ -261,7 +261,7 @@ const UseAsProgramButton = () => {
             fallback={
                 <Box alignSelf="center">
                     <RadioCardButton py="4" mb="4" onClick={() => setShowProgramNameInput(true)}>
-                        Use as program ?
+                        Export as program ?
                     </RadioCardButton>
                 </Box>
             }
