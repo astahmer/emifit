@@ -1,5 +1,7 @@
+import { Show } from "@/components/Show";
 import { Serie } from "@/orm-types";
 import { OrderedList, ListProps, ListItem, Text, TextProps } from "@chakra-ui/react";
+import { getSum } from "@pastable/core";
 
 export const ExerciseSetList = ({ setList, ...props }: { setList: Serie[] } & ListProps) => {
     return (
@@ -17,6 +19,11 @@ export const ExerciseSetList = ({ setList, ...props }: { setList: Serie[] } & Li
                     {serie.kind === "warmup" ? "(warmup) " : ""} with {serie.kg} kg / {serie.reps} reps
                 </ListItem>
             ))}
+            <Show when={setList.length > 1}>
+                <span>
+                    Total: {getSum(setList.map((s) => s.kg))} kgs / {getSum(setList.map((s) => s.kg))} reps
+                </span>
+            </Show>
         </OrderedList>
     );
 };
