@@ -14,7 +14,11 @@ function ReloadPrompt() {
         needRefresh: [needRefresh, setNeedRefresh],
         updateServiceWorker,
     } = useRegisterSW({
+        onNeedRefresh: () => {
+            console.log("onNeedRefresh");
+        },
         onRegistered(r) {
+            console.log("onRegistered");
             // @ts-expect-error just ignore
             if (reloadSW === "true") {
                 r &&
