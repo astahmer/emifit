@@ -20,7 +20,7 @@ export function InitialState({ sortByDirection }: { sortByDirection: SortByDirec
 
     const categoryListFromProgramList = programList.map((program) => program.category);
     const pickableCategoryList = categoryList.filter((category) => categoryListFromProgramList.includes(category.id));
-    const [byName, setByName] = useState<string>();
+    const [byName, setByName] = useState<Program>();
 
     let filteredProgramList = programList;
 
@@ -28,7 +28,7 @@ export function InitialState({ sortByDirection }: { sortByDirection: SortByDirec
         filteredProgramList = programList.filter((program) => actions.findById(program.category));
     }
     if (byName) {
-        filteredProgramList = programList.filter((program) => program.name.toLowerCase() === byName.toLowerCase());
+        filteredProgramList = programList.filter((program) => program.name.toLowerCase() === byName.name.toLowerCase());
     }
     if (sortByDirection) {
         filteredProgramList = sortBy(filteredProgramList, "name", sortByDirection);
@@ -92,7 +92,9 @@ export function InitialState({ sortByDirection }: { sortByDirection: SortByDirec
                         renderModalContent={() => (
                             <Box py="4">
                                 <ProgramCombobox
-                                    onSelectedItemChange={(changes) => setByName(changes.selectedItem?.name)}
+                                    initialSelectedItem={byName}
+                                    defaultValue={byName?.name}
+                                    onSelectedItemChange={(changes) => setByName(changes.selectedItem)}
                                     getItems={(items) => filteredProgramList}
                                     label={() => null}
                                     placeholder="Search for a program by name"

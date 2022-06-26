@@ -46,7 +46,7 @@ export const ExerciseLibraryPage = () => {
     const tagQuery = useCategoryQuery(byCategory);
     const tagList = tagQuery.data?.tagList || [];
     const [byTags, setByTags] = useState<string[]>([]);
-    const [byName, setByName] = useState<string>();
+    const [byName, setByName] = useState<Exercise>();
 
     const exerciseListByCategory = useExerciseList({ index: "by-category", query: byCategory });
     let exerciseList = exerciseListByCategory;
@@ -55,7 +55,7 @@ export const ExerciseLibraryPage = () => {
         exerciseList = exerciseList.filter((exo) => byTags.every((tagId) => exo.tags.some((t) => t.id === tagId)));
     }
     if (byName) {
-        exerciseList = exerciseList.filter((exo) => exo.name.toLowerCase() === byName.toLowerCase());
+        exerciseList = exerciseList.filter((exo) => exo.name.toLowerCase() === byName?.name.toLowerCase());
     }
 
     const containerRef = useRef();
@@ -122,7 +122,9 @@ export const ExerciseLibraryPage = () => {
                 renderModalContent={() => (
                     <Box py="4">
                         <ExerciseCombobox
-                            onSelectedItemChange={(changes) => setByName(changes.selectedItem?.name || null)}
+                            initialSelectedItem={byName}
+                            defaultValue={byName?.name}
+                            onSelectedItemChange={(changes) => setByName(changes.selectedItem || null)}
                             params={{ index: "by-category", query: byCategory }}
                             getItems={(items) =>
                                 items.filter((exo) => byTags.every((tagId) => exo.tags.some((t) => t.id === tagId)))

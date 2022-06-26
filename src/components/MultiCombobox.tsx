@@ -1,3 +1,4 @@
+import { mergeProps } from "@/functions/mergeProps";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import {
     Flex,
@@ -15,7 +16,6 @@ import {
     Wrap,
     WrapItem,
 } from "@chakra-ui/react";
-import { callAll } from "@pastable/core";
 import {
     useCombobox,
     UseComboboxProps,
@@ -109,17 +109,7 @@ function MultiComboboxBase<Item = any>({
         return reducer;
     }, [getValue]);
 
-    const {
-        isOpen,
-        getToggleButtonProps,
-        getLabelProps,
-        getMenuProps,
-        getInputProps,
-        getComboboxProps,
-        highlightedIndex,
-        getItemProps,
-        setInputValue,
-    } = useCombobox({
+    const combobox = useCombobox({
         defaultHighlightedIndex: 0, // after selection, highlight the first item.
         selectedItem: null,
         stateReducer,
@@ -154,15 +144,22 @@ function MultiComboboxBase<Item = any>({
             }
         },
     });
+    const {
+        isOpen,
+        getToggleButtonProps,
+        getLabelProps,
+        getMenuProps,
+        getInputProps,
+        getComboboxProps,
+        highlightedIndex,
+        getItemProps,
+        setInputValue,
+    } = combobox;
 
     const isDisabled = items.length === values.length;
 
     const inputProps = getInputProps(getDropdownProps({ preventKeyAction: isOpen }));
     const inputRef = useMergeRefs(externalRef, inputProps.ref);
-    const mergedProps = {
-        onChange: callAll(props.onChange, inputProps.onChange),
-        onBlur: callAll(props.onBlur, inputProps.onBlur),
-    };
 
     const canRemoveItems = minItems ? values.length > minItems : values.length > 0;
 
@@ -187,9 +184,9 @@ function MultiComboboxBase<Item = any>({
                                 <Input
                                     placeholder={items.length ? "Search or create a new one..." : "Create a new one..."}
                                     disabled={isDisabled}
-                                    {...inputProps}
-                                    {...props}
-                                    {...mergedProps}
+                                    {...mergeProps(mergeProps(inputProps, props), {
+                                        onFocus: () => !combobox.isOpen && combobox.openMenu(),
+                                    })}
                                     ref={inputRef}
                                 />
                             )}
