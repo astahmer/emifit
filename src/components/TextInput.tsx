@@ -70,11 +70,17 @@ export type TextInputBaseProps = {
 };
 export type TextInputProps = InputProps & TextInputBaseProps;
 
-export const TextareaInput = forwardRef<HTMLTextAreaElement, TextareaInputProps>(({ children, ...props }, ref) => (
-    <TextInput {...(props as any)} render={() => <Textarea {...appInputProps} ref={ref} {...props} />}>
-        {children}
-    </TextInput>
-));
+export const TextareaInput = forwardRef<HTMLTextAreaElement, TextareaInputProps>(
+    ({ children, labelProps, ...props }, ref) => (
+        <TextInput
+            {...(props as any)}
+            labelProps={labelProps}
+            render={() => <Textarea {...appInputProps} ref={ref} {...props} />}
+        >
+            {children}
+        </TextInput>
+    )
+);
 
 export const AutoResizeTextarea = forwardRef<
     HTMLTextAreaElement,
