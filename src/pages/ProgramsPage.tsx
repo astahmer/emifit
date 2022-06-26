@@ -1,17 +1,18 @@
+import { SortByDirection, SortByIconButton } from "@/components/SortByIconButton";
 import { serializeExercise } from "@/functions/snapshot";
 import { onError, successToast } from "@/functions/toasts";
 import { makeId, rmTrailingSlash } from "@/functions/utils";
 import { mergeMeta, printStatesPathValue } from "@/functions/xstate-utils";
 import { orm } from "@/orm";
+import { useProgramQuery } from "@/orm-hooks";
 import { ProgramInterpretProvider } from "@/Programs/useProgramInterpret";
 import { routeMap } from "@/routes";
 import { browserHistory, debugModeAtom } from "@/store";
-import { useProgramQuery } from "@/orm-hooks";
 import { Box, Heading, Tag } from "@chakra-ui/react";
 import { useMachine } from "@xstate/react";
 import confetti from "canvas-confetti";
 import { useAtomValue } from "jotai";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { InitialState } from "../Programs/InitialState";
@@ -101,14 +102,23 @@ export const ProgramsPage = () => {
     }, []);
 
     const debugMode = useAtomValue(debugModeAtom);
+    const [sortByDirection, setSortByDirection] = useState<SortByDirection>("asc");
 
     return (
         <ProgramInterpretProvider value={interpret}>
             <Box id="ProgramsPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
-                <Heading as="h1">Programs</Heading>
+                <Box d="flex" alignItems="center">
+                    <Heading as="h1">Programs</Heading>
+                    <SortByIconButton
+                        ml="auto"
+                        variant="outline"
+                        sortByDirection={sortByDirection}
+                        onSortByDirectionChange={setSortByDirection}
+                    />
+                </Box>
                 {query.isFetched && (
                     <>
-                        {state.matches("initial") && <InitialState />}
+                        {state.matches("initial") && <InitialState sortByDirection={sortByDirection} />}
                         {state.matches("creating") && <ProgramForm />}
                     </>
                 )}

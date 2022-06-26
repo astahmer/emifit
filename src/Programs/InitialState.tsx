@@ -1,18 +1,18 @@
 import { FloatingButton } from "@/components/FloatingButton";
 import { HFlex } from "@/components/HFlex";
 import { MultiSelect } from "@/components/MultiSelect";
-import { ExerciseCombobox } from "@/Exercises/ExerciseCombobox";
+import { SortByDirection } from "@/components/SortByIconButton";
 import { useCategoryList, useProgramList } from "@/orm-hooks";
-import { Category } from "@/orm-types";
+import { Category, Program } from "@/orm-types";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import { Alert, AlertIcon, Box, Button, Divider, FormLabel, IconButton, Text } from "@chakra-ui/react";
-import { useSelection } from "@pastable/core";
+import { sortBy, useSelection } from "@pastable/core";
 import { useState } from "react";
 import { ProgramCombobox } from "./ProgramCombobox";
 import { ProgramList } from "./ProgramList";
 
-export function InitialState() {
+export function InitialState({ sortByDirection }: { sortByDirection: SortByDirection }) {
     const send = useProgramInterpret().send;
     const [selection, actions] = useSelection<Category>({ getId: (item) => item.id });
     const categoryList = useCategoryList();
@@ -29,6 +29,9 @@ export function InitialState() {
     }
     if (byName) {
         filteredProgramList = programList.filter((program) => program.name.toLowerCase() === byName.toLowerCase());
+    }
+    if (sortByDirection) {
+        filteredProgramList = sortBy(filteredProgramList, "name", sortByDirection);
     }
 
     return (

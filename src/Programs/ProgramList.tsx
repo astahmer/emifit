@@ -16,7 +16,6 @@ export function ProgramList({
 
     // Keep items up to date with programIdList whenever a program is created/deleted
     useEffect(() => {
-        if (programIdList.length === items.length) return;
         if (programIdList.join() === items.join()) return;
 
         setItems(programIdList);

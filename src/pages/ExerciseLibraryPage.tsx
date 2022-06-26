@@ -2,6 +2,7 @@ import { DynamicTable } from "@/components/DynamicTable";
 import { FloatingButton } from "@/components/FloatingButton";
 import { MultiSelect } from "@/components/MultiSelect";
 import { Show } from "@/components/Show";
+import { SortByDirection, SortByIconButton } from "@/components/SortByIconButton";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseCombobox } from "@/Exercises/ExerciseCombobox";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
@@ -29,7 +30,6 @@ import {
 } from "@chakra-ui/react";
 import { sortBy } from "@pastable/core";
 import { useEffect, useRef, useState } from "react";
-import { HiSortAscending, HiSortDescending } from "react-icons/hi";
 import { Link as ReactLink } from "react-router-dom";
 
 export const ExerciseLibraryPage = () => {
@@ -59,7 +59,7 @@ export const ExerciseLibraryPage = () => {
     }
 
     const containerRef = useRef();
-    const [sortByDirection, setSortByDirection] = useState<"asc" | "desc">("asc");
+    const [sortByDirection, setSortByDirection] = useState<SortByDirection>("asc");
 
     if (sortByDirection) {
         exerciseList = sortBy(exerciseList, "name", sortByDirection);
@@ -91,10 +91,9 @@ export const ExerciseLibraryPage = () => {
                                 </Text>
                             )}
                         />
-                        <IconButton
-                            aria-label="Sort"
-                            icon={sortByDirection === "desc" ? <HiSortAscending /> : <HiSortDescending />}
-                            onClick={() => setSortByDirection((current) => (current === "asc" ? "desc" : "asc"))}
+                        <SortByIconButton
+                            sortByDirection={sortByDirection}
+                            onSortByDirectionChange={setSortByDirection}
                         />
                     </ButtonGroup>
                     <div ref={containerRef} />
