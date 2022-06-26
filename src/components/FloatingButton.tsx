@@ -1,5 +1,6 @@
 import {
     Box,
+    BoxProps,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -13,15 +14,17 @@ import { ReactNode } from "react";
 export const FloatingButton = ({
     renderButton,
     renderModalContent,
+    containerProps,
 }: {
     renderButton: (props: UseDisclosureReturn) => ReactNode;
     renderModalContent: (props: UseDisclosureReturn) => ReactNode;
+    containerProps?: BoxProps;
 }) => {
     const toggle = useDisclosure();
     const { isOpen, onClose } = toggle;
 
     return (
-        <Box pos="absolute" bottom={5} right={5}>
+        <Box pos="absolute" bottom={5} right={5} {...containerProps}>
             {renderButton(toggle)}
             <Modal onClose={onClose} isOpen={isOpen} motionPreset="slideInBottom">
                 <ModalOverlay />

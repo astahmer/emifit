@@ -1,11 +1,15 @@
+import { FloatingButton } from "@/components/FloatingButton";
 import { HFlex } from "@/components/HFlex";
 import { MultiSelect } from "@/components/MultiSelect";
+import { ExerciseCombobox } from "@/Exercises/ExerciseCombobox";
 import { useCategoryList, useProgramList } from "@/orm-hooks";
 import { Category } from "@/orm-types";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
-import { AddIcon } from "@chakra-ui/icons";
-import { Alert, AlertIcon, Box, Button, Divider, FormLabel, Text } from "@chakra-ui/react";
+import { AddIcon, SearchIcon } from "@chakra-ui/icons";
+import { Alert, AlertIcon, Box, Button, Divider, FormLabel, IconButton, Text } from "@chakra-ui/react";
 import { useSelection } from "@pastable/core";
+import { useState } from "react";
+import { ProgramCombobox } from "./ProgramCombobox";
 import { ProgramList } from "./ProgramList";
 
 export function InitialState() {
@@ -16,10 +20,16 @@ export function InitialState() {
 
     const categoryListFromProgramList = programList.map((program) => program.category);
     const pickableCategoryList = categoryList.filter((category) => categoryListFromProgramList.includes(category.id));
+    const [byName, setByName] = useState<string>();
 
-    const filteredProgramList = selection.length
-        ? programList.filter((program) => actions.findById(program.category))
-        : programList;
+    let filteredProgramList = programList;
+
+    if (selection.length) {
+        filteredProgramList = programList.filter((program) => actions.findById(program.category));
+    }
+    if (byName) {
+        filteredProgramList = programList.filter((program) => program.name.toLowerCase() === byName.toLowerCase());
+    }
 
     return (
         <>
@@ -64,6 +74,29 @@ export function InitialState() {
                             Create program
                         </Button>
                     </Box>
+                    <FloatingButton
+                        containerProps={{ bottom: 20, right: 5 }}
+                        renderButton={(props) => (
+                            <IconButton
+                                aria-label="Search"
+                                icon={<SearchIcon />}
+                                colorScheme="pink"
+                                rounded="full"
+                                size="lg"
+                                onClick={props.onOpen}
+                            />
+                        )}
+                        renderModalContent={() => (
+                            <Box py="4">
+                                <ProgramCombobox
+                                    onSelectedItemChange={(changes) => setByName(changes.selectedItem?.name)}
+                                    getItems={(items) => filteredProgramList}
+                                    label={() => null}
+                                    placeholder="Search for a program by name"
+                                />
+                            </Box>
+                        )}
+                    />
                 </>
             ) : (
                 <Box d="flex" flexDirection="column" m="auto" mt="auto" alignItems="center">
