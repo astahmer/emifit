@@ -14,14 +14,14 @@ import { ReactNode, useRef } from "react";
 export function PersistModal({
     renderTrigger,
     title,
-    onConfirm,
     renderBody,
+    renderConfirmButton,
     formId,
 }: {
     renderTrigger: (onOpen: () => void) => ReactNode;
     renderBody: (onClose: () => void) => ReactNode;
+    renderConfirmButton?: (onClose: () => void) => ReactNode;
     title: string;
-    onConfirm?: (onClose: () => void) => void;
     formId?: string;
 }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -47,15 +47,16 @@ export function PersistModal({
                         <Button mr={3} onClick={onClose} variant="outline" ref={initialFocusRef}>
                             Cancel
                         </Button>
-                        <Button
-                            colorScheme="pink"
-                            variant="solid"
-                            onClick={() => onConfirm?.(onClose)}
-                            form={formId}
-                            type={formId ? "submit" : undefined}
-                        >
-                            Save
-                        </Button>
+                        {renderConfirmButton?.(onClose) || (
+                            <Button
+                                colorScheme="pink"
+                                variant="solid"
+                                form={formId}
+                                type={formId ? "submit" : undefined}
+                            >
+                                Save
+                            </Button>
+                        )}
                     </ModalFooter>
                 </ModalContent>
             </Modal>

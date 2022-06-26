@@ -3,6 +3,7 @@ import { DotsIconButton } from "@/components/DotsIconButton";
 import { DynamicTable } from "@/components/DynamicTable";
 import { HFlex } from "@/components/HFlex";
 import { onError, toasts } from "@/functions/toasts";
+import { printDate } from "@/functions/utils";
 import { orm, StoreQueryParams } from "@/orm";
 import { useCategoryList } from "@/orm-hooks";
 import { Category, Daily, Exercise, Group, Program, Tag } from "@/orm-types";
@@ -26,6 +27,7 @@ import {
 import { useMutation, useQueryClient } from "react-query";
 import { PersistModal } from "../components/PersistModal";
 import { AddCategoryForm, CategoryForm } from "./CategoryForm";
+import { GlobalExerciseForm, GlobalExerciseFormValues } from "./GlobalExerciseForm";
 import { AddGroupForm, GroupForm } from "./GroupForm";
 import { AddTagForm, TagForm, TagFormValues } from "./TagForm";
 
@@ -67,6 +69,7 @@ export const DataAccordions = ({
                                 data={exerciseList}
                                 isHeaderSticky
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
+                                initialSortBy={[{ id: "name", desc: false }]}
                             />
                         </Box>
                     </AccordionPanel>
@@ -96,6 +99,7 @@ export const DataAccordions = ({
                                         <ProgramCardExerciseList program={row.original as Program} />
                                     </HFlex>
                                 )}
+                                initialSortBy={[{ id: "name", desc: false }]}
                             />
                         </Box>
                     </AccordionPanel>
@@ -125,6 +129,7 @@ export const DataAccordions = ({
                                         <ProgramCardExerciseList program={row.original as Program} />
                                     </HFlex>
                                 )}
+                                initialSortBy={[{ id: "id", desc: true }]}
                             />
                         </Box>
                     </AccordionPanel>
@@ -147,6 +152,7 @@ export const DataAccordions = ({
                                 data={tagList}
                                 isHeaderSticky
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
+                                initialSortBy={[{ id: "name", desc: false }]}
                             />
                         </Box>
                     </AccordionPanel>
@@ -183,6 +189,7 @@ export const DataAccordions = ({
                                 data={categoryList}
                                 isHeaderSticky
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
+                                initialSortBy={[{ id: "name", desc: false }]}
                             />
                         </Box>
                     </AccordionPanel>
@@ -219,6 +226,7 @@ export const DataAccordions = ({
                                 data={groupList}
                                 isHeaderSticky
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
+                                initialSortBy={[{ id: "name", desc: false }]}
                             />
                         </Box>
                     </AccordionPanel>
@@ -248,6 +256,7 @@ const tagsColumns = [
     {
         Header: "",
         accessor: "__actions",
+        canBeSorted: false,
         Cell: ({ row }) => {
             const tag = row.original as Tag;
             const categoryList = useCategoryList().filter((category) =>
@@ -357,10 +366,12 @@ const categoryColumns = [
         Header: "tagList",
         accessor: "tagList",
         Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", "),
+        canBeSorted: false,
     },
     {
         Header: "",
         accessor: "__actions",
+        canBeSorted: false,
         Cell: ({ row }) => {
             const category = row.original as Category;
 
@@ -437,6 +448,7 @@ const groupColumns = [
     {
         Header: "",
         accessor: "__actions",
+        canBeSorted: false,
         Cell: ({ row }) => {
             const group = row.original as Group;
 
@@ -497,9 +509,73 @@ const groupColumns = [
 const exerciseColumns = [
     { Header: "id", accessor: "id" },
     { Header: "name", accessor: "name" },
+    {
+        Header: "last date",
+        accessor: "createdAt",
+        Cell: (props) => <Text whiteSpace="nowrap">{printDate(new Date(props.value))}</Text>,
+    },
     { Header: "category", accessor: "category" },
     { Header: "sets count", accessor: "series", Cell: (props) => props.value.length },
-    { Header: "tags", accessor: "tags", Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", ") },
+    {
+        Header: "tags",
+        accessor: "tags",
+        Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", "),
+        canBeSorted: false,
+    },
+    {
+        Header: "",
+        accessor: "__actions",
+        canBeSorted: false,
+        Cell: ({ row }) => {
+            const exercise = row.original as Exercise;
+            const queryClient = useQueryClient();
+
+            const editMutation = useMutation(
+                async (values: GlobalExerciseFormValues) => {
+                    const tx = orm.db.transaction("exercise", "readwrite");
+
+                    let cursor = await tx.store.index("by-name").openCursor(exercise.name);
+
+                    while (cursor) {
+                        cursor.update({ ...cursor.value, name: values.name });
+                        cursor = await cursor.continue();
+                    }
+                },
+                {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries([orm.exercise.name]);
+                        toasts.success(`All occurrences of the exercise <${exercise.name}> have been updated !`);
+                    },
+                    onError: (err) => void onError(typeof err === "string" ? err : (err as any).message),
+                }
+            );
+
+            return (
+                <Menu strategy="absolute">
+                    <MenuButton as={DotsIconButton} />
+                    <MenuList>
+                        <PersistModal
+                            title="Edit exercise"
+                            formId="EditExerciseForm"
+                            renderTrigger={(onOpen) => (
+                                <MenuItem icon={<EditIcon />} onClick={onOpen}>
+                                    Edit
+                                </MenuItem>
+                            )}
+                            renderBody={(onClose) => (
+                                <GlobalExerciseForm
+                                    formId="EditExerciseForm"
+                                    defaultValues={{ name: exercise.name }}
+                                    onSubmit={(values) => editMutation.mutate(values, { onSuccess: onClose })}
+                                    canShowStats={editMutation.status === "idle" || editMutation.status === "success"}
+                                />
+                            )}
+                        />
+                    </MenuList>
+                </Menu>
+            );
+        },
+    },
 ];
 const programColumns = [
     { Header: "id", accessor: "id" },

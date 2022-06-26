@@ -45,11 +45,10 @@ export const SettingsPage = () => {
 };
 
 const DebugModeOnly = () => {
-    const exerciseList = useExerciseList();
     const programList = useProgramList();
     const dailyList = useDailyList();
 
-    return <DataAccordions exerciseList={exerciseList} programList={programList} dailyList={dailyList} showIdColumn />;
+    return <DataAccordions programList={programList} dailyList={dailyList} showIdColumn />;
 };
 
 const EditableList = () => {
@@ -57,14 +56,16 @@ const EditableList = () => {
     const categoryList = useCategoryList();
     const groupList = useGroupList();
     const isDebugMode = useAtomValue(debugModeAtom);
+    const exerciseList = useExerciseList();
 
     return (
         <DataAccordions
             tagList={tagList}
             categoryList={categoryList}
             groupList={groupList}
-            withActions
+            exerciseList={exerciseList}
             showIdColumn={isDebugMode}
+            withActions
         />
     );
 };

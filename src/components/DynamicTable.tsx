@@ -13,7 +13,7 @@ import {
     TableCellProps,
     Box,
 } from "@chakra-ui/react";
-import { isDefined } from "@pastable/core";
+import { isDefined, ObjectLiteral } from "@pastable/core";
 import { Fragment, ReactNode, useEffect } from "react";
 import { Cell, Column, Row, TableOptions, UseExpandedOptions, useExpanded, useSortBy, useTable } from "react-table";
 
@@ -110,18 +110,18 @@ export function DynamicTable({
     );
 }
 
-export interface DynamicTableProps extends Pick<TableProps, "size"> {
-    columns: TableOptions<{}>["columns"];
-    data: TableOptions<{}>["data"];
+export interface DynamicTableProps<RowData extends ObjectLiteral = any> extends Pick<TableProps, "size"> {
+    columns: TableOptions<RowData>["columns"];
+    data: TableOptions<RowData>["data"];
     getHeaderProps?: (column: Column, colIndex: number) => TableColumnHeaderProps;
     getRowProps?: (row: Column, rowIndex: number) => TableRowProps;
     getCellProps?: (cell: Cell, rowIndex: number, cellIndex: number) => TableCellProps;
     renderSubRow?: ({ row }: { row: Row }) => ReactNode;
     isHeaderSticky?: boolean;
     hiddenColumns?: string[];
-    initialSortBy?: ReactTableSortBy[];
+    initialSortBy?: ReactTableSortBy<RowData>[];
 }
 
-type ReactTableSortBy = { id: string; desc?: boolean };
+type ReactTableSortBy<RowData extends ObjectLiteral = any> = { id: keyof RowData & {}; desc?: boolean };
 
 const defaultColumn = { Cell: ({ cell: { value } }) => (isDefined(value) ? String(value) : "--") };

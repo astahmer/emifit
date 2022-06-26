@@ -18,7 +18,6 @@ export function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercis
     const exerciseListByCategory = useExerciseList({ index: "by-category", query: catId });
 
     const [byNameList, setByNameList] = useState<Exercise[]>([]);
-    console.log(byNameList);
 
     let exerciseList = exerciseListByCategory;
     if (byNameList.length) {
