@@ -149,7 +149,7 @@ export function useExerciseUnsortedList<Index extends StoreIndex<"exercise"> = u
     const canSeeEveryExercises = catQuery.data?.canSeeEveryExercises || false;
 
     return useQuery<Exercise[]>(
-        [orm.exercise.name, params, { canSeeEveryExercises }],
+        [orm.exercise.name, "list", params, { canSeeEveryExercises }],
         async () => {
             const exerciseParams =
                 params.index === "by-category" ? (canSeeEveryExercises ? undefined : params) : params;
@@ -174,6 +174,19 @@ export const useExerciseListInDailyCategory = () => {
     const daily = useCurrentDaily();
     return useExerciseList({ index: "by-category", query: daily.category });
 };
+
+export function useExerciseQuery(id: Exercise["id"]) {
+    return useQuery<Exercise>(
+        [orm.exercise.name, "item", id],
+        async () => {
+            const [exercise, tagList] = await Promise.all([orm.exercise.find(id), orm.tag.get()]);
+            console.log(exercise);
+            const tagListById = groupIn(tagList, "id");
+            return computeExerciseFromReferences(exercise, tagListById);
+        },
+        { enabled: Boolean(id), initialData: null }
+    );
+}
 
 export function useHasProgram<Index extends StoreIndex<"program"> = undefined>(
     params: StoreQueryParams<"program", Index> = {}

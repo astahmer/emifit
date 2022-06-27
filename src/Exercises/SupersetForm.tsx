@@ -20,7 +20,7 @@ export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void
 
     const route = getRouteTypeFromPathname(location.pathname);
     const title = match(route)
-        .with("add", () => "Create superset")
+        .with("add", "copy", () => "Create superset")
         .with("edit-superset", () => "Update superset")
         .run();
 

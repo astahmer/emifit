@@ -5,7 +5,7 @@ import { Scrollable } from "@/components/Scrollable";
 import { Show } from "@/components/Show";
 import { TextInput } from "@/components/TextInput";
 import { ExerciseGrid } from "@/Exercises/ExerciseGrid";
-import { ExerciseMenu, SupersetExerciseMenu } from "@/Exercises/ExerciseMenu";
+import { ExerciseMenu, PastDailyExerciseMenu, SupersetExerciseMenu } from "@/Exercises/ExerciseMenu";
 import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { groupBy } from "@/functions/groupBy";
@@ -130,7 +130,7 @@ function ExerciseTaskItem({ exo }: { exo: Exercise }) {
                     <Heading as="h4" size="md">
                         {exo.name}
                     </Heading>
-                    {isDailyToday && <ExerciseMenu exo={exo} />}
+                    {isDailyToday ? <ExerciseMenu exo={exo} /> : <PastDailyExerciseMenu exo={exo} />}
                 </Flex>
                 <ExerciseSetListOverview setList={exo.series} />
                 <ExerciseTagList mt="2" tagList={exo.tags} />

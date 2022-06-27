@@ -4,9 +4,10 @@ import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { HStack, IconButton } from "@chakra-ui/react";
+import { Box, HStack, IconButton } from "@chakra-ui/react";
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
+import { FaRegCopy } from "react-icons/fa";
 
 export function ExerciseMenu({ exo }: { exo: Exercise }) {
     const daily = useCurrentDaily();
@@ -53,6 +54,23 @@ export function ExerciseMenu({ exo }: { exo: Exercise }) {
                 onConfirm={() => removeExerciseFromDaily.mutate()}
             />
         </HStack>
+    );
+}
+
+export function PastDailyExerciseMenu({ exo }: { exo: Exercise }) {
+    const navigate = useNavigate();
+
+    return (
+        <Box ml="auto" mt="2" aria-label="menu">
+            <IconButton
+                icon={<FaRegCopy />}
+                onClick={() => navigate(`/daily/entry/${printDailyDate(new Date())}/exercise/copy?exoId=${exo.id}`)}
+                aria-label="Copy exercise"
+                size="sm"
+                colorScheme="pink"
+                variant="outline"
+            />
+        </Box>
     );
 }
 

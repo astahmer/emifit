@@ -1,4 +1,6 @@
+import { Show } from "@/components/Show";
 import { SwitchInput } from "@/components/SwitchInput";
+import { SupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
 import { makeId } from "@/functions/utils";
@@ -13,13 +15,15 @@ import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
 import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
-import { SupersetForm } from "@/Exercises/SupersetForm";
 
-export const ExerciseAddPage = () => {
+export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
+    console.log({ exercise });
     const query = useCurrentDailyQuery();
     const daily = query.data;
 
-    const service = useInterpret(makeExerciseFormMachine);
+    const service = useInterpret(() =>
+        makeExerciseFormMachine({ singleForm: { ...exercise, nbSeries: exercise.series.length } })
+    );
     const isSuperset = useSelector(service, (state) => state.matches("superset"));
 
     const queryClient = useQueryClient();
@@ -77,18 +81,20 @@ export const ExerciseAddPage = () => {
 
     return (
         <ExerciseFormMachineProvider value={service}>
-            <Box px="8" py="4" minH={0}>
-                <SwitchInput
-                    id="isSuperset"
-                    label="Is it a superset ?"
-                    onChange={(e) => service.send(e.target.checked ? "AddExercise" : "RemoveExercise")}
-                />
-            </Box>
-            {!isSuperset ? (
-                <SingleExerciseForm onSubmit={addExerciseToDaily.mutate} />
-            ) : (
-                <SupersetForm onSubmit={addExerciseSupersetToDaily.mutate} />
-            )}
+            <Show when={service.initialized}>
+                <Box px="8" py="4" minH={0}>
+                    <SwitchInput
+                        id="isSuperset"
+                        label="Is it a superset ?"
+                        onChange={(e) => service.send(e.target.checked ? "AddExercise" : "RemoveExercise")}
+                    />
+                </Box>
+                {!isSuperset ? (
+                    <SingleExerciseForm onSubmit={addExerciseToDaily.mutate} />
+                ) : (
+                    <SupersetForm onSubmit={addExerciseSupersetToDaily.mutate} />
+                )}
+            </Show>
         </ExerciseFormMachineProvider>
     );
 };

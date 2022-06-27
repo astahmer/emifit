@@ -17,6 +17,7 @@ export function ExercisePageLayout() {
     const route = getRouteTypeFromPathname(location.pathname);
     const title = match(route)
         .with("add", () => "Add exercise")
+        .with("copy", () => "Copy exercise")
         .with("edit", () => "Edit exercise")
         .with("edit-superset", () => "Edit superset exercise")
         .exhaustive();
@@ -55,6 +56,10 @@ export function getRouteTypeFromPathname(pathname: string) {
         .when(
             (path) => matchPath("daily/entry/:dailyId/exercise/add", path),
             () => "add" as const
+        )
+        .when(
+            (path) => matchPath("daily/entry/:dailyId/exercise/copy", path),
+            () => "copy" as const
         )
         .when(
             (path) => matchPath("daily/entry/:dailyId/exercise/edit/:exerciseId", path),

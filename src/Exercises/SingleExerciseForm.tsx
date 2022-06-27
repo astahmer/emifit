@@ -17,7 +17,7 @@ export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => 
 
     const route = getRouteTypeFromPathname(location.pathname);
     const title = match(route)
-        .with("add", () => "Create")
+        .with("add", "copy", () => "Create")
         .with("edit", () => "Update")
         .run();
 

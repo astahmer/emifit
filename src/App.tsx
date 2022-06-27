@@ -22,6 +22,7 @@ import { ExercisePageLayout } from "./pages/ExercisePageLayout";
 import { appTheme } from "./theme";
 import { Layout } from "./Layout";
 import { ExerciseLibraryPage } from "./pages/ExerciseLibraryPage";
+import { ExerciseCopyPage } from "./pages/ExerciseCopyPage";
 
 const queryClient = new QueryClient();
 
@@ -42,11 +43,11 @@ function App() {
                                     <Route path="daily/entry/:dailyId/exercise" element={<ExercisePageLayout />}>
                                         <Route path="add" element={<ExerciseAddPage />} />
                                         <Route path="edit/:exoId" element={<ExerciseEditPage />} />
+                                        <Route path="copy" element={<ExerciseCopyPage />} />
                                         <Route
                                             path="superset/edit/:supersetId"
                                             element={<ExerciseSupersetEditPage />}
                                         />
-                                        <Route path="select" element={<ExerciseAddPage />} />
                                     </Route>
                                     <Route path={routeMap.progress} element={<ProgressPage />} />
                                     <Route path={routeMap.settings} element={<SettingsPage />} />
