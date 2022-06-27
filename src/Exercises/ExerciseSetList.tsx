@@ -16,12 +16,12 @@ export const ExerciseSetList = ({ setList, ...props }: { setList: Serie[] } & Li
         >
             {setList.map((serie) => (
                 <ListItem key={serie.id}>
-                    {serie.kind === "warmup" ? "(warmup) " : ""} with {serie.kg} kg / {serie.reps} reps
+                    {serie.kind === "warmup" ? "(warmup) " : ""} with {serie.kg} kg | {serie.reps} reps
                 </ListItem>
             ))}
             <Show when={setList.length > 1}>
                 <span>
-                    Total: {getSum(setList.map((s) => s.kg))} kgs / {getSum(setList.map((s) => s.reps))} reps
+                    Total: {getSum(setList.map((s) => s.kg))} kgs | {getSum(setList.map((s) => s.reps))} reps
                 </span>
             </Show>
         </OrderedList>
