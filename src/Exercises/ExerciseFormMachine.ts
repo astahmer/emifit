@@ -117,7 +117,7 @@ export const makeExerciseFormMachine = (initialContext?: Partial<Context>) =>
         }
     );
 
-const hasFilledSingleForm = (ctx: Context) => Boolean(ctx.singleForm.name && ctx.singleForm.tags.length);
+const hasFilledSingleForm = (ctx: Context) => Boolean(ctx.singleForm.name && ctx.singleForm.tags?.length);
 const hasAllSupersetFormFilled = (ctx: Context) => {
     const values = Object.values(ctx.supersetForms);
     if (!values.length) return false;
