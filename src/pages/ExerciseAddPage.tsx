@@ -22,7 +22,9 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
     const daily = query.data;
 
     const service = useInterpret(() =>
-        makeExerciseFormMachine({ singleForm: { ...exercise, nbSeries: exercise?.series?.length } })
+        makeExerciseFormMachine({
+            singleForm: exercise ? { ...exercise, nbSeries: exercise?.series?.length || 0 } : ({} as any),
+        })
     );
     const isSuperset = useSelector(service, (state) => state.matches("superset"));
 

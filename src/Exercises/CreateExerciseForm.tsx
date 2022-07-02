@@ -54,7 +54,7 @@ export const CreateExerciseForm = ({
     shouldOverflow?: boolean;
     getExerciseItems?: (items: Exercise[]) => Exercise[];
 }) => {
-    const form = useForm({ defaultValues });
+    const form = useForm({ defaultValues: { ...formDefaultValues, ...defaultValues } });
 
     const mutation = useMutation(async (params: CreateExerciseParams) => makeExercise({ ...params, category }), {
         onSuccess: onSubmit,
@@ -131,6 +131,7 @@ export const CreateExerciseForm = ({
                                 inputProps={{
                                     min: 1,
                                     max: 20,
+                                    defaultValue: defaultValues.nbSeries || defaultValues.series?.length,
                                     onWheel: () => {
                                         if ((document.activeElement as HTMLInputElement).type === "number") {
                                             (document.activeElement as HTMLInputElement).blur();
