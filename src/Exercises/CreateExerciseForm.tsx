@@ -100,6 +100,7 @@ export const CreateExerciseForm = ({
                                     nbSeries: changes.selectedItem.series.length,
                                     tags: changes.selectedItem.tags,
                                 });
+                                form.setValue("nbSeries", changes.selectedItem.series.length);
                             } else {
                                 form.reset({ name: null, series: [], nbSeries: 0, tags: [] });
                             }
@@ -131,7 +132,6 @@ export const CreateExerciseForm = ({
                                 inputProps={{
                                     min: 1,
                                     max: 20,
-                                    defaultValue: defaultValues.nbSeries || defaultValues.series?.length,
                                     onWheel: () => {
                                         if ((document.activeElement as HTMLInputElement).type === "number") {
                                             (document.activeElement as HTMLInputElement).blur();
