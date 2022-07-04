@@ -18,17 +18,19 @@ import {
     Calendar,
     CalendarControls,
     CalendarDate,
+    CalendarDay,
+    CalendarDays,
     CalendarMonth,
     CalendarMonthName,
     CalendarMonths,
     CalendarNextButton,
     CalendarPrevButton,
     CalendarWeek,
+    useCalendarDay,
 } from "@uselessdev/datepicker";
 import { format } from "date-fns";
 import { useAtomValue } from "jotai";
-import { useRef } from "react";
-import { EmiFitCalendarDays } from "./CalendarDays";
+import { ComponentProps, useRef } from "react";
 
 export const CalendarButton = ({
     selectedDate,
@@ -90,20 +92,9 @@ export const CalendarButton = ({
                             <CalendarMonth>
                                 <CalendarMonthName />
                                 <CalendarWeek />
-                                <EmiFitCalendarDays
-                                    getVariant={(args) =>
-                                        dailyList.find((d) => d.id === printDate(args.day))?.exerciseList?.length
-                                            ? "filled"
-                                            : args.variant
-                                    }
-                                    render={(day) => (
-                                        <DailyCalendarDay
-                                            day={day.day}
-                                            dailyList={dailyList}
-                                            categoryList={categoryList}
-                                        />
-                                    )}
-                                />
+                                <CalendarDays>
+                                    <CustomDay {...{ dailyList, categoryList }} />
+                                </CalendarDays>
                             </CalendarMonth>
                         </CalendarMonths>
                     </PopoverBody>
@@ -113,7 +104,15 @@ export const CalendarButton = ({
     );
 };
 
-function DailyCalendarDay({ day, dailyList }: { day: CalendarDate; dailyList: Daily[]; categoryList: Category[] }) {
+export function DailyCalendarDay({
+    day,
+    dailyList,
+}: {
+    day: CalendarDate;
+    dailyList: Daily[];
+    categoryList: Category[];
+}) {
+    const calendarDay = useCalendarDay();
     const daily = dailyList.find((d) => d.id === printDate(day));
     const hasSomeExerciseThatDay = daily?.exerciseList?.length;
 
@@ -124,8 +123,23 @@ function DailyCalendarDay({ day, dailyList }: { day: CalendarDate; dailyList: Da
 
     return (
         <Box d="flex" flexDirection="column" alignItems="center">
-            <Text color={bgColor}>{format(day, "d")}</Text>
+            <Text color={!(calendarDay.isInRange || calendarDay.isSelected) ? bgColor : undefined}>
+                {format(day, "d")}
+            </Text>
             <Circle size="4px" bgColor={bgColor} />
         </Box>
+    );
+}
+
+export function CustomDay({
+    dailyList,
+    categoryList,
+}: Pick<ComponentProps<typeof DailyCalendarDay>, "dailyList" | "categoryList">) {
+    const { day } = useCalendarDay();
+
+    return (
+        <CalendarDay>
+            <DailyCalendarDay day={day} dailyList={dailyList} categoryList={categoryList} />
+        </CalendarDay>
     );
 }
