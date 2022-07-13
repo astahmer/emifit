@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { readFile, writeFile } from "fs/promises";
 
 const env = dotenv.config();
-const newVersion = Number(env.parsed.VITE_APP_VERSION) + 1;
+const newVersion = Number(env.parsed!.VITE_APP_VERSION) + 1;
 console.log(`Releasing EmiFIT with version <${newVersion}>`);
 
 // @see https://vercel.com/docs/rest-api#endpoints/projects/edit-an-environment-variable
@@ -24,7 +24,7 @@ try {
         headers: { Authorization: `Bearer ${process.env.AUTH_BEARER_TOKEN}` },
         data: { value: newVersion },
     });
-    const VITE_APP_VERSION = envListResponse.data.envs.find((env) => env.key === "VITE_APP_VERSION");
+    const VITE_APP_VERSION = envListResponse.data.envs.find((env) => env.key === "VITE_APP_VERSION")!;
 
     const updateResponse = await axios.request<VercelEnvItem>({
         method: "PATCH",

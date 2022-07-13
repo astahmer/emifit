@@ -8,7 +8,7 @@
         "build": "tsc && vite build",
         "serve": "vite preview",
         "prettier": "prettier --write \"./{src,tests}/**/*\"",
-        "release": "esno ./release.mts && vercel && git push"
+        "release": "esno ./release.mts && vercel --prod && git push"
     },
     "dependencies": {
         "@babel/core": "^7.18.2",
