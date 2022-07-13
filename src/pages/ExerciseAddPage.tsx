@@ -3,9 +3,9 @@ import { SwitchInput } from "@/components/SwitchInput";
 import { SupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
-import { makeId } from "@/functions/utils";
+import { makeId, printDate } from "@/functions/utils";
 import { orm } from "@/orm";
-import { useCurrentDailyInvalidate, useCurrentDailyQuery } from "@/orm-hooks";
+import { useCurrentDailyInvalidate, useDailyQuery } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { makeExercise } from "@/orm-utils";
 import { routeMap } from "@/routes";
@@ -18,7 +18,7 @@ import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
 
 export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
     console.log({ exercise });
-    const query = useCurrentDailyQuery();
+    const query = useDailyQuery(printDate(new Date()));
     const daily = query.data;
 
     const service = useInterpret(() =>
@@ -26,6 +26,7 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
             singleForm: exercise ? { ...exercise, nbSeries: exercise?.series?.length || 0 } : ({} as any),
         })
     );
+    const isInitialized = useSelector(service, () => service.initialized);
     const isSuperset = useSelector(service, (state) => state.matches("superset"));
 
     const queryClient = useQueryClient();
@@ -80,10 +81,11 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
             },
         }
     );
+    console.log({ isInitialized });
 
     return (
         <ExerciseFormMachineProvider value={service}>
-            <Show when={service.initialized}>
+            <Show when={isInitialized}>
                 <Box px="8" py="4" minH={0}>
                     <SwitchInput
                         id="isSuperset"

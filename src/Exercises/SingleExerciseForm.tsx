@@ -14,6 +14,7 @@ export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => 
     const exoNameList = daily.exerciseList.map((exo) => exo.name);
 
     const service = useExerciseFormMachine();
+    const isInitialized = useSelector(service, () => service.initialized);
 
     const route = getRouteTypeFromPathname(location.pathname);
     const title = match(route)
@@ -24,7 +25,7 @@ export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => 
     return (
         <CreateExerciseForm
             id="single-form"
-            defaultValues={service.initialized ? service.state.context.singleForm : undefined}
+            defaultValues={isInitialized ? service.state.context.singleForm : undefined}
             category={daily.category}
             onSubmit={onSubmit}
             onChange={(values) => service.send({ type: "UpdateForm", form: values })}

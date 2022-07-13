@@ -28,7 +28,7 @@ browserHistory.listen((update) => {
         // -> when navigating using BottomTabs.Add when today's daily has not been created yet
         if (
             update.location.pathname.startsWith("/daily/entry/") &&
-            update.location.pathname.endsWith(getDailyIdFromUrl(update.location.pathname))
+            update.location.pathname.includes(getDailyIdFromUrl(update.location.pathname))
         ) {
             log("history 2", update, parseDailyDateFromUrl(window.location.href));
             return store.set(currentDateAtom, parseDailyDateFromUrl(window.location.href));

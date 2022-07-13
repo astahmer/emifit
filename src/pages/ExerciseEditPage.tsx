@@ -4,7 +4,7 @@ import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { routeMap } from "@/routes";
-import { useInterpret } from "@xstate/react";
+import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,6 +21,7 @@ export const ExerciseEditPage = () => {
     const service = useInterpret(() =>
         makeExerciseFormMachine({ singleForm: { ...exercise, nbSeries: exercise.series.length } })
     );
+    const isInitialized = useSelector(service, () => service.initialized);
 
     const navigate = useNavigate();
     const editExerciseById = useMutation(
@@ -48,7 +49,7 @@ export const ExerciseEditPage = () => {
 
     return (
         <ExerciseFormMachineProvider value={service}>
-            {exercise && service.initialized && <SingleExerciseForm onSubmit={editExerciseById.mutate} />}
+            {exercise && isInitialized && <SingleExerciseForm onSubmit={editExerciseById.mutate} />}
         </ExerciseFormMachineProvider>
     );
 };

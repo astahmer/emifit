@@ -3,7 +3,7 @@ import { serializeExercise } from "@/functions/snapshot";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { routeMap } from "@/routes";
-import { useInterpret } from "@xstate/react";
+import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
@@ -24,6 +24,7 @@ export const ExerciseSupersetEditPage = () => {
             ),
         })
     );
+    const isInitialized = useSelector(service, () => service.initialized);
 
     const navigate = useNavigate();
     const editSupersetExerciseList = useMutation(
@@ -52,7 +53,7 @@ export const ExerciseSupersetEditPage = () => {
 
     return (
         <ExerciseFormMachineProvider value={service}>
-            {exerciseList?.length && service.initialized && <SupersetForm onSubmit={editSupersetExerciseList.mutate} />}
+            {exerciseList?.length && isInitialized && <SupersetForm onSubmit={editSupersetExerciseList.mutate} />}
         </ExerciseFormMachineProvider>
     );
 };
