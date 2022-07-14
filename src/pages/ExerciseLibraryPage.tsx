@@ -143,6 +143,21 @@ const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: n
     const exerciseList = (query.data || []).filter((exo) => !Boolean(exo.programId));
     const ctx = useAccordionContext();
 
+    const listWithTops = exerciseList.map((exo) => ({
+        ...exo,
+        topKg: Math.max(...exo.series.map((set) => set.kg)),
+        topReps: Math.max(...exo.series.map((set) => set.reps)),
+    }));
+
+    const topKg = Math.max(...listWithTops.map((exo) => exo.topKg));
+    const topReps = Math.max(...listWithTops.map((exo) => exo.topReps));
+
+    const data = listWithTops.map((exo) => ({
+        ...exo,
+        isTopKg: exo.topKg === topKg,
+        isTopReps: exo.topReps === topReps,
+    }));
+
     return (
         <AccordionItem w="100%" isDisabled={!exerciseList.length}>
             <AccordionButton w="100%">
@@ -157,11 +172,11 @@ const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: n
                 </Stack>
                 <Show when={ctx.index === index}>
                     <Stack mx="2">
-                        <Badge variant="outline" colorScheme="pink" fontSize="x-small">
-                            Top kg {Math.max(...exercise.series.map((set) => set.kg))}
+                        <Badge variant="outline" colorScheme="messenger" fontSize="x-small">
+                            Top kg {topKg}
                         </Badge>
-                        <Badge variant="outline" colorScheme="pink" fontSize="x-small">
-                            Top reps {Math.max(...exercise.series.map((set) => set.reps))}
+                        <Badge variant="outline" colorScheme="messenger" fontSize="x-small">
+                            Top reps {topReps}
                         </Badge>
                     </Stack>
                 </Show>
@@ -178,7 +193,7 @@ const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: n
             >
                 <DynamicTable
                     columns={columns}
-                    data={exerciseList}
+                    data={data}
                     isHeaderSticky
                     initialSortBy={[{ id: "createdAt", desc: true }]}
                 />
@@ -201,18 +216,39 @@ const columns = [
     },
     {
         Header: "top kg",
-        accessor: "series.kg",
-        // TODO tag si best
-        Cell: (props) => (
-            <Text>{(props.row.original as Exercise).series.reduce((max, serie) => Math.max(max, serie.kg), 0)}</Text>
-        ),
+        accessor: "topKg",
+        Cell: (props) => {
+            const exo = props.row.original as ExerciseWithTops;
+            if (exo.isTopKg)
+                return (
+                    <Text color="messenger.300" fontWeight="bold">
+                        {props.value}
+                    </Text>
+                );
+
+            return <Text>{props.value}</Text>;
+        },
     },
     {
         Header: "top reps",
-        accessor: "series.reps",
-        // TODO tag si best
-        Cell: (props) => (
-            <Text>{(props.row.original as Exercise).series.reduce((max, serie) => Math.max(max, serie.reps), 0)}</Text>
-        ),
+        accessor: "topReps",
+        Cell: (props) => {
+            const exo = props.row.original as ExerciseWithTops;
+            if (exo.isTopReps)
+                return (
+                    <Text color="messenger.300" fontWeight="bold">
+                        {props.value}
+                    </Text>
+                );
+
+            return <Text>{props.value}</Text>;
+        },
     },
 ];
+
+interface ExerciseWithTops extends Exercise {
+    isTopKg: boolean;
+    isTopReps: boolean;
+    topKg: number;
+    topReps: number;
+}
