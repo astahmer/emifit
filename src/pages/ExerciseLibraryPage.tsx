@@ -172,10 +172,10 @@ const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: n
                 </Stack>
                 <Show when={ctx.index === index}>
                     <Stack mx="2">
-                        <Badge variant="outline" colorScheme="messenger" fontSize="x-small">
+                        <Badge variant="outline" colorScheme="pink" fontSize="x-small">
                             Top kg {topKg}
                         </Badge>
-                        <Badge variant="outline" colorScheme="messenger" fontSize="x-small">
+                        <Badge variant="outline" colorScheme="pink" fontSize="x-small">
                             Top reps {topReps}
                         </Badge>
                     </Stack>
@@ -229,7 +229,7 @@ const columns = [
             const exo = props.row.original as ExerciseWithTops;
             if (exo.isTopKg)
                 return (
-                    <Text color="messenger.300" fontWeight="bold">
+                    <Text color="pink.300" fontWeight="bold">
                         {props.value}
                     </Text>
                 );
@@ -244,7 +244,7 @@ const columns = [
             const exo = props.row.original as ExerciseWithTops;
             if (exo.isTopReps)
                 return (
-                    <Text color="messenger.300" fontWeight="bold">
+                    <Text color="pink.300" fontWeight="bold">
                         {props.value}
                     </Text>
                 );
