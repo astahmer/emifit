@@ -30,7 +30,7 @@ import {
     DrawerHeader,
     DrawerOverlay,
 } from "@chakra-ui/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { AiFillHome } from "react-icons/ai";
 import { FiSettings } from "react-icons/fi";
 import { GiProgression } from "react-icons/gi";
@@ -42,6 +42,9 @@ import { GoToClosestPreviousDailyEntryButton } from "./Daily/GoToClosestPrevious
 import { useLastFilledDailyDate } from "./Daily/useLastFilledDailyDate";
 import { createContextWithHook } from "./functions/createContextWithHook";
 import { useCurrentDailyCategory } from "./orm-hooks";
+import { on } from "@pastable/core";
+import { createMachine } from "xstate";
+import { useInterpret } from "@xstate/react";
 
 export const Layout = () => {
     const setDebugMode = useSetAtom(debugModeAtom);
@@ -49,10 +52,29 @@ export const Layout = () => {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const btnRef = useRef();
+
+    const isScrollingRef = useRef(false);
+    const service = useInterpret(scrollMachine, undefined, (state) => {
+        isScrollingRef.current = state.matches("scrolling");
+    });
+
+    useEffect(() => {
+        return on(
+            window,
+            "scroll",
+            (e) => {
+                if (e.type !== "scroll") return;
+
+                service.send("Scroll");
+            },
+            true
+        );
+    }, [service]);
+
     const mainDragProps = useSwipeable({
         delta: 30,
-        onSwipedRight: () => {
-            if (isSwipingCarouselRef.current) {
+        onSwipedRight: (e) => {
+            if (isSwipingCarouselRef.current || isScrollingRef.current) {
                 return;
             }
             onOpen();
@@ -101,6 +123,20 @@ export const Layout = () => {
         </Flex>
     );
 };
+
+const scrollMachine = createMachine({
+    id: "scrollMachine",
+    initial: "idle",
+    schema: { events: {} as { type: "Scroll" } },
+    states: {
+        idle: {
+            on: { Scroll: "scrolling" },
+        },
+        scrolling: {
+            after: { 400: "idle" },
+        },
+    },
+});
 
 const [SidebarProvider, useSidebar] = createContextWithHook<Pick<UseDisclosureReturn, "onClose">>("Sidebar");
 

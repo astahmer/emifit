@@ -4,10 +4,6 @@ body,
     height: 100%;
 }
 
-* {
-    touch-action: pan-y;
-}
-
 ::-webkit-scrollbar {
     width: 7px;
     height: 5px;
