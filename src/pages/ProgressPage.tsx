@@ -127,53 +127,59 @@ export const ProgressPage = () => {
 
     return (
         <UnitModeContext value={unitMode}>
-            <Box id="ProgressPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
-                <Box d="flex" alignItems="center" mb="4">
-                    <Heading as="h1">Progress</Heading>
-                    <SwitchInput
-                        ml="auto"
-                        label="Use %"
-                        onChange={(e) => setUnitMode((current) => (current === "percent" ? "count" : "percent"))}
-                    />
-                </Box>
-                <DateRangePresetPicker {...{ dates, setDates, activeRange, setActiveRange }} />
-                <Heading as="h3" mt="4" fontSize="lg">
-                    From {displayDate(dates.start)} to {displayDate(dates.end)}{" "}
-                </Heading>
-                <Box w="100%" h="300px" my="4">
+            <Box id="ProgressPage" d="flex" flexDirection="column" h="100%" w="100%">
+                <Box maxH="100%" overflowX="hidden" overflowY="auto" p="4">
+                    <Box d="flex" flexDir="column" position="sticky" top="0" bgColor="white" pb="4">
+                        <Box d="flex" alignItems="center" mb="4">
+                            <Heading as="h1">Progress</Heading>
+                            <SwitchInput
+                                ml="auto"
+                                label="Use %"
+                                onChange={(e) =>
+                                    setUnitMode((current) => (current === "percent" ? "count" : "percent"))
+                                }
+                            />
+                        </Box>
+                        <DateRangePresetPicker {...{ dates, setDates, activeRange, setActiveRange }} />
+                    </Box>
+                    <Heading as="h3" fontSize="lg">
+                        From {displayDate(dates.start)} to {displayDate(dates.end)}{" "}
+                    </Heading>
+                    <Box w="100%" h="300px" my="4">
+                        <Show
+                            when={dailyListInDateRangeQuery.status === "success"}
+                            fallback={
+                                <Center h="100%">
+                                    <Spinner size="xl" />
+                                </Center>
+                            }
+                        >
+                            <PieGraph data={data} />
+                        </Show>
+                    </Box>
                     <Show
                         when={dailyListInDateRangeQuery.status === "success"}
                         fallback={
-                            <Center h="100%">
+                            <Center my="4">
                                 <Spinner size="xl" />
                             </Center>
                         }
                     >
-                        <PieGraph data={data} />
+                        <Divider mx="2" my="4" />
+                        <StatTotals totals={totals} />
+                    </Show>
+                    <Show
+                        when={exerciseListInDateRangeQuery.status === "success"}
+                        fallback={
+                            <Center my="4">
+                                <Spinner size="xl" />
+                            </Center>
+                        }
+                    >
+                        <Divider mx="2" my="4" />
+                        <TopKgInDateRange exerciseList={exerciseList} />
                     </Show>
                 </Box>
-                <Show
-                    when={dailyListInDateRangeQuery.status === "success"}
-                    fallback={
-                        <Center my="4">
-                            <Spinner size="xl" />
-                        </Center>
-                    }
-                >
-                    <Divider mx="2" my="4" />
-                    <StatTotals totals={totals} />
-                </Show>
-                <Show
-                    when={exerciseListInDateRangeQuery.status === "success"}
-                    fallback={
-                        <Center my="4">
-                            <Spinner size="xl" />
-                        </Center>
-                    }
-                >
-                    <Divider mx="2" my="4" />
-                    <TopKgInDateRange exerciseList={exerciseList} />
-                </Show>
             </Box>
         </UnitModeContext>
     );
