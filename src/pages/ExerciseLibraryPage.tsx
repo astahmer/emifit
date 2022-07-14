@@ -9,7 +9,7 @@ import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { useCategoryList, useCategoryQuery, useExerciseList, useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
-import { SearchIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon, SearchIcon } from "@chakra-ui/icons";
 import {
     Accordion,
     AccordionButton,
@@ -207,11 +207,19 @@ const columns = [
         Header: "Date",
         accessor: "createdAt",
         Cell: (props) => (
-            <ReactLink to={`/daily/entry/${printDailyDate(new Date(props.value))}`}>
+            <Stack
+                direction="row"
+                as={ReactLink}
+                to={`/daily/entry/${printDailyDate(new Date(props.value))}`}
+                color="pink.300"
+                alignItems="center"
+                spacing="1.5"
+            >
+                <ExternalLinkIcon color="pink.700" opacity="0.6" boxSize="3" />
                 <Text color="pink.300" fontWeight="bold">
                     {new Date(props.value).toLocaleDateString()}
                 </Text>
-            </ReactLink>
+            </Stack>
         ),
     },
     {
