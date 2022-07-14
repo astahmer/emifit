@@ -238,7 +238,7 @@ const columns = [
 
             return (
                 <Stack direction="row" alignItems="center">
-                    <Text color="pink.300" fontWeight="bold">
+                    <Text {...(exo.isTopKg ? { color: "pink.300", fontWeight: "bold" } : undefined)}>
                         {props.value}
                     </Text>
                     <Show when={diff !== 0}>
@@ -268,7 +268,7 @@ const columns = [
 
             return (
                 <Stack direction="row" alignItems="center">
-                    <Text color="pink.300" fontWeight="bold">
+                    <Text {...(exo.isTopReps ? { color: "pink.300", fontWeight: "bold" } : undefined)}>
                         {props.value}
                     </Text>
                     <Show when={diff !== 0}>
