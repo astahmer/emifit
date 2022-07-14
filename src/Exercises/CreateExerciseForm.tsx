@@ -109,7 +109,7 @@ export const CreateExerciseForm = ({
                         getItems={getExerciseItems}
                     />
                     <TagMultiSelect
-                        control={form.control}
+                        control={form.control as any}
                         name="tags"
                         rules={{ required: requiredRule }}
                         items={tagList}

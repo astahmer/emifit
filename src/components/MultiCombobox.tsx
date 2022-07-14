@@ -121,7 +121,7 @@ function MultiComboboxBase<Item = any>({
                 items.filter((item) =>
                     (typeof item === "string" ? item : itemToString(item))
                         .toLowerCase()
-                        .startsWith(inputValue.toLowerCase())
+                        .includes(inputValue.toLowerCase())
                 )
             );
         },
