@@ -28,9 +28,10 @@ import {
     Text,
     useAccordionContext,
 } from "@chakra-ui/react";
-import { sortBy } from "@pastable/core";
+import { findBy, sortBy } from "@pastable/core";
 import { useEffect, useRef, useState } from "react";
 import { Link as ReactLink } from "react-router-dom";
+import { Row } from "react-table";
 
 export const ExerciseLibraryPage = () => {
     const categoryList = useCategoryList();
@@ -145,6 +146,7 @@ const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: n
 
     const listWithTops = exerciseList.map((exo) => ({
         ...exo,
+        createdAt: new Date(exo.createdAt),
         topKg: Math.max(...exo.series.map((set) => set.kg)),
         topReps: Math.max(...exo.series.map((set) => set.reps)),
     }));
@@ -206,6 +208,7 @@ const columns = [
     {
         Header: "Date",
         accessor: "createdAt",
+        sortType: "datetime",
         Cell: (props) => (
             <Stack
                 direction="row"
@@ -227,14 +230,29 @@ const columns = [
         accessor: "topKg",
         Cell: (props) => {
             const exo = props.row.original as ExerciseWithTops;
-            if (exo.isTopKg)
-                return (
+            const list = props.sortedRows as Row<ExerciseWithTops>[];
+
+            const sortedIndex = findBy(list, "original.id", exo.id, true);
+            const next = list[sortedIndex + 1];
+            const diff = sortedIndex < list.length - 1 ? exo.topKg - next?.original.topKg : 0;
+
+            return (
+                <Stack direction="row" alignItems="center">
                     <Text color="pink.300" fontWeight="bold">
                         {props.value}
                     </Text>
-                );
-
-            return <Text>{props.value}</Text>;
+                    <Show when={diff !== 0}>
+                        <Badge
+                            variant="subtle"
+                            colorScheme={diff > 0 ? "whatsapp" : "red"}
+                            fontSize="x-small"
+                            fontStyle="italic"
+                        >
+                            {diff > 0 ? "+" + diff : diff}
+                        </Badge>
+                    </Show>
+                </Stack>
+            );
         },
     },
     {
@@ -242,14 +260,29 @@ const columns = [
         accessor: "topReps",
         Cell: (props) => {
             const exo = props.row.original as ExerciseWithTops;
-            if (exo.isTopReps)
-                return (
+            const list = props.sortedRows as Row<ExerciseWithTops>[];
+
+            const sortedIndex = findBy(list, "original.id", exo.id, true);
+            const next = list[sortedIndex + 1];
+            const diff = sortedIndex < list.length - 1 ? exo.topReps - next?.original.topReps : 0;
+
+            return (
+                <Stack direction="row" alignItems="center">
                     <Text color="pink.300" fontWeight="bold">
                         {props.value}
                     </Text>
-                );
-
-            return <Text>{props.value}</Text>;
+                    <Show when={diff !== 0}>
+                        <Badge
+                            variant="subtle"
+                            colorScheme={diff > 0 ? "whatsapp" : "red"}
+                            fontSize="x-small"
+                            fontStyle="italic"
+                        >
+                            {diff > 0 ? "+" + diff : diff}
+                        </Badge>
+                    </Show>
+                </Stack>
+            );
         },
     },
 ];
