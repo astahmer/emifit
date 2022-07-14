@@ -21,6 +21,8 @@ export interface Exercise {
     series: Serie[];
     createdAt: Date;
     note?: string;
+    from: "daily" | "copy" | "program" | "program-clone";
+    dailyId?: string;
     /** if made from X program / when creating Y program / when cloning Z program  */
     madeFromExerciseId?: string;
     /** if made within Y superset */

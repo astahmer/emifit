@@ -141,7 +141,7 @@ export const ExerciseLibraryPage = () => {
 
 const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: number }) => {
     const query = useExerciseUnsortedList({ index: "by-name", query: exercise.name });
-    const exerciseList = (query.data || []).filter((exo) => !Boolean(exo.programId));
+    const exerciseList = (query.data || []).filter((exo) => exo.from === "daily");
     const ctx = useAccordionContext();
 
     const listWithTops = exerciseList.map((exo) => ({

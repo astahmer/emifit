@@ -170,6 +170,98 @@ export const runMigrations: (
         migrationVersion++;
     }
 
+    // nothing changed between v25 -> v44
+    if (migrationVersion >= 25 && migrationVersion < 45) migrationVersion = 45;
+
+    // Add exercise "by-created-date" index
+    if (migrationVersion === 45 && isVersionChange) {
+        const exerciseStore = tx.objectStore("exercise");
+        if (!exerciseStore.indexNames.contains("by-created-date")) {
+            exerciseStore.createIndex("by-created-date", "createdAt");
+        }
+        console.log("migrated to version", migrationVersion, `Add exercise "by-created-date" index`);
+        migrationVersion++;
+    }
+
+    // Format existing exercises to have a createdAt date as a Date object
+    if (migrationVersion === 46) {
+        let cursor = await tx.objectStore("exercise").openCursor();
+
+        while (cursor) {
+            if (typeof cursor.value.createdAt === "string") {
+                cursor.update({ ...cursor.value, createdAt: new Date(cursor.value.createdAt) });
+            }
+
+            cursor = await cursor.continue();
+        }
+        console.log(
+            "migrated to version",
+            migrationVersion,
+            `Format existing exercises to have a createdAt date as a Date object`
+        );
+        migrationVersion++;
+    }
+    // Format existing exercises to have a "dailyId" & "from" properties
+    if (migrationVersion === 47) {
+        let programCursor = await tx.objectStore("program").openCursor();
+
+        while (programCursor) {
+            let exoCursor = await tx.objectStore("exercise").openCursor();
+            while (exoCursor) {
+                if (programCursor.value.exerciseList.includes(exoCursor.value.id)) {
+                    exoCursor.update({
+                        ...exoCursor.value,
+                        programId: programCursor.value.id,
+                        from: programCursor.value.madeFromProgramId ? "program-clone" : "program",
+                    });
+                }
+                exoCursor = await exoCursor.continue();
+            }
+
+            programCursor = await programCursor.continue();
+        }
+
+        let dailyCursor = await tx.objectStore("daily").openCursor();
+
+        while (dailyCursor) {
+            let exoCursor = await tx.objectStore("exercise").openCursor();
+            while (exoCursor) {
+                if (dailyCursor.value.exerciseList.includes(exoCursor.value.id)) {
+                    exoCursor.update({ ...exoCursor.value, dailyId: dailyCursor.value.id, from: "daily" });
+                }
+                exoCursor = await exoCursor.continue();
+            }
+
+            dailyCursor = await dailyCursor.continue();
+        }
+
+        console.log(
+            "migrated to version",
+            migrationVersion,
+            `Format existing exercises to have a "dailyId" & "from" properties`
+        );
+        migrationVersion++;
+    }
+
+    if (migrationVersion === 48) {
+        const exerciseStore = tx.objectStore("exercise");
+        if (!exerciseStore.indexNames.contains("by-from")) {
+            exerciseStore.createIndex("by-from", "from");
+        }
+        if (!exerciseStore.indexNames.contains("by-daily")) {
+            exerciseStore.createIndex("by-daily", "dailyId");
+        }
+        if (!exerciseStore.indexNames.contains("by-program")) {
+            exerciseStore.createIndex("by-program", "programId");
+        }
+        console.log(
+            "migrated to version",
+            migrationVersion,
+            "Add exercise 'by-from', 'by-daily', 'by-program' indexes"
+        );
+        migrationVersion++;
+    }
+
     if (oldVersion === newVersion) await run();
     else if (!isVersionChange) await run();
 

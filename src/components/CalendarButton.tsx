@@ -1,4 +1,4 @@
-import { printDate } from "@/functions/utils";
+import { displayDate, printDate } from "@/functions/utils";
 import { useCategoryList, useCategoryQuery, useDailyList } from "@/orm-hooks";
 import { Category, Daily } from "@/orm-types";
 import { isDailyTodayAtom } from "@/store";
@@ -62,7 +62,7 @@ export const CalendarButton = ({
                     onClick={onOpen}
                     colorScheme={isDailyToday ? "pink" : undefined}
                 >
-                    {format(selectedDate, "dd/MM/yyyy")}
+                    {displayDate(selectedDate)}
                 </Button>
             </PopoverTrigger>
 
