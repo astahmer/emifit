@@ -1,4 +1,3 @@
-import { CustomDay } from "@/components/CalendarButton";
 import { DynamicTable } from "@/components/DynamicTable";
 import { Show } from "@/components/Show";
 import { SwitchInput } from "@/components/SwitchInput";
@@ -6,55 +5,39 @@ import { createContextWithHook } from "@/functions/createContextWithHook";
 import { groupBy } from "@/functions/groupBy";
 import { displayDate, parseDate } from "@/functions/utils";
 import { orm } from "@/orm";
-import { useCategoryList, useDailyList } from "@/orm-hooks";
+import { useCategoryList } from "@/orm-hooks";
 import { DailyWithReferences, ExerciseWithReferences } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
-import { CheckIcon, ExternalLinkIcon } from "@chakra-ui/icons";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
     Box,
-    Button,
     Center,
     Divider,
     Heading,
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-    Portal,
     Spinner,
     Stack,
     Stat,
     StatGroup,
     StatLabel,
     StatNumber,
-    Tag,
-    TagLabel,
-    TagLeftIcon,
     Text,
-    useDisclosure,
-    useOutsideClick,
-    VStack,
-    Wrap,
-    WrapItem,
 } from "@chakra-ui/react";
-import { getSum, SetState } from "@pastable/core";
-import {
-    Calendar,
-    CalendarControls,
-    CalendarDays,
-    CalendarMonth,
-    CalendarMonthName,
-    CalendarMonths,
-    CalendarNextButton,
-    CalendarPrevButton,
-    CalendarValues,
-    CalendarWeek,
-} from "@uselessdev/datepicker";
-import { subMonths, subWeeks, subYears } from "date-fns";
-import { ComponentPropsWithoutRef, MutableRefObject, ReactNode, useRef, useState } from "react";
+import { getSum } from "@pastable/core";
+import { CalendarValues } from "@uselessdev/datepicker";
+import { ComponentPropsWithoutRef, useState } from "react";
 import { useQuery } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
-import { match } from "ts-pattern";
+import {
+    DateRangePresetPicker,
+    getRangeStart,
+    RangePreset,
+    RangePresetOrCustom,
+} from "../Calendar/DateRangePresetPicker";
+import { CalendarValuesProvider } from "../Calendar/useCalendarValues";
+
+type UnitMode = "count" | "percent";
+const [UnitModeContext, useUnitMode] = createContextWithHook<UnitMode>("UnitMode");
 
 export const ProgressPage = () => {
     const [activeRange, setActiveRange] = useState<RangePresetOrCustom>("Week");
@@ -62,6 +45,7 @@ export const ProgressPage = () => {
         start: activeRange !== "custom" ? getRangeStart(activeRange as RangePreset) : null,
         end: new Date(),
     });
+
     const dailyListInDateRangeQuery = useQuery(
         ["stats", dates, "daily"],
         async () => {
@@ -127,62 +111,64 @@ export const ProgressPage = () => {
     const exerciseList = exerciseListInDateRangeQuery.data || [];
 
     return (
-        <UnitModeContext value={unitMode}>
-            <Box id="ProgressPage" d="flex" flexDirection="column" h="100%" w="100%">
-                <Box maxH="100%" overflowX="hidden" overflowY="auto" p="4">
-                    <Box d="flex" flexDir="column" position="sticky" top="0" bgColor="white" pb="4">
-                        <Box d="flex" alignItems="center" mb="4">
-                            <Heading as="h1">Progress</Heading>
-                            <SwitchInput
-                                ml="auto"
-                                label="Use %"
-                                onChange={(e) =>
-                                    setUnitMode((current) => (current === "percent" ? "count" : "percent"))
-                                }
-                            />
+        <CalendarValuesProvider value={{ ...dates, setDates }}>
+            <UnitModeContext value={unitMode}>
+                <Box id="ProgressPage" d="flex" flexDirection="column" h="100%" w="100%">
+                    <Box maxH="100%" overflowX="hidden" overflowY="auto" p="4">
+                        <Box d="flex" flexDir="column" position="sticky" top="0" bgColor="white" pb="4">
+                            <Box d="flex" alignItems="center" mb="4">
+                                <Heading as="h1">Progress</Heading>
+                                <SwitchInput
+                                    ml="auto"
+                                    label="Use %"
+                                    onChange={(e) =>
+                                        setUnitMode((current) => (current === "percent" ? "count" : "percent"))
+                                    }
+                                />
+                            </Box>
+                            <DateRangePresetPicker {...{ activeRange, setActiveRange }} />
                         </Box>
-                        <DateRangePresetPicker {...{ dates, setDates, activeRange, setActiveRange }} />
-                    </Box>
-                    <Heading as="h3" fontSize="lg">
-                        From {displayDate(dates.start)} to {displayDate(dates.end)}{" "}
-                    </Heading>
-                    <Box w="100%" h="300px" my="4">
+                        <Heading as="h3" fontSize="lg">
+                            From {displayDate(dates.start)} to {displayDate(dates.end)}{" "}
+                        </Heading>
+                        <Box w="100%" h="300px" my="4">
+                            <Show
+                                when={dailyListInDateRangeQuery.status === "success"}
+                                fallback={
+                                    <Center h="100%">
+                                        <Spinner size="xl" />
+                                    </Center>
+                                }
+                            >
+                                <PieGraph data={data} />
+                            </Show>
+                        </Box>
                         <Show
                             when={dailyListInDateRangeQuery.status === "success"}
                             fallback={
-                                <Center h="100%">
+                                <Center my="4">
                                     <Spinner size="xl" />
                                 </Center>
                             }
                         >
-                            <PieGraph data={data} />
+                            <Divider mx="2" my="4" />
+                            <StatTotals totals={totals} />
+                        </Show>
+                        <Show
+                            when={exerciseListInDateRangeQuery.status === "success"}
+                            fallback={
+                                <Center my="4">
+                                    <Spinner size="xl" />
+                                </Center>
+                            }
+                        >
+                            <Divider mx="2" my="4" />
+                            <TopKgInDateRange exerciseList={exerciseList} />
                         </Show>
                     </Box>
-                    <Show
-                        when={dailyListInDateRangeQuery.status === "success"}
-                        fallback={
-                            <Center my="4">
-                                <Spinner size="xl" />
-                            </Center>
-                        }
-                    >
-                        <Divider mx="2" my="4" />
-                        <StatTotals totals={totals} />
-                    </Show>
-                    <Show
-                        when={exerciseListInDateRangeQuery.status === "success"}
-                        fallback={
-                            <Center my="4">
-                                <Spinner size="xl" />
-                            </Center>
-                        }
-                    >
-                        <Divider mx="2" my="4" />
-                        <TopKgInDateRange exerciseList={exerciseList} />
-                    </Show>
                 </Box>
-            </Box>
-        </UnitModeContext>
+            </UnitModeContext>
+        </CalendarValuesProvider>
     );
 };
 
@@ -237,61 +223,8 @@ const columns = [
     { Header: "Reps", accessor: "topReps" },
 ];
 
-type UseStateProps<Name extends string, T> = { [key in Name]: T } & { [key in `set${Capitalize<Name>}`]: SetState<T> };
-
-const DateRangePresetPicker = ({
-    dates,
-    setDates,
-    activeRange,
-    setActiveRange,
-}: UseStateProps<"dates", CalendarValues> & UseStateProps<"activeRange", RangePresetOrCustom>) => {
-    const rangeContainerRef = useRef<HTMLDivElement>();
-
-    return (
-        <CalendarValuesProvider value={{ ...dates, setDates }}>
-            <Wrap ref={rangeContainerRef}>
-                {rangePresets.map((value) => (
-                    <WrapItem key={value}>
-                        <Tag
-                            colorScheme="pink"
-                            variant={value === activeRange ? "solid" : "subtle"}
-                            onClick={() => {
-                                setActiveRange(value);
-                                setDates({ start: getRangeStart(value as RangePreset), end: new Date() });
-                            }}
-                        >
-                            {value === activeRange ? <TagLeftIcon boxSize="12px" as={CheckIcon} /> : null}
-                            <TagLabel>{value}</TagLabel>
-                        </Tag>
-                    </WrapItem>
-                ))}
-                <WrapItem>
-                    <CustomDateRangeCalendarButton
-                        calendarRef={rangeContainerRef}
-                        renderTrigger={({ onOpen }) => (
-                            <Tag
-                                colorScheme="pink"
-                                variant={"custom" === activeRange ? "solid" : "subtle"}
-                                onClick={() => {
-                                    if (activeRange !== "custom") {
-                                        setActiveRange("custom");
-                                        setDates({ start: null, end: null });
-                                    }
-
-                                    return onOpen();
-                                }}
-                            >
-                                {"custom" === activeRange ? <TagLeftIcon boxSize="12px" as={CheckIcon} /> : null}
-                                <TagLabel>Custom</TagLabel>
-                            </Tag>
-                        )}
-                    />
-                </WrapItem>
-            </Wrap>
-        </CalendarValuesProvider>
-    );
-};
-
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const RADIAN = Math.PI / 180;
 const PieGraph = ({ data }: Pick<ComponentPropsWithoutRef<typeof Pie>, "data">) => {
     const unitMode = useUnitMode();
 
@@ -356,109 +289,5 @@ const StatTotals = ({ totals }: { totals: StatsTotalByKind }) => {
                 <StatNumber>{totals.cardio}</StatNumber>
             </Stat>
         </StatGroup>
-    );
-};
-
-type UnitMode = "count" | "percent";
-const [UnitModeContext, useUnitMode] = createContextWithHook<UnitMode>("UnitMode");
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-const RADIAN = Math.PI / 180;
-
-const getRangeStart = (preset: RangePreset) => {
-    const today = new Date();
-    return match(preset)
-        .with("Week", () => subWeeks(today, 1))
-        .with("1m", () => subMonths(today, 1))
-        .with("3m", () => subMonths(today, 3))
-        .with("6m", () => subMonths(today, 6))
-        .with("1y", () => subYears(today, 1))
-        .exhaustive();
-};
-
-const rangePresets = ["Week", "1m", "3m", "6m", "1y"] as const;
-type RangePresetOrCustom = typeof rangePresets[number] | "custom";
-type RangePreset = Exclude<RangePresetOrCustom, "custom">;
-
-const [CalendarValuesProvider, useCalendarValues] = createContextWithHook<
-    CalendarValues & { setDates: SetState<CalendarValues> }
->("CalendarValues");
-
-const CustomDateRangeCalendarButton = ({
-    renderTrigger,
-    calendarRef,
-}: {
-    renderTrigger: (props: { onOpen: () => void }) => ReactNode;
-    calendarRef: MutableRefObject<HTMLDivElement>;
-}) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-
-    useOutsideClick({ ref: calendarRef, handler: onClose, enabled: isOpen });
-
-    return (
-        <Popover placement="auto-start" isOpen={isOpen}>
-            <PopoverTrigger>{renderTrigger({ onOpen })}</PopoverTrigger>
-            <Portal>
-                <PopoverContent
-                    p={0}
-                    w="min-content"
-                    border="none"
-                    outline="none"
-                    _focus={{ boxShadow: "none" }}
-                    ref={calendarRef}
-                >
-                    <TwoMonthsDateRangeCalendar onSelectDates={onClose} />
-                </PopoverContent>
-            </Portal>
-        </Popover>
-    );
-};
-
-const MONTHS = 2;
-const TwoMonthsDateRangeCalendar = ({ onSelectDates }: { onSelectDates: (dates: CalendarValues) => void }) => {
-    const dailyList = useDailyList();
-    const { setDates, ...dates } = useCalendarValues();
-    const handleSelectDate = (dates: CalendarValues) => {
-        console.log(dates);
-        setDates(dates);
-        if (dates.start && dates.end) {
-            onSelectDates(dates);
-        }
-    };
-    const categoryList = useCategoryList();
-
-    return (
-        <Calendar value={dates} onSelectDate={handleSelectDate} months={MONTHS} disableFutureDates>
-            <Box d="flex" flexDir="column">
-                <Box position="relative">
-                    <CalendarControls>
-                        <CalendarPrevButton />
-                        <CalendarNextButton />
-                    </CalendarControls>
-
-                    <CalendarMonths gridTemplate="1fr 1fr / 1fr">
-                        {[...Array(MONTHS).keys()].map((month) => (
-                            <CalendarMonth month={month} key={month}>
-                                <CalendarMonthName />
-                                <CalendarWeek />
-                                <CalendarDays>
-                                    <CustomDay {...{ dailyList, categoryList }} />
-                                </CalendarDays>
-                            </CalendarMonth>
-                        ))}
-                    </CalendarMonths>
-                </Box>
-                <VStack spacing={4} bgColor="gray.50" p={4} alignItems="stretch" borderEndRadius="md" flex={1}>
-                    <Button
-                        onClick={() => setDates({ start: null, end: null })}
-                        colorScheme="pink"
-                        size="md"
-                        disabled={!Boolean(dates.start || dates.end)}
-                    >
-                        Reset range
-                    </Button>
-                </VStack>
-            </Box>
-        </Calendar>
     );
 };

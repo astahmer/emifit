@@ -1,4 +1,4 @@
-import { CalendarButton } from "@/components/CalendarButton";
+import { CalendarButton } from "@/Calendar/CalendarButton";
 import { DailyEntry } from "@/Daily/DailyEntry";
 import { currentDateAtom } from "@/store";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
