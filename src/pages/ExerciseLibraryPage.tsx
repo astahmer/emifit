@@ -102,7 +102,7 @@ export const ExerciseLibraryPage = () => {
             )}
             <Flex flexDirection="column" mt="4" h="100%" minH="0" overflow="auto">
                 <Accordion allowToggle w="100%">
-                    {/* TODO virtual */}
+                    {/* TODO virtual ? */}
                     {exerciseList.map((exo, index) => (
                         <ExerciseLibraryItem key={exo.id} exercise={exo} index={index} />
                     ))}
@@ -159,6 +159,7 @@ const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: n
         isTopKg: exo.topKg === topKg,
         isTopReps: exo.topReps === topReps,
     }));
+    const isFocused = ctx.focusedIndex === index;
 
     return (
         <AccordionItem w="100%" isDisabled={!exerciseList.length}>
@@ -193,12 +194,14 @@ const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: n
                 borderTopRightRadius={0}
                 sx={{ th: { whiteSpace: "nowrap" } }}
             >
-                <DynamicTable
-                    columns={columns}
-                    data={data}
-                    isHeaderSticky
-                    initialSortBy={[{ id: "createdAt", desc: true }]}
-                />
+                {isFocused && (
+                    <DynamicTable
+                        columns={columns}
+                        data={data}
+                        isHeaderSticky
+                        initialSortBy={[{ id: "createdAt", desc: true }]}
+                    />
+                )}
             </AccordionPanel>
         </AccordionItem>
     );
