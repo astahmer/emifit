@@ -19,6 +19,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
+    Portal,
     Spinner,
     Stack,
     Stat,
@@ -329,7 +330,7 @@ const PieGraph = ({ data }: Pick<ComponentPropsWithoutRef<typeof Pie>, "data">) 
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                 </Pie>
-                <Legend verticalAlign="bottom" height={26} align="center" />
+                <Legend />
             </PieChart>
         </ResponsiveContainer>
     );
@@ -397,16 +398,18 @@ const CustomDateRangeCalendarButton = ({
     return (
         <Popover placement="auto-start" isOpen={isOpen}>
             <PopoverTrigger>{renderTrigger({ onOpen })}</PopoverTrigger>
-            <PopoverContent
-                p={0}
-                w="min-content"
-                border="none"
-                outline="none"
-                _focus={{ boxShadow: "none" }}
-                ref={calendarRef}
-            >
-                <TwoMonthsDateRangeCalendar onSelectDates={onClose} />
-            </PopoverContent>
+            <Portal>
+                <PopoverContent
+                    p={0}
+                    w="min-content"
+                    border="none"
+                    outline="none"
+                    _focus={{ boxShadow: "none" }}
+                    ref={calendarRef}
+                >
+                    <TwoMonthsDateRangeCalendar onSelectDates={onClose} />
+                </PopoverContent>
+            </Portal>
         </Popover>
     );
 };
