@@ -1,4 +1,4 @@
-import { RadioCard, RadioCardPicker, RadioCardPickerProps } from "@/components/RadioCard";
+import { RadioCard, RadioCardPicker, RadioCardPickerProps } from "@/fields/RadioCard";
 import { useCategoryList } from "@/orm-hooks";
 import { Category } from "@/orm-types";
 

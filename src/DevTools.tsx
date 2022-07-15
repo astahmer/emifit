@@ -1,11 +1,11 @@
 import { Box, Button, Stack } from "@chakra-ui/react";
 import { useAtomValue, useSetAtom } from "jotai";
-import { SwitchInput } from "./components/SwitchInput";
+import { SwitchInput } from "./fields/SwitchInput";
 import { toasts } from "./functions/toasts";
 import { orm } from "./orm";
 import { currentDailyIdAtom, debugModeAtom, showSkeletonsAtom } from "./store";
 import { useCurrentDailyInvalidate } from "./orm-hooks";
-import { ConfirmationButton } from "./components/ConfirmationButton";
+import { ConfirmationButton } from "./fields/ConfirmationButton";
 import { useLocation } from "react-router-dom";
 
 export function DevTools() {

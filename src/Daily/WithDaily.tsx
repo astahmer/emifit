@@ -1,6 +1,6 @@
-import { ConfirmationButton } from "@/components/ConfirmationButton";
+import { ConfirmationButton } from "@/fields/ConfirmationButton";
 import { HFlex } from "@/components/HFlex";
-import { RadioCardButton } from "@/components/RadioCard";
+import { RadioCardButton } from "@/fields/RadioCard";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseGridView } from "@/Exercises/ExerciseGrid";
 import { orm } from "@/orm";

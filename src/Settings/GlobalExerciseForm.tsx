@@ -1,5 +1,5 @@
 import { Show } from "@/components/Show";
-import { TextInput } from "@/components/TextInput";
+import { TextInput } from "@/fields/TextInput";
 import { requiredRule } from "@/functions/utils";
 import { useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";

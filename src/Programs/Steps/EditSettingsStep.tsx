@@ -1,4 +1,4 @@
-import { TextInput } from "@/components/TextInput";
+import { TextInput } from "@/fields/TextInput";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import {
@@ -19,7 +19,7 @@ import { AddTag, ExerciseName } from "@/Exercises/ExerciseName";
 import { ExerciseListCombobox } from "@/Exercises/ExerciseCombobox";
 import { Link as ReactLink } from "react-router-dom";
 import { useRef } from "react";
-import { RadioCardButton } from "@/components/RadioCard";
+import { RadioCardButton } from "@/fields/RadioCard";
 import { requiredRule } from "@/functions/utils";
 
 export function EditSettingsStep() {

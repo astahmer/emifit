@@ -1,4 +1,4 @@
-import { CheckboxSquare } from "@/components/CheckboxCircle";
+import { CheckboxSquare } from "@/fields/CheckboxCircle";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";

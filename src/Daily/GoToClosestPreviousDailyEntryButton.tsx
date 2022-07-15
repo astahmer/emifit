@@ -1,4 +1,4 @@
-import { RadioCardButton } from "@/components/RadioCard";
+import { RadioCardButton } from "@/fields/RadioCard";
 import { currentDateAtom } from "@/store";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
 import { ButtonProps } from "@chakra-ui/react";

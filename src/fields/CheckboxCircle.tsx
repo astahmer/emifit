@@ -1,4 +1,4 @@
-import { TextInputProps } from "@/components/TextInput";
+import { TextInputProps } from "@/fields/TextInput";
 import { CheckCircleIcon, CheckIcon } from "@chakra-ui/icons";
 import {
     Box,

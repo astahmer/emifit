@@ -1,4 +1,4 @@
-import { CheckboxButton } from "@/components/CheckboxCircle";
+import { CheckboxButton } from "@/fields/CheckboxCircle";
 import { Box, Heading } from "@chakra-ui/react";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { useProgramInterpret } from "../useProgramInterpret";

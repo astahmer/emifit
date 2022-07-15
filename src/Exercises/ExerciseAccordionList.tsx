@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { sortArrayOfObjectByPropFromArray } from "@pastable/core";
 import { useSelector } from "@xstate/react";
-import { CheckboxSquare } from "../components/CheckboxCircle";
+import { CheckboxSquare } from "../fields/CheckboxCircle";
 import { ExerciseTagList } from "./ExerciseTag";
 
 export const ExerciseAccordionList = ({

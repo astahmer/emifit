@@ -1,4 +1,4 @@
-import { Combobox, ComboboxProps } from "@/components/Combobox";
+import { Combobox, ComboboxProps } from "@/fields/Combobox";
 import { Program } from "@/orm-types";
 import { useProgramList } from "@/orm-hooks";
 import { FormControl, FormErrorMessage, FormLabel, forwardRef } from "@chakra-ui/react";

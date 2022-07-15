@@ -1,5 +1,5 @@
-import { Combobox, ComboboxProps } from "@/components/Combobox";
-import { MultiCombobox, MultiComboboxProps } from "@/components/MultiCombobox";
+import { Combobox, ComboboxProps } from "@/fields/Combobox";
+import { MultiCombobox, MultiComboboxProps } from "@/fields/MultiCombobox";
 import { Exercise } from "@/orm-types";
 import { useExerciseList } from "@/orm-hooks";
 import { FormControl, FormErrorMessage, FormLabel, forwardRef } from "@chakra-ui/react";

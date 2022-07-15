@@ -1,9 +1,9 @@
-import { CheckboxCircleInFragment } from "@/components/CheckboxCircle";
-import { ConfirmationButton } from "@/components/ConfirmationButton";
-import { RadioCardButton } from "@/components/RadioCard";
+import { CheckboxCircleInFragment } from "@/fields/CheckboxCircle";
+import { ConfirmationButton } from "@/fields/ConfirmationButton";
+import { RadioCardButton } from "@/fields/RadioCard";
 import { Scrollable } from "@/components/Scrollable";
 import { Show } from "@/components/Show";
-import { TextInput } from "@/components/TextInput";
+import { TextInput } from "@/fields/TextInput";
 import { ExerciseGrid } from "@/Exercises/ExerciseGrid";
 import { ExerciseMenu, PastDailyExerciseMenu, SupersetExerciseMenu } from "@/Exercises/ExerciseMenu";
 import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";

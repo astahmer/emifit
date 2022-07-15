@@ -1,5 +1,5 @@
-import { SwitchInput } from "@/components/SwitchInput";
-import { TextInput } from "@/components/TextInput";
+import { SwitchInput } from "@/fields/SwitchInput";
+import { TextInput } from "@/fields/TextInput";
 import { TagMultiSelect } from "@/Exercises/TagMultiSelect";
 import { mergeProps } from "@/functions/mergeProps";
 import { toasts } from "@/functions/toasts";
@@ -41,7 +41,7 @@ export const CategoryForm = ({
                 error={form.formState.errors.name}
             />
             <TagMultiSelect
-                control={form.control}
+                control={form.control as any}
                 name="tagList"
                 rules={{ required: requiredRule }}
                 items={tagList}

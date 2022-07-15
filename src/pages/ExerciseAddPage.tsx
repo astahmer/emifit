@@ -1,5 +1,5 @@
 import { Show } from "@/components/Show";
-import { SwitchInput } from "@/components/SwitchInput";
+import { SwitchInput } from "@/fields/SwitchInput";
 import { SupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";

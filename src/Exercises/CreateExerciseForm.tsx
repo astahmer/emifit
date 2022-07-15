@@ -1,7 +1,7 @@
-import { ConfirmationButton } from "@/components/ConfirmationButton";
-import { MobileNumberInput } from "@/components/MobileNumberInput";
-import { SwitchInput } from "@/components/SwitchInput";
-import { AutoResizeTextarea, TextInput } from "@/components/TextInput";
+import { ConfirmationButton } from "@/fields/ConfirmationButton";
+import { MobileNumberInput } from "@/fields/MobileNumberInput";
+import { SwitchInput } from "@/fields/SwitchInput";
+import { AutoResizeTextarea, TextInput } from "@/fields/TextInput";
 import { onError } from "@/functions/toasts";
 import { requiredRule } from "@/functions/utils";
 import { useCategoryQuery } from "@/orm-hooks";

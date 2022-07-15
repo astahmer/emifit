@@ -1,6 +1,6 @@
 import { DynamicTable } from "@/components/DynamicTable";
 import { Show } from "@/components/Show";
-import { SwitchInput } from "@/components/SwitchInput";
+import { SwitchInput } from "@/fields/SwitchInput";
 import { createContextWithHook } from "@/functions/createContextWithHook";
 import { groupBy } from "@/functions/groupBy";
 import { displayDate, parseDate } from "@/functions/utils";

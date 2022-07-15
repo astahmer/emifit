@@ -1,6 +1,6 @@
 import { DynamicTable } from "@/components/DynamicTable";
 import { FloatingButton } from "@/components/FloatingButton";
-import { MultiSelect } from "@/components/MultiSelect";
+import { MultiSelect } from "@/fields/MultiSelect";
 import { Show } from "@/components/Show";
 import { SortByDirection, SortByIconButton } from "@/components/SortByIconButton";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";

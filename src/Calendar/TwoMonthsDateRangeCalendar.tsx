@@ -1,4 +1,4 @@
-import { CustomDay } from "@/components/CalendarButton";
+import { CustomDay } from "@/Calendar/CalendarButton";
 import { useCategoryList, useDailyList } from "@/orm-hooks";
 import { Box, Button, VStack } from "@chakra-ui/react";
 import {
