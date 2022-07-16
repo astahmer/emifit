@@ -1,11 +1,23 @@
 import { useCompactState } from "@/Daily/ExpandButton";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { Exercise } from "@/orm-types";
-import { Flex, Heading } from "@chakra-ui/react";
+import { Flex, Heading, UseDisclosureProps } from "@chakra-ui/react";
 import { ExerciseSetList, ExerciseSetListOverview } from "./ExerciseSetList";
 
-export function ExerciseListItem({ exo, withExpand }: { exo: Exercise; withExpand?: boolean }) {
-    const toggle = useCompactState();
+export function ExerciseListItem({
+    exo,
+    withExpand,
+    disclosureProps,
+    shouldShowAllTags,
+    withSetListOverview,
+}: {
+    exo: Exercise;
+    withExpand?: boolean;
+    disclosureProps?: UseDisclosureProps;
+    shouldShowAllTags?: boolean;
+    withSetListOverview?: boolean;
+}) {
+    const toggle = useCompactState(disclosureProps);
 
     return (
         <Flex
@@ -19,8 +31,8 @@ export function ExerciseListItem({ exo, withExpand }: { exo: Exercise; withExpan
                     {exo.name}
                 </Heading>
             </Flex>
-            <ExerciseSetListOverview setList={exo.series} />
-            <ExerciseTagList mt="2" tagList={exo.tags} isHidden={toggle.isHidden} />
+            {withSetListOverview && <ExerciseSetListOverview setList={exo.series} />}
+            <ExerciseTagList mt="2" tagList={exo.tags} isPreview={shouldShowAllTags ? false : toggle.isHidden} />
             {toggle.isHidden ? null : <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />}
         </Flex>
     );
