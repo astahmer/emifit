@@ -53,8 +53,10 @@ export const ExerciseLibraryItem = ({
             <AccordionButton w="100%">
                 <Stack direction="row" alignItems="center" w="100%">
                     <Stack alignItems="flex-start" w="100%">
-                        <Flex alignItems="flex-start">
-                            <Text mr="1">{exercise.name}</Text>
+                        <Flex alignItems="center">
+                            <Text mr="1" fontWeight="bold">
+                                {exercise.name}
+                            </Text>
                             <Text fontSize="xs">({exerciseList.length})</Text>
                         </Flex>
                         {Boolean(exercise.tags?.length) && <ExerciseTagList tagList={exercise.tags} />}
