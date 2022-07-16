@@ -20,9 +20,15 @@ import { findBy } from "@pastable/core";
 import { Link as ReactLink } from "react-router-dom";
 import { Row } from "react-table";
 
-export const ExerciseLibraryItem = ({ exercise, index }: { exercise: Exercise; index: number }) => {
-    const query = useExerciseUnsortedList({ index: "by-name", query: exercise.name });
-    const exerciseList = (query.data || []).filter((exo) => exo.from === "daily");
+export const ExerciseLibraryItem = ({
+    exercise,
+    index,
+    exerciseList,
+}: {
+    exercise: Exercise;
+    index: number;
+    exerciseList: Exercise[];
+}) => {
     const ctx = useAccordionContext();
 
     const listWithTops = exerciseList.map((exo) => ({

@@ -1,20 +1,23 @@
 import { FloatingButton } from "@/components/FloatingButton";
-import { MultiSelect } from "@/fields/MultiSelect";
-import { SortByDirection, SortByIconButton } from "@/components/SortByIconButton";
+import { SortByIconButton } from "@/components/SortByIconButton";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseCombobox } from "@/Exercises/ExerciseCombobox";
-import { useCategoryList, useCategoryQuery, useExerciseList } from "@/orm-hooks";
-import { Exercise, Tag } from "@/orm-types";
-import { SearchIcon } from "@chakra-ui/icons";
-import { Accordion, Box, ButtonGroup, Divider, filter, Flex, IconButton, Portal, Stack, Text } from "@chakra-ui/react";
-import { sortBy } from "@pastable/core";
-import { useEffect, useRef, useState } from "react";
-import { ExerciseLibraryItem } from "./ExerciseLibraryItem";
-import { useInterpret, useMachine, useSelector } from "@xstate/react";
-import { ExerciseFiltersMachine, ExerciseFiltersProvider, useExerciseFilters } from "./ExerciseFiltersMachine";
-import { createContextWithHook } from "@/functions/createContextWithHook";
-import { InterpreterFrom } from "xstate";
+import { MultiSelect } from "@/fields/MultiSelect";
+import { groupBy, groupIn } from "@/functions/groupBy";
 import { needsAll } from "@/functions/needsAll";
+import { computeExerciseFromReferences } from "@/functions/snapshot";
+import { orm } from "@/orm";
+import { useCategoryList, useCategoryQuery } from "@/orm-hooks";
+import { Exercise, Tag } from "@/orm-types";
+import { getMostRecentsExerciseById } from "@/orm-utils";
+import { SearchIcon } from "@chakra-ui/icons";
+import { Accordion, Box, ButtonGroup, Divider, Flex, IconButton, Portal, Stack, Text } from "@chakra-ui/react";
+import { sortBy } from "@pastable/core";
+import { useInterpret, useSelector } from "@xstate/react";
+import { useEffect, useRef } from "react";
+import { useQuery } from "react-query";
+import { ExerciseFiltersMachine, ExerciseFiltersProvider, useExerciseFilters } from "./ExerciseFiltersMachine";
+import { ExerciseLibraryItem } from "./ExerciseLibraryItem";
 
 export const ExerciseLibrary = () => {
     // const [state, send, service] = useMachine(ExerciseFiltersMachine);
@@ -35,7 +38,27 @@ export const ExerciseLibrary = () => {
     const tagQuery = useCategoryQuery(filters.category);
     const tagList = tagQuery.data?.tagList || [];
 
-    const exerciseListByCategory = useExerciseList({ index: "by-category", query: filters.category });
+    const exerciseListByCategoryQuery = useQuery<Exercise[]>(
+        [orm.exercise.name, "library", filters.category],
+        async () => {
+            const tagList = await orm.tag.get();
+            const tagListById = groupIn(tagList, "id");
+
+            const tx = orm.exercise.tx("readonly");
+            let cursor = await tx.store.index("by-category").openCursor(filters.category);
+
+            const list = [] as Exercise[];
+            while (cursor) {
+                list.push(computeExerciseFromReferences(cursor.value, tagListById));
+                cursor = await cursor.continue();
+            }
+
+            return list;
+        },
+        { enabled: Boolean(filters.category), initialData: [] }
+    );
+    const exerciseListByCategory = getMostRecentsExerciseById(exerciseListByCategoryQuery.data || []);
+    const groupedByNames = groupBy(exerciseListByCategoryQuery.data || [], "name");
 
     const byTag = (exo: Exercise) => filters.tagList.every((tagId) => exo.tags.some((t) => t.id === tagId));
     const byName = (exo: Exercise) => exo.name.toLowerCase() === filters.selected?.name.toLowerCase();
@@ -50,7 +73,6 @@ export const ExerciseLibrary = () => {
     if (filters.sortByDirection) {
         exerciseList = sortBy(exerciseList, "name", filters.sortByDirection);
     }
-    console.log({ exerciseList });
 
     return (
         <ExerciseFiltersProvider value={service}>
@@ -58,9 +80,14 @@ export const ExerciseLibrary = () => {
             <Flex flexDirection="column" mt="4" h="100%" minH="0" overflow="auto">
                 <Accordion allowToggle w="100%">
                     {/* TODO virtual ? */}
-                    {/* {exerciseList.map((exo, index) => (
-                        <ExerciseLibraryItem key={exo.id} exercise={exo} index={index} />
-                    ))} */}
+                    {exerciseList.map((exo, index) => (
+                        <ExerciseLibraryItem
+                            key={exo.id}
+                            exercise={exo}
+                            index={index}
+                            exerciseList={groupedByNames[exo.name]}
+                        />
+                    ))}
                 </Accordion>
                 <Divider my="2" />
             </Flex>
