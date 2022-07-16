@@ -1,17 +1,15 @@
 import { useCalendarValues } from "@/Calendar/useCalendarValues";
-import { UseStateProps } from "@/types";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Tag, TagLabel, TagLeftIcon, Wrap, WrapItem } from "@chakra-ui/react";
 import { subMonths, subWeeks, subYears } from "date-fns";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { CustomDateRangeCalendarButton } from "./CustomDateRangeCalendarButton";
 
-export const DateRangePresetPicker = ({
-    activeRange,
-    setActiveRange,
-}: UseStateProps<"activeRange", RangePresetOrCustom>) => {
+export const DateRangePresetPicker = () => {
     const { setDates } = useCalendarValues();
+    const [activeRange, setActiveRange] = useState<RangePresetOrCustom>("1 week");
+
     const rangeContainerRef = useRef<HTMLDivElement>();
 
     return (
@@ -60,7 +58,7 @@ export const DateRangePresetPicker = ({
 export const getRangeStart = (preset: RangePreset) => {
     const today = new Date();
     return match(preset)
-        .with("Week", () => subWeeks(today, 1))
+        .with("1 week", () => subWeeks(today, 1))
         .with("1m", () => subMonths(today, 1))
         .with("3m", () => subMonths(today, 3))
         .with("6m", () => subMonths(today, 6))
@@ -68,6 +66,6 @@ export const getRangeStart = (preset: RangePreset) => {
         .exhaustive();
 };
 
-export const rangePresets = ["Week", "1m", "3m", "6m", "1y"] as const;
+export const rangePresets = ["1 week", "1m", "3m", "6m", "1y"] as const;
 export type RangePresetOrCustom = typeof rangePresets[number] | "custom";
 export type RangePreset = Exclude<RangePresetOrCustom, "custom">;
