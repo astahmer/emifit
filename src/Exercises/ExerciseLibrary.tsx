@@ -3,11 +3,9 @@ import { SortByIconButton } from "@/components/SortByIconButton";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseCombobox } from "@/Exercises/ExerciseCombobox";
 import { MultiSelect } from "@/fields/MultiSelect";
-import { groupBy, groupIn } from "@/functions/groupBy";
+import { groupBy } from "@/functions/groupBy";
 import { needsAll } from "@/functions/needsAll";
-import { computeExerciseFromReferences } from "@/functions/snapshot";
-import { orm } from "@/orm";
-import { useCategoryList, useCategoryQuery } from "@/orm-hooks";
+import { useCategoryList, useCategoryQuery, useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise, Tag } from "@/orm-types";
 import { getMostRecentsExerciseById } from "@/orm-utils";
 import { SearchIcon } from "@chakra-ui/icons";
@@ -15,15 +13,12 @@ import { Accordion, Box, ButtonGroup, Divider, Flex, IconButton, Portal, Stack, 
 import { sortBy } from "@pastable/core";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect, useRef } from "react";
-import { useQuery } from "react-query";
 import { ExerciseFiltersMachine, ExerciseFiltersProvider, useExerciseFilters } from "./ExerciseFiltersMachine";
 import { ExerciseLibraryItem } from "./ExerciseLibraryItem";
 
 export const ExerciseLibrary = () => {
-    // const [state, send, service] = useMachine(ExerciseFiltersMachine);
     const service = useInterpret(ExerciseFiltersMachine);
     const isInitialized = useSelector(service, () => service.initialized);
-    // const filters = state.context;
     const filters = useSelector(service, (state) => state.context);
 
     const categoryList = useCategoryList();
@@ -38,25 +33,7 @@ export const ExerciseLibrary = () => {
     const tagQuery = useCategoryQuery(filters.category);
     const tagList = tagQuery.data?.tagList || [];
 
-    const exerciseListByCategoryQuery = useQuery<Exercise[]>(
-        [orm.exercise.name, "library", filters.category],
-        async () => {
-            const tagList = await orm.tag.get();
-            const tagListById = groupIn(tagList, "id");
-
-            const tx = orm.exercise.tx("readonly");
-            let cursor = await tx.store.index("by-category").openCursor(filters.category);
-
-            const list = [] as Exercise[];
-            while (cursor) {
-                list.push(computeExerciseFromReferences(cursor.value, tagListById));
-                cursor = await cursor.continue();
-            }
-
-            return list;
-        },
-        { enabled: Boolean(filters.category), initialData: [] }
-    );
+    const exerciseListByCategoryQuery = useExerciseUnsortedList({ index: "by-category", query: filters.category });
     const exerciseListByCategory = getMostRecentsExerciseById(exerciseListByCategoryQuery.data || []);
     const groupedByNames = groupBy(exerciseListByCategoryQuery.data || [], "name");
 
@@ -108,7 +85,7 @@ export const ExerciseLibraryFilters = ({ tagList }: { tagList: Tag[] }) => {
             <Stack mt="4" w="100%">
                 <CategoryRadioPicker
                     defaultValue={filters.category}
-                    onChange={(category) => (console.log(category), send({ type: "UpdateCategory", category }))}
+                    onChange={(category) => send({ type: "UpdateCategory", category })}
                 />
                 <ButtonGroup isAttached variant="outline">
                     <MultiSelect
