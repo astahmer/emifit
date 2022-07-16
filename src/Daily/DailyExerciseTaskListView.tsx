@@ -6,8 +6,6 @@ import { Show } from "@/components/Show";
 import { TextInput } from "@/fields/TextInput";
 import { ExerciseGrid } from "@/Exercises/ExerciseGrid";
 import { ExerciseMenu, PastDailyExerciseMenu, SupersetExerciseMenu } from "@/Exercises/ExerciseMenu";
-import { ExerciseSetList, ExerciseSetListOverview } from "@/Exercises/ExerciseSetList";
-import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { groupBy } from "@/functions/groupBy";
 import { serializeExercise, serializeProgram } from "@/functions/snapshot";
 import { onError, toasts } from "@/functions/toasts";
@@ -24,8 +22,9 @@ import { useAtomValue } from "jotai";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { Link as ReactLink } from "react-router-dom";
-import { ExerciseCheckbox } from "../Exercises/ExerciseCheckbox";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
+import { ExerciseTaskItem } from "../Exercises/ExerciseTaskItem";
+import { DailyExerciseCheckbox } from "./DailyExerciseCheckbox";
 
 export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
@@ -33,7 +32,7 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
 
     return (
         <Scrollable pt="2" pb="8">
-            <ExerciseTaskList exerciseList={exerciseList} />
+            <DailyExerciseTaskList exerciseList={exerciseList} />
             <Divider my="4" />
             <CardioLine />
             <Divider my="4" />
@@ -52,7 +51,7 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
     );
 };
 
-const ExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
+const DailyExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
     const taskList = [] as Array<Exercise | Exercise[]>;
@@ -104,7 +103,7 @@ const ExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
                                 <Divider my="2" />
                             </Box>
                         )}
-                        <ExerciseTaskItem exo={exoOrSuperset} />
+                        <DailyExerciseTaskItem exo={exoOrSuperset} />
                     </Fragment>
                 );
             })}
@@ -112,41 +111,22 @@ const ExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
     );
 };
 
-function ExerciseTaskItem({ exo }: { exo: Exercise }) {
+export function DailyExerciseTaskItem({ exo }: { exo: Exercise }) {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
     return (
-        <Flex>
-            {/* Currently that is deadcode but i'm leaving it just in case one day she wants it back */}
-            {isDailyToday && false ? (
-                <Flex h="100%" alignItems="center" px="8">
-                    <ExerciseCheckbox exo={exo} />
-                </Flex>
-            ) : (
-                <Spacer pl="8" />
-            )}
-            <Flex flexDirection="column" pr="8" w="100%">
-                <Flex w="100%" alignItems="flex-end">
-                    <Heading as="h4" size="md">
-                        {exo.name}
-                    </Heading>
-                    {isDailyToday ? <ExerciseMenu exo={exo} /> : <PastDailyExerciseMenu exo={exo} />}
-                </Flex>
-                <ExerciseSetListOverview setList={exo.series} />
-                <ExerciseTagList mt="2" tagList={exo.tags} />
-                <ExerciseSetList mt="2" fontSize="sm" setList={exo.series} />
-                <Show when={Boolean(exo.note)}>
-                    <Box mt="2" fontWeight="normal" fontSize="xs" color="gray.500">
-                        <Text as="span" fontWeight="bold">
-                            Note:
-                        </Text>
-                        <Text ml="1" as="span">
-                            {exo.note}
-                        </Text>
-                    </Box>
-                </Show>
-            </Flex>
-        </Flex>
+        <ExerciseTaskItem
+            exo={exo}
+            /* Currently that is deadcode but i'm leaving it just in case one day she wants it back */
+            renderLeft={() =>
+                isDailyToday && false ? (
+                    <Flex h="100%" alignItems="center" px="8">
+                        <DailyExerciseCheckbox exo={exo} />
+                    </Flex>
+                ) : null
+            }
+            renderAfterName={() => (isDailyToday ? <ExerciseMenu exo={exo} /> : <PastDailyExerciseMenu exo={exo} />)}
+        />
     );
 }
 

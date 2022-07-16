@@ -6,7 +6,7 @@ import { isDailyTodayAtom } from "@/store";
 import { useAtomValue } from "jotai";
 import { useMutation } from "react-query";
 
-export function ExerciseCheckbox({ exo }: { exo: Exercise }) {
+export function DailyExerciseCheckbox({ exo }: { exo: Exercise }) {
     const daily = useCurrentDaily();
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
