@@ -26,6 +26,7 @@ import { ExerciseCopyPage } from "./pages/ExerciseCopyPage";
 import { CompareTab } from "./Progress/CompareTab";
 import { ProgressTab } from "./Progress/ProgressTab";
 import { InspectTab } from "./Progress/InspectTab";
+import { InspectExerciseTab } from "./Progress/InspectExerciseTab";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ function App() {
                                     <Route path={routeMap.progress} element={<ProgressPage />}>
                                         <Route index element={<ProgressTab />} />
                                         <Route path="inspect" element={<InspectTab />} />
+                                        <Route path="inspect/:exoId" element={<InspectExerciseTab />} />
                                         <Route path="compare" element={<CompareTab />} />
                                     </Route>
                                     <Route path={routeMap.settings} element={<SettingsPage />} />

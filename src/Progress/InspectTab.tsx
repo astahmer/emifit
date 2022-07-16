@@ -1,5 +1,3 @@
-import { HFlex } from "@/components/HFlex";
-import { ExerciseTaskItem } from "@/Exercises/ExerciseTaskItem";
 import { ExerciseFiltersMachine, ExerciseFiltersProvider } from "@/Exercises/ExerciseFiltersMachine";
 import { ExerciseLibraryFilters } from "@/Exercises/ExerciseLibrary";
 import { ExerciseListItem } from "@/Exercises/ExerciseListItem";
@@ -8,14 +6,13 @@ import { needsAll } from "@/functions/needsAll";
 import { useCategoryList, useCategoryQuery, useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { getMostRecentsExerciseById } from "@/orm-utils";
-import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/react";
-import { sortBy, useSelection } from "@pastable/core";
+import { ChevronRightIcon } from "@chakra-ui/icons";
+import { Box, Divider, Flex, Text } from "@chakra-ui/react";
+import { sortBy } from "@pastable/core";
 import { useInterpret, useSelector } from "@xstate/react";
 import { Fragment, useEffect } from "react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { CheckboxCircle, CheckboxSquare } from "@/fields/CheckboxCircle";
-import { CompactProvider } from "@/store";
-import { ChevronRightIcon } from "@chakra-ui/icons";
+import { Link as ReactLink, useLocation } from "react-router-dom";
 
 export const InspectTab = () => {
     const service = useInterpret(ExerciseFiltersMachine);
@@ -65,7 +62,7 @@ export const InspectTab = () => {
                                 <Divider my="1" />
                             </Box>
                         )}
-                        <Box py="1" px="4" d="flex">
+                        <Box as={ReactLink} to={exo.id} py="1" px="4" d="flex" alignItems="center">
                             <ExerciseListItem
                                 exo={{
                                     ...exo,
