@@ -20,7 +20,7 @@ export const DailyExerciseListView = ({ exerciseList }: WithExerciseList) => {
         <Flex flexDirection="column" pt="2" pb="8" px="4" overflowY="auto">
             {exerciseList.map((exo) => (
                 <Box key={exo.id} py="1" px="4">
-                    <ExerciseListItem exo={exo} withExpand />
+                    <ExerciseListItem exo={exo} withExpand withSetListOverview />
                 </Box>
             ))}
         </Flex>
@@ -91,7 +91,7 @@ const ReorderExerciseItem = ({
             onAnimationComplete={(e: any) => e.scale === 1 && onAnimationComplete()}
         >
             <Flex bg="white">
-                <ExerciseListItem exo={exercise} />
+                <ExerciseListItem exo={exercise} withSetListOverview />
                 <HFlex justifyContent="space-around" p="4" ml="auto">
                     <Icon as={DragHandleIcon} size="24px" />
                 </HFlex>

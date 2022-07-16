@@ -14,13 +14,15 @@ export const ProgressPage = () => {
             flexGrow={1}
         >
             <TabPanels h="100%" minH={0} overflowX="hidden" overflowY="auto">
-                <TabPanel>
+                <TabPanel pos="relative" h="100%" d="flex" flexDirection="column">
                     <ProgressTab />
                 </TabPanel>
-                <TabPanel>
+                <TabPanel pos="relative" h="100%" d="flex" flexDirection="column">
                     <InspectTab />
                 </TabPanel>
-                <TabPanel>Inspect</TabPanel>
+                <TabPanel pos="relative" h="100%" d="flex" flexDirection="column">
+                    Inspect
+                </TabPanel>
             </TabPanels>
             <TabList mt="auto" p="4" flexShrink={0} minH={0} alignSelf="center">
                 {/* global stats overview */}
