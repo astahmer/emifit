@@ -1,7 +1,9 @@
+import { SetState } from "@pastable/core";
 import { CalendarDate } from "@uselessdev/datepicker";
 import { isToday } from "date-fns";
 import { createBrowserHistory } from "history";
 import { atom, unstable_createStore } from "jotai";
+import { createContextWithHook } from "./functions/createContextWithHook";
 import { printDate } from "./functions/utils";
 import { getDailyIdFromUrl, parseDailyDateFromUrl, printDailyDate } from "./orm-utils";
 
@@ -52,7 +54,7 @@ export const currentDateAtom = atom<CalendarDate>(today);
 export const currentDailyIdAtom = atom((get) => printDate(get(currentDateAtom)));
 export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
 
-export const isCompactViewAtom = atom(true);
+export const [CompactProvider, useCompactContext] = createContextWithHook<[boolean, SetState<boolean>]>("Compact");
 
 store.sub(currentDateAtom, () => {
     // Only ever update the location.pahtname if the user is on the homepage either as "/" or from "/daily/entry/:id"

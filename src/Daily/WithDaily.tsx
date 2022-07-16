@@ -9,7 +9,7 @@ import { Program } from "@/orm-types";
 import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
 import { ProgramCard } from "@/Programs/ProgramCard";
 import { ProgramCombobox } from "@/Programs/ProgramCombobox";
-import { isCompactViewAtom, isDailyTodayAtom } from "@/store";
+import { isDailyTodayAtom, useCompactContext } from "@/store";
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
     Alert,
@@ -107,7 +107,7 @@ const viewTypeAtom = atom("task" as ViewType);
 
 const SwitchViewType = ({ toggle }: { toggle: UseDisclosureReturn }) => {
     const setViewType = useSetAtom(viewTypeAtom);
-    const setIsCompactView = useSetAtom(isCompactViewAtom);
+    const [_isCompact, setIsCompact] = useCompactContext();
 
     return (
         <ButtonGroup
@@ -118,7 +118,7 @@ const SwitchViewType = ({ toggle }: { toggle: UseDisclosureReturn }) => {
                 const value = (e.target as HTMLButtonElement).value;
                 if (!value) return;
                 setViewType(value as ViewType);
-                setIsCompactView(true);
+                setIsCompact(true);
             }}
         >
             <IconButton

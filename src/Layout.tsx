@@ -18,7 +18,7 @@ import { Outlet } from "react-router-dom";
 import { BottomTabs } from "./components/BottomTabs";
 import { ErrorFallback } from "./components/ErrorFallback";
 import { DevTools } from "./DevTools";
-import { currentDateAtom, debugModeAtom, isDailyTodayAtom, isSwipingCarouselRef } from "./store";
+import { CompactProvider, currentDateAtom, debugModeAtom, isDailyTodayAtom, isSwipingCarouselRef } from "./store";
 
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import {
@@ -30,7 +30,7 @@ import {
     DrawerHeader,
     DrawerOverlay,
 } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AiFillHome } from "react-icons/ai";
 import { FiSettings } from "react-icons/fi";
 import { GiProgression } from "react-icons/gi";
@@ -86,11 +86,15 @@ export const Layout = () => {
         onSwipeStart: (info) => console.log(info),
     });
 
+    const [isCompact, setIsCompact] = useState(true);
+
     return (
         <Flex as="main" direction="column" boxSize="100%" {...mainDragProps} style={{ touchAction: "none" }}>
             <Flex as="section" id="View" direction="column" h="100%" overflow="hidden" pos="relative">
                 <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <Outlet />
+                    <CompactProvider value={[isCompact, setIsCompact]}>
+                        <Outlet />
+                    </CompactProvider>
                 </ErrorBoundary>
             </Flex>
             <DevTools />
