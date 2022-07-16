@@ -15,12 +15,13 @@ import { match } from "ts-pattern";
 
 export const BottomTabs = () => {
     const location = useLocation();
-    const submitBtnRef = useRef<HTMLButtonElement>(null);
+    const index = getDefaultTabIndex(location.pathname);
+
     const todaysDaily = useDailyQuery(printDate(new Date()));
     const hasCreatedTodaysDaily = Boolean(todaysDaily.data?.id);
     const addExerciseLink = `/daily/entry/${printDailyDate(new Date())}${hasCreatedTodaysDaily ? `/exercise/add` : ""}`;
 
-    const index = getDefaultTabIndex(location.pathname);
+    const submitBtnRef = useRef<HTMLButtonElement>(null);
 
     return (
         <>

@@ -23,6 +23,9 @@ import { appTheme } from "./theme";
 import { Layout } from "./Layout";
 import { ExerciseLibraryPage } from "./pages/ExerciseLibraryPage";
 import { ExerciseCopyPage } from "./pages/ExerciseCopyPage";
+import { CompareTab } from "./Progress/CompareTab";
+import { ProgressTab } from "./Progress/ProgressTab";
+import { InspectTab } from "./Progress/InspectTab";
 
 const queryClient = new QueryClient();
 
@@ -49,7 +52,11 @@ function App() {
                                             element={<ExerciseSupersetEditPage />}
                                         />
                                     </Route>
-                                    <Route path={routeMap.progress} element={<ProgressPage />} />
+                                    <Route path={routeMap.progress} element={<ProgressPage />}>
+                                        <Route index element={<ProgressTab />} />
+                                        <Route path="inspect" element={<InspectTab />} />
+                                        <Route path="compare" element={<CompareTab />} />
+                                    </Route>
                                     <Route path={routeMap.settings} element={<SettingsPage />} />
                                     <Route path={routeMap.programs} element={<ProgramsPage />} />
                                     <Route path={routeMap.exerciseLibrary} element={<ExerciseLibraryPage />} />
