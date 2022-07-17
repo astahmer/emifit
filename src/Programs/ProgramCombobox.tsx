@@ -9,7 +9,7 @@ export const ProgramCombobox = forwardRef(
             error,
             getItems,
             ...props
-        }: Omit<ComboboxProps, "items" | "getValue" | "itemToString" | "label"> & {
+        }: Omit<ComboboxProps<Program>, "items" | "getValue" | "itemToString" | "label"> & {
             error?: string;
             getItems?: (items: Program[]) => Program[];
         },

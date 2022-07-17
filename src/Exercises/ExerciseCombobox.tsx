@@ -46,7 +46,7 @@ export const ExerciseListCombobox = forwardRef(
             error,
             params,
             ...props
-        }: Omit<MultiComboboxProps, "items" | "getValue" | "itemToString" | "label"> & {
+        }: Omit<MultiComboboxProps<Exercise>, "items" | "getValue" | "itemToString" | "label"> & {
             error?: string;
             params?: StoreQueryParams<"exercise">;
         },
