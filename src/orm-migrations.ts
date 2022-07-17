@@ -8,31 +8,25 @@ export const runMigrations: (
     oldVersion: number,
     newVersion: number | null,
     transaction: IDBPTransaction<EmifitSchema, StoreNames<EmifitSchema>[], "versionchange" | "readwrite">,
-    onVersionMigrate?: (
+    importData?: (
         currentVersion: number,
         tx: IDBPTransaction<EmifitSchema, StoreNames<EmifitSchema>[], "versionchange" | "readwrite">
     ) => void | Promise<void>
-) => Promise<void> = async (db, oldVersion, newVersion, transaction, onVersionMigrated) => {
+) => Promise<void> = async (db, oldVersion, newVersion, transaction, importData) => {
     let migrationVersion = oldVersion;
 
     const isVersionChange = transaction.mode === "versionchange";
-    const isImport = oldVersion === newVersion;
-    console.log({ db, oldVersion, newVersion, transaction, migrationVersion, isVersionChange, isImport });
+    console.log({ db, oldVersion, newVersion, transaction, migrationVersion, isVersionChange });
 
     const tx = transaction;
-    let hasRunCallback = false;
-    const run = () => {
-        if (hasRunCallback) {
-            return;
-        }
-        hasRunCallback = true;
-        console.log("running migration at version", migrationVersion);
-        if (onVersionMigrated) {
-            return onVersionMigrated(migrationVersion, tx);
-        }
-    };
 
     console.log("start migrating");
+
+    if (!isVersionChange && importData) {
+        console.log("import: running migrations at version", migrationVersion);
+        await importData(migrationVersion, tx);
+    }
+
     if (migrationVersion === 0 && isVersionChange) {
         console.log("create db object stores");
         const daily = db.createObjectStore("daily", { keyPath: "id" });
@@ -55,7 +49,6 @@ export const runMigrations: (
         console.log("migrated to version", migrationVersion);
     }
     if (migrationVersion === 1) {
-        await run();
         let cursor = await tx.objectStore("daily").index("by-time").openCursor();
 
         while (cursor) {
@@ -73,7 +66,6 @@ export const runMigrations: (
     if (migrationVersion >= 2 && migrationVersion <= 12) migrationVersion = 13;
 
     if (migrationVersion === 13) {
-        await run();
         const program = await tx.objectStore("program").getAll();
         const exerciseList = await tx.objectStore("exercise").getAll();
         const exerciseMap = new Map(exerciseList.map((e) => [e.id, e]));
@@ -93,7 +85,6 @@ export const runMigrations: (
     if (migrationVersion >= 13 && migrationVersion < 24) migrationVersion = 24;
 
     if (migrationVersion === 24) {
-        await run();
         const exerciseList = await tx.objectStore("exercise").getAll();
 
         const removedTagId = "CBarbell";
@@ -121,8 +112,6 @@ export const runMigrations: (
     }
 
     if (migrationVersion === 25 && isVersionChange) {
-        await run();
-
         const group = db.createObjectStore("group", { keyPath: "id" });
         group.createIndex("by-name", "name");
 
@@ -175,12 +164,14 @@ export const runMigrations: (
     if (migrationVersion >= 25 && migrationVersion < 45) migrationVersion = 45;
 
     // Add exercise "by-created-date" index
-    if (migrationVersion === 45 && isVersionChange) {
-        const exerciseStore = tx.objectStore("exercise");
-        if (!exerciseStore.indexNames.contains("by-created-date")) {
-            exerciseStore.createIndex("by-created-date", "createdAt");
+    if (migrationVersion === 45) {
+        if (isVersionChange) {
+            const exerciseStore = tx.objectStore("exercise");
+            if (!exerciseStore.indexNames.contains("by-created-date")) {
+                exerciseStore.createIndex("by-created-date", "createdAt");
+            }
+            console.log("migrated to version", migrationVersion, `Add exercise "by-created-date" index`);
         }
-        console.log("migrated to version", migrationVersion, `Add exercise "by-created-date" index`);
         migrationVersion++;
     }
 
@@ -245,21 +236,23 @@ export const runMigrations: (
     }
 
     if (migrationVersion === 48) {
-        const exerciseStore = tx.objectStore("exercise");
-        if (!exerciseStore.indexNames.contains("by-from")) {
-            exerciseStore.createIndex("by-from", "from");
+        if (isVersionChange) {
+            const exerciseStore = tx.objectStore("exercise");
+            if (!exerciseStore.indexNames.contains("by-from")) {
+                exerciseStore.createIndex("by-from", "from");
+            }
+            if (!exerciseStore.indexNames.contains("by-daily")) {
+                exerciseStore.createIndex("by-daily", "dailyId");
+            }
+            if (!exerciseStore.indexNames.contains("by-program")) {
+                exerciseStore.createIndex("by-program", "programId");
+            }
+            console.log(
+                "migrated to version",
+                migrationVersion,
+                "Add exercise 'by-from', 'by-daily', 'by-program' indexes"
+            );
         }
-        if (!exerciseStore.indexNames.contains("by-daily")) {
-            exerciseStore.createIndex("by-daily", "dailyId");
-        }
-        if (!exerciseStore.indexNames.contains("by-program")) {
-            exerciseStore.createIndex("by-program", "programId");
-        }
-        console.log(
-            "migrated to version",
-            migrationVersion,
-            "Add exercise 'by-from', 'by-daily', 'by-program' indexes"
-        );
         migrationVersion++;
     }
 
@@ -282,17 +275,16 @@ export const runMigrations: (
     }
     // Add exercise.slug index
     if (migrationVersion === 50) {
-        const exerciseStore = tx.objectStore("exercise");
-        if (!exerciseStore.indexNames.contains("by-slug")) {
-            exerciseStore.createIndex("by-slug", "slug");
-        }
+        if (isVersionChange) {
+            const exerciseStore = tx.objectStore("exercise");
+            if (!exerciseStore.indexNames.contains("by-slug")) {
+                exerciseStore.createIndex("by-slug", "slug");
+            }
 
-        console.log("migrated to version", migrationVersion, `Add exercise.slug index`);
+            console.log("migrated to version", migrationVersion, `Add exercise.slug index`);
+        }
         migrationVersion++;
     }
-
-    if (oldVersion === newVersion) await run();
-    else if (!isVersionChange) await run();
 
     console.log("done migrating");
 };
