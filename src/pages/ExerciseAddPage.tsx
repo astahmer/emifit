@@ -17,7 +17,6 @@ import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercis
 import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
 
 export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
-    console.log({ exercise });
     const query = useDailyQuery(printDate(new Date()));
     const daily = query.data;
 
@@ -81,7 +80,6 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
             },
         }
     );
-    console.log({ isInitialized });
 
     return (
         <ExerciseFormMachineProvider value={service}>

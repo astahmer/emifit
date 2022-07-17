@@ -8,7 +8,6 @@ import { match } from "ts-pattern";
 
 export function ExercisePageLayout() {
     const dailyId = useAtomValue(currentDailyIdAtom);
-    console.log(dailyId);
     const query = useCurrentDailyQuery();
     const daily = query.data;
 
