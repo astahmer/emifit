@@ -70,7 +70,11 @@ export const AddCategoryForm = ({ onSuccess }: { onSuccess: () => void }) => {
     const queryClient = useQueryClient();
     const mutation = useMutation(
         (values: typeof defaultCategoryValues) => {
-            return orm.category.add({ ...values, tagList: values.tagList.map((tag) => tag.id) });
+            return orm.category.add({
+                ...values,
+                tagList: values.tagList.map((tag) => tag.id),
+                name: values.name.trim(),
+            });
         },
         {
             onSuccess: () => {

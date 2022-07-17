@@ -34,7 +34,7 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
 
     const addExerciseToDaily = useMutation(
         async (exo: Exercise) => {
-            await orm.exercise.add(serializeExercise(exo));
+            await orm.exercise.add({ ...serializeExercise(exo), name: exo.name.trim() });
             return orm.daily.upsert(daily.id, (current) => ({
                 ...current,
                 exerciseList: (current.exerciseList || []).concat(exo.id),

@@ -146,7 +146,7 @@ export const AddTagForm = ({ onSuccess }: { onSuccess: () => void }) => {
         (values: TagFormValues) => {
             const { categoryList, addedCategoryList, removedCategoryList, ...tag } = values;
             return Promise.all([
-                orm.tag.add(tag),
+                orm.tag.add({ ...tag, name: tag.name.trim() }),
                 ...addedCategoryList.map((catId) => {
                     orm.category.upsert(catId, (current) => ({
                         ...current,

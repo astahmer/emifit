@@ -17,6 +17,7 @@ export interface Exercise {
     id: string;
     category: Category["id"];
     name: string;
+    slug: string;
     tags: Tag[];
     series: Serie[];
     createdAt: Date;

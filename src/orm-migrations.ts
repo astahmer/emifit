@@ -1,4 +1,5 @@
 import { IDBPDatabase, IDBPTransaction, StoreNames } from "idb";
+import { slugify } from "./functions/utils";
 import type { EmifitSchema } from "./orm";
 import type { Tag } from "./orm-types";
 
@@ -258,6 +259,24 @@ export const runMigrations: (
             "migrated to version",
             migrationVersion,
             "Add exercise 'by-from', 'by-daily', 'by-program' indexes"
+        );
+        migrationVersion++;
+    }
+
+    // Add exercise.slug + fix exercise.name by trimming whitespaces
+    if (migrationVersion === 49) {
+        let exerciseCursor = await tx.objectStore("exercise").openCursor();
+
+        while (exerciseCursor) {
+            const name = exerciseCursor.value.name.trim();
+            exerciseCursor.update({ ...exerciseCursor.value, name, slug: slugify(name) });
+            exerciseCursor = await exerciseCursor.continue();
+        }
+
+        console.log(
+            "migrated to version",
+            migrationVersion,
+            `Add exercise.slug + fix exercise.name by trimming whitespaces`
         );
         migrationVersion++;
     }

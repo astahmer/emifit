@@ -52,7 +52,7 @@ export const AddGroupForm = ({ onSuccess }: { onSuccess: () => void }) => {
     const queryClient = useQueryClient();
     const mutation = useMutation(
         (values: typeof defaultGroupValues) => {
-            return orm.group.add(values);
+            return orm.group.add({ ...values, name: values.name.trim() });
         },
         {
             onSuccess: () => {
