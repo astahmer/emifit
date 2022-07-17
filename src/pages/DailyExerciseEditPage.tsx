@@ -9,9 +9,9 @@ import { useEffect } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
-import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
+import { DailySingleExerciseForm } from "../Exercises/SingleExerciseForm";
 
-export const ExerciseEditPage = () => {
+export const DailyExerciseEditPage = () => {
     const params = useParams<{ dailyId: string; exoId: string }>();
     const exerciseId = params.exoId;
 
@@ -49,7 +49,7 @@ export const ExerciseEditPage = () => {
 
     return (
         <ExerciseFormMachineProvider value={service}>
-            {exercise && isInitialized && <SingleExerciseForm onSubmit={editExerciseById.mutate} />}
+            {exercise && isInitialized && <DailySingleExerciseForm onSubmit={editExerciseById.mutate} />}
         </ExerciseFormMachineProvider>
     );
 };

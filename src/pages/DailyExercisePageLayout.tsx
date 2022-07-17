@@ -6,7 +6,7 @@ import { useAtomValue } from "jotai";
 import { matchPath, Outlet, useLocation } from "react-router-dom";
 import { match } from "ts-pattern";
 
-export function ExercisePageLayout() {
+export function DailyExercisePageLayout() {
     const dailyId = useAtomValue(currentDailyIdAtom);
     const query = useCurrentDailyQuery();
     const daily = query.data;
@@ -23,33 +23,35 @@ export function ExercisePageLayout() {
         .exhaustive();
 
     if (showSkeletons || query.isLoading) {
-        return (
-            <Flex id="ExercisePageLayoutSkeleton" as="section" flexDirection="column" h="100%" minH={0}>
-                <Flex justifyContent="space-around">
-                    <Skeleton w="100px" h="40px" />
-                    <Skeleton w="100px" h="40px" />
-                    <Skeleton w="100px" h="40px" />
-                </Flex>
-                <Divider mt="4" />
-                <DailyExerciseTaskListSkeleton />
-            </Flex>
-        );
+        return <DailyExercisePageLayoutSkeleton />;
     }
 
     return (
-        <Box id="ExercisePageLayout" as="section" d="flex" flexDirection="column" h="100%" p="4" w="100%">
+        <Box id="DailyExercisePageLayout" as="section" d="flex" flexDirection="column" h="100%" p="4" w="100%">
             <Heading as="h1">{title} </Heading>
             <Heading as="h2" size="md">
                 {dailyId} - {daily?.category}
             </Heading>
             {daily && (
-                <Box id="ExercisePageLayoutOutlet" d="flex" flexDirection="column" mt="auto" minH="0">
+                <Box id="DailyExercisePageLayoutOutlet" d="flex" flexDirection="column" mt="auto" minH="0">
                     <Outlet />
                 </Box>
             )}
         </Box>
     );
 }
+
+export const DailyExercisePageLayoutSkeleton = () => (
+    <Flex id="DailyExercisePageLayoutSkeleton" as="section" flexDirection="column" h="100%" minH={0}>
+        <Flex justifyContent="space-around">
+            <Skeleton w="100px" h="40px" />
+            <Skeleton w="100px" h="40px" />
+            <Skeleton w="100px" h="40px" />
+        </Flex>
+        <Divider mt="4" />
+        <DailyExerciseTaskListSkeleton />
+    </Flex>
+);
 
 export function getRouteTypeFromPathname(pathname: string) {
     return match(pathname)

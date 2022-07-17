@@ -1,4 +1,4 @@
-import { SupersetForm } from "@/Exercises/SupersetForm";
+import { DailySupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
@@ -53,7 +53,7 @@ export const ExerciseSupersetEditPage = () => {
 
     return (
         <ExerciseFormMachineProvider value={service}>
-            {exerciseList?.length && isInitialized && <SupersetForm onSubmit={editSupersetExerciseList.mutate} />}
+            {exerciseList?.length && isInitialized && <DailySupersetForm onSubmit={editSupersetExerciseList.mutate} />}
         </ExerciseFormMachineProvider>
     );
 };

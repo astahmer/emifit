@@ -1,6 +1,6 @@
 import { Show } from "@/components/Show";
 import { SwitchInput } from "@/fields/SwitchInput";
-import { SupersetForm } from "@/Exercises/SupersetForm";
+import { DailySupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
 import { makeId, printDate } from "@/functions/utils";
@@ -14,9 +14,9 @@ import { useInterpret, useSelector } from "@xstate/react";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
-import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
+import { DailySingleExerciseForm } from "../Exercises/SingleExerciseForm";
 
-export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
+export const DailyExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
     const query = useDailyQuery(printDate(new Date()));
     const daily = query.data;
 
@@ -92,9 +92,9 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
                     />
                 </Box>
                 {!isSuperset ? (
-                    <SingleExerciseForm onSubmit={addExerciseToDaily.mutate} />
+                    <DailySingleExerciseForm onSubmit={addExerciseToDaily.mutate} />
                 ) : (
-                    <SupersetForm onSubmit={addExerciseSupersetToDaily.mutate} />
+                    <DailySupersetForm onSubmit={addExerciseSupersetToDaily.mutate} />
                 )}
             </Show>
         </ExerciseFormMachineProvider>
