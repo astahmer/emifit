@@ -109,12 +109,14 @@ export const ProgramsPage = () => {
             <Box id="ProgramsPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
                 <Box d="flex" alignItems="center">
                     <Heading as="h1">Programs</Heading>
-                    <SortByIconButton
-                        ml="auto"
-                        variant="outline"
-                        sortByDirection={sortByDirection}
-                        onSortByDirectionChange={setSortByDirection}
-                    />
+                    {state.matches("initial") && (
+                        <SortByIconButton
+                            ml="auto"
+                            variant="outline"
+                            sortByDirection={sortByDirection}
+                            onSortByDirectionChange={setSortByDirection}
+                        />
+                    )}
                 </Box>
                 {query.isFetched && (
                     <>
