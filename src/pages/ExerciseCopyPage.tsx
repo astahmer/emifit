@@ -1,6 +1,6 @@
 import { Show } from "@/components/Show";
 import { DailyExerciseTaskListSkeleton } from "@/Daily/DailyExerciseTaskListSkeleton";
-import { useExerciseQuery } from "@/orm-hooks";
+import { useExerciseByIdQuery } from "@/orm-hooks";
 import { Divider, Flex, Skeleton } from "@chakra-ui/react";
 import { useSearchParams } from "react-router-dom";
 import { ExerciseAddPage } from "./ExerciseAddPage";
@@ -8,7 +8,7 @@ import { ExerciseAddPage } from "./ExerciseAddPage";
 export const ExerciseCopyPage = () => {
     const [searchParams] = useSearchParams();
     const exerciseId = searchParams.get("exoId");
-    const exerciseQuery = useExerciseQuery(exerciseId);
+    const exerciseQuery = useExerciseByIdQuery(exerciseId);
     const exercise = exerciseQuery.data;
 
     return (

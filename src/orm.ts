@@ -111,6 +111,8 @@ const makeStore = <Key extends StoreName, StoreEntity extends Entity = EmifitSch
         name,
         tx: (mode?: IDBTransactionMode, options?: IDBTransactionOptions) => db.transaction(name, mode, options),
         find: (id: StoreEntity["id"]) => db.get(name, id) as Promise<StoreEntity>,
+        findBy: <Index extends StoreIndex<Key> = undefined>(params: StoreQueryParams<Key, Index> = {}) =>
+            db.getFromIndex(name, params.index, params.query as any) as Promise<StoreEntity>,
         get: <Index extends StoreIndex<Key> = undefined>(params: StoreQueryParams<Key, Index> = {}) =>
             params.index
                 ? db.getAllFromIndex(name, params.index, params.query as any, params.count)
