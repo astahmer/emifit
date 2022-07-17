@@ -280,6 +280,16 @@ export const runMigrations: (
         );
         migrationVersion++;
     }
+    // Add exercise.slug index
+    if (migrationVersion === 50) {
+        const exerciseStore = tx.objectStore("exercise");
+        if (!exerciseStore.indexNames.contains("by-slug")) {
+            exerciseStore.createIndex("by-slug", "slug");
+        }
+
+        console.log("migrated to version", migrationVersion, `Add exercise.slug index`);
+        migrationVersion++;
+    }
 
     if (oldVersion === newVersion) await run();
     else if (!isVersionChange) await run();

@@ -60,6 +60,7 @@ export type EmifitSchema = {
         value: ExerciseWithReferences;
         indexes: {
             "by-name": ExerciseWithReferences["name"];
+            "by-slug": ExerciseWithReferences["slug"];
             "by-daily": ExerciseWithReferences["dailyId"];
             "by-program": ExerciseWithReferences["programId"];
             "by-category": ExerciseWithReferences["category"];
