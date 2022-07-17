@@ -17,9 +17,12 @@ export const ProgressPage = () => {
             flexGrow={1}
             index={index}
         >
-            <Box pos="relative" h="100%" minH={0} overflowX="hidden" overflowY="auto" p="4">
-                <Outlet />
+            <Box pos="relative" h="100%" minH={0}>
+                <Box h="100%" minH={0} overflowX="hidden" overflowY="auto" p="4">
+                    <Outlet />
+                </Box>
             </Box>
+
             <TabList mt="auto" p="4" flexShrink={0} minH={0} alignSelf="center">
                 {/* global stats overview */}
                 <Tab as={ReactLink} to="">

@@ -119,6 +119,7 @@ export const ExerciseLibraryFilters = ({ tagList }: { tagList: Tag[] }) => {
             <FloatingButton
                 renderButton={(props) => (
                     <IconButton
+                        zIndex={1}
                         aria-label="Search"
                         icon={<SearchIcon />}
                         colorScheme="pink"
