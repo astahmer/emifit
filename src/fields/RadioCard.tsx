@@ -65,7 +65,7 @@ export function RadioCardPicker({
     const { getRootProps, getRadioProps } = useRadioGroup({ ...props, name: "category" });
 
     return (
-        <Stack direction="row" spacing="4" textAlign="center" w="100%" {...getStackProps()} {...getRootProps()}>
+        <Stack direction="row" spacing="4" textAlign="center" w="100%" {...getStackProps?.()} {...getRootProps()}>
             {renderOptions(getRadioProps)}
         </Stack>
     );
