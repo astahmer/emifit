@@ -1,19 +1,19 @@
 import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
 import { useCurrentDailyQuery } from "@/orm-hooks";
-import { getRouteTypeFromPathname } from "@/pages/ExercisePageLayout";
+import { getRouteTypeFromPathname } from "@/pages/DailyExercisePageLayout";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Heading, Stack } from "@chakra-ui/react";
 import { makeArrayOf } from "@pastable/core";
 import { useSelector } from "@xstate/react";
-import { Fragment } from "react";
+import { ComponentProps, Fragment } from "react";
 import { match } from "ts-pattern";
 import { useExerciseFormMachine } from "./ExerciseFormMachine";
 
-export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void> }) {
-    const query = useCurrentDailyQuery();
-    const daily = query.data;
-    const exoNameList = daily.exerciseList.map((exo) => exo.name);
-
+export function SupersetForm({
+    onSubmit,
+    ...props
+}: { onSubmit: () => void | Promise<void> } & Partial<ComponentProps<typeof CreateExerciseForm>> &
+    Pick<ComponentProps<typeof CreateExerciseForm>, "category">) {
     const service = useExerciseFormMachine();
     const exoCount = useSelector(service, (state) => state.context.exerciseCount);
     const canSubmit = useSelector(service, (state) => state.matches("superset.canSubmit"));
@@ -39,11 +39,10 @@ export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void
                         </Heading>
                     </Box>
                     <CreateExerciseForm
-                        category={daily.category}
+                        {...props}
                         defaultValues={service.state.context.supersetForms[i]}
                         onChange={(values) => service.send({ type: "UpdateSupersetForm", index: i, form: values })}
                         shouldOverflow={false}
-                        getExerciseItems={(items) => items.filter((item) => !exoNameList.includes(item.name))}
                     />
                 </Fragment>
             ))}
@@ -66,5 +65,19 @@ export function SupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void
                 </Box>
             )}
         </Stack>
+    );
+}
+
+export function DailySupersetForm({ onSubmit }: { onSubmit: () => void | Promise<void> }) {
+    const query = useCurrentDailyQuery();
+    const daily = query.data;
+    const exoNameList = daily.exerciseList.map((exo) => exo.name);
+
+    return (
+        <SupersetForm
+            category={daily.category}
+            getExerciseItems={(items) => items.filter((item) => !exoNameList.includes(item.name))}
+            onSubmit={onSubmit}
+        />
     );
 }
