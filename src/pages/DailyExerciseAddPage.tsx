@@ -3,7 +3,7 @@ import { SwitchInput } from "@/fields/SwitchInput";
 import { DailySupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
-import { makeId, printDate } from "@/functions/utils";
+import { makeId, printDate, slugify } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCurrentDailyInvalidate, useDailyQuery } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
@@ -34,7 +34,8 @@ export const DailyExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
 
     const addExerciseToDaily = useMutation(
         async (exo: Exercise) => {
-            await orm.exercise.add({ ...serializeExercise(exo), name: exo.name.trim() });
+            const name = exo.name.trim();
+            await orm.exercise.add({ ...serializeExercise(exo), name, slug: slugify(name) });
             return orm.daily.upsert(daily.id, (current) => ({
                 ...current,
                 exerciseList: (current.exerciseList || []).concat(exo.id),
