@@ -32,7 +32,10 @@ export const InspectTab = () => {
 
     const exerciseListByCategoryQuery = useExerciseUnsortedList({ index: "by-category", query: filters.category });
     const exerciseListByCategory = getMostRecentsExerciseById(exerciseListByCategoryQuery.data || []);
-    const groupedByNames = groupBy(exerciseListByCategoryQuery.data || [], "name");
+    const groupedByNames = groupBy(
+        (exerciseListByCategoryQuery.data || []).filter((exo) => exo.from === "daily"),
+        "name"
+    );
 
     const byTag = (exo: Exercise) => filters.tagList.every((tagId) => exo.tags.some((t) => t.id === tagId));
     const byName = (exo: Exercise) => exo.name.toLowerCase() === filters.selected?.name.toLowerCase();
