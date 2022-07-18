@@ -6,9 +6,15 @@ import { useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { CustomDateRangeCalendarButton } from "./CustomDateRangeCalendarButton";
 
-export const DateRangePresetPicker = ({ rangePresets }: { rangePresets?: RangePreset[] }) => {
+export const DateRangePresetPicker = ({
+    rangePresets,
+    initialRange,
+}: {
+    rangePresets?: RangePreset[];
+    initialRange?: RangePresetOrCustom;
+}) => {
     const { setDates } = useCalendarValues();
-    const [activeRange, setActiveRange] = useState<RangePresetOrCustom>("1 week");
+    const [activeRange, setActiveRange] = useState<RangePresetOrCustom>(initialRange || rangePresets[0]);
 
     const rangeContainerRef = useRef<HTMLDivElement>();
 
