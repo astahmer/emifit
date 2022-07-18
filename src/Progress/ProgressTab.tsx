@@ -9,20 +9,7 @@ import { useCategoryList } from "@/orm-hooks";
 import { DailyWithReferences, ExerciseWithReferences } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import {
-    Box,
-    Center,
-    CenterProps,
-    Divider,
-    Heading,
-    Spinner,
-    Stack,
-    Stat,
-    StatGroup,
-    StatLabel,
-    StatNumber,
-    Text,
-} from "@chakra-ui/react";
+import { Box, Divider, Heading, Stack, Stat, StatGroup, StatLabel, StatNumber, Text } from "@chakra-ui/react";
 import { getSum } from "@pastable/core";
 import { CalendarValues } from "@uselessdev/datepicker";
 import { ComponentPropsWithoutRef, useState } from "react";
@@ -31,6 +18,7 @@ import { Link as ReactLink } from "react-router-dom";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { DateRangePresetPicker, getRangeStart } from "../Calendar/DateRangePresetPicker";
 import { CalendarValuesProvider } from "../Calendar/useCalendarValues";
+import { CenteredSpinner } from "./CenteredSpinner";
 
 export type UnitMode = "count" | "percent";
 const [UnitModeContext, useUnitMode] = createContextWithHook<UnitMode>("UnitMode");
@@ -137,11 +125,7 @@ export const ProgressTab = () => {
         </CalendarValuesProvider>
     );
 };
-const CenteredSpinner = (props: CenterProps) => (
-    <Center {...props}>
-        <Spinner size="xl" />
-    </Center>
-);
+
 const TopKgInDateRange = ({ exerciseList }: { exerciseList: ExerciseWithReferences[] }) => {
     const topKgInDateRange = Math.max(...exerciseList.flatMap((exo) => exo.series.map((set) => set.kg)));
     const exerciseListWithTopKgs = exerciseList
@@ -166,6 +150,7 @@ const TopKgInDateRange = ({ exerciseList }: { exerciseList: ExerciseWithReferenc
         </>
     );
 };
+
 const columns = [
     {
         Header: "Date",
