@@ -9,7 +9,7 @@ import {
     useOutsideClick,
 } from "@chakra-ui/react";
 import { MutableRefObject, ReactNode } from "react";
-import { getRangeStart } from "./DateRangePresetPicker";
+import { getRangeStart, useFallbackDates } from "./DateRangePresetPicker";
 import { TwoMonthsDateRangeCalendar } from "./TwoMonthsDateRangeCalendar";
 import { useCalendarValues } from "./useCalendarValues";
 
@@ -23,13 +23,14 @@ export const CustomDateRangeCalendarButton = ({
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const { setDates, ...dates } = useCalendarValues();
+    const fallbackDates = useFallbackDates();
     const handleClose = () => {
         let { start, end } = dates;
         if (!dates.start) {
-            start = getRangeStart("1m");
+            start = fallbackDates.start || getRangeStart("1m");
         }
         if (!dates.end) {
-            end = new Date();
+            end = fallbackDates.end || new Date();
         }
         setDates({ start, end });
         onClose();

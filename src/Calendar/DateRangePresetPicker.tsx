@@ -1,7 +1,9 @@
 import { useCalendarValues } from "@/Calendar/useCalendarValues";
+import { createContextWithHook } from "@/functions/createContextWithHook";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Tag, TagLabel, TagLeftIcon, Wrap, WrapItem } from "@chakra-ui/react";
-import { subMonths, subWeeks, subYears } from "date-fns";
+import { CalendarValues } from "@uselessdev/datepicker";
+import { subMonths, subWeeks, subYears, closestIndexTo } from "date-fns";
 import { useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { CustomDateRangeCalendarButton } from "./CustomDateRangeCalendarButton";
@@ -14,7 +16,13 @@ export const DateRangePresetPicker = ({
     initialRange?: RangePresetOrCustom;
 }) => {
     const { setDates } = useCalendarValues();
-    const [activeRange, setActiveRange] = useState<RangePresetOrCustom>(initialRange || rangePresets[0]);
+
+    const defaultRange = initialRange || rangePresets[0];
+    const datesRange = rangePresets.map((range) => getRangeStart(range));
+    const fallbackIndex = closestIndexTo(getRangeStart(defaultRange === "custom" ? "1m" : defaultRange), datesRange);
+    const fallbackDates = { start: datesRange[fallbackIndex], end: new Date() };
+
+    const [activeRange, setActiveRange] = useState<RangePresetOrCustom>(defaultRange);
 
     const rangeContainerRef = useRef<HTMLDivElement>();
 
@@ -36,30 +44,34 @@ export const DateRangePresetPicker = ({
                 </WrapItem>
             ))}
             <WrapItem>
-                <CustomDateRangeCalendarButton
-                    calendarRef={rangeContainerRef}
-                    renderTrigger={({ onOpen }) => (
-                        <Tag
-                            colorScheme="pink"
-                            variant={"custom" === activeRange ? "solid" : "subtle"}
-                            onClick={() => {
-                                if (activeRange !== "custom") {
-                                    setActiveRange("custom");
-                                    setDates({ start: getRangeStart("1m"), end: new Date() });
-                                }
+                <FallbackDatesProvider value={fallbackDates}>
+                    <CustomDateRangeCalendarButton
+                        calendarRef={rangeContainerRef}
+                        renderTrigger={({ onOpen }) => (
+                            <Tag
+                                colorScheme="pink"
+                                variant={"custom" === activeRange ? "solid" : "subtle"}
+                                onClick={() => {
+                                    if (activeRange !== "custom") {
+                                        setActiveRange("custom");
+                                        setDates(fallbackDates);
+                                    }
 
-                                return onOpen();
-                            }}
-                        >
-                            {"custom" === activeRange ? <TagLeftIcon boxSize="12px" as={CheckIcon} /> : null}
-                            <TagLabel>Custom</TagLabel>
-                        </Tag>
-                    )}
-                />
+                                    return onOpen();
+                                }}
+                            >
+                                {"custom" === activeRange ? <TagLeftIcon boxSize="12px" as={CheckIcon} /> : null}
+                                <TagLabel>Custom</TagLabel>
+                            </Tag>
+                        )}
+                    />
+                </FallbackDatesProvider>
             </WrapItem>
         </Wrap>
     );
 };
+
+export const [FallbackDatesProvider, useFallbackDates] = createContextWithHook<CalendarValues>("FallbackDates");
 
 export const getRangeStart = (preset: RangePreset) => {
     const today = new Date();
