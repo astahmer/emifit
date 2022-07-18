@@ -1,6 +1,6 @@
 import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
 import { useCurrentDailyQuery } from "@/orm-hooks";
-import { getRouteTypeFromPathname } from "@/pages/DailyExercisePageLayout";
+import { getRouteTypeFromPathname } from "@/Daily/DailyExercisePageLayout";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Heading, Stack } from "@chakra-ui/react";
 import { makeArrayOf } from "@pastable/core";

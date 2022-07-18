@@ -6,7 +6,7 @@ import { Box, Button, Divider } from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { match } from "ts-pattern";
 import { useExerciseFormMachine } from "./ExerciseFormMachine";
-import { getRouteTypeFromPathname } from "../pages/DailyExercisePageLayout";
+import { getRouteTypeFromPathname } from "../Daily/DailyExercisePageLayout";
 import { ComponentProps } from "react";
 
 export function SingleExerciseForm({

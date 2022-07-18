@@ -63,6 +63,7 @@ export type EmifitSchema = {
             "by-slug": ExerciseWithReferences["slug"];
             "by-daily": ExerciseWithReferences["dailyId"];
             "by-program": ExerciseWithReferences["programId"];
+            "by-superset": ExerciseWithReferences["supersetId"];
             "by-category": ExerciseWithReferences["category"];
             "by-tags": ExerciseWithReferences["tags"];
             "by-parent": ExerciseWithReferences["madeFromExerciseId"];

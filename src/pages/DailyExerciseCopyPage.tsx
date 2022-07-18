@@ -2,7 +2,7 @@ import { Show } from "@/components/Show";
 import { useExerciseByIdQuery } from "@/orm-hooks";
 import { useSearchParams } from "react-router-dom";
 import { DailyExerciseAddPage } from "./DailyExerciseAddPage";
-import { DailyExercisePageLayoutSkeleton } from "./DailyExercisePageLayout";
+import { DailyExercisePageLayoutSkeleton } from "../Daily/DailyExercisePageLayout";
 
 export const DailyExerciseCopyPage = () => {
     const [searchParams] = useSearchParams();

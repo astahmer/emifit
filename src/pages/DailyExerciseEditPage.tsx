@@ -12,7 +12,7 @@ import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercis
 import { DailySingleExerciseForm } from "../Exercises/SingleExerciseForm";
 
 export const DailyExerciseEditPage = () => {
-    const params = useParams<{ dailyId: string; exoId: string }>();
+    const params = useParams<{ exoId: string }>();
     const exerciseId = params.exoId;
 
     const daily = useCurrentDaily();

@@ -286,5 +286,18 @@ export const runMigrations: (
         migrationVersion++;
     }
 
+    // Add exercise.superset index
+    if (migrationVersion === 51) {
+        if (isVersionChange) {
+            const exerciseStore = tx.objectStore("exercise");
+            if (!exerciseStore.indexNames.contains("by-superset")) {
+                exerciseStore.createIndex("by-superset", "supersetId");
+            }
+
+            console.log("migrated to version", migrationVersion, `Add exercise.superset index`);
+        }
+        migrationVersion++;
+    }
+
     console.log("done migrating");
 };

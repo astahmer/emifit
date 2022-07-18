@@ -17,8 +17,8 @@ import { routeMap } from "./routes";
 import { browserHistory, store } from "./store";
 import { ClickToComponent } from "click-to-react-component";
 import "./App.css";
-import { ExerciseSupersetEditPage } from "./pages/ExerciseSupersetEditPage";
-import { DailyExercisePageLayout } from "./pages/DailyExercisePageLayout";
+import { DailyExerciseSupersetEditPage } from "./pages/DailyExerciseSupersetEditPage";
+import { DailyExercisePageLayout } from "./Daily/DailyExercisePageLayout";
 import { appTheme } from "./theme";
 import { Layout } from "./Layout";
 import { ExerciseLibraryPage } from "./pages/ExerciseLibraryPage";
@@ -27,6 +27,9 @@ import { CompareTab } from "./Progress/CompareTab";
 import { ProgressTab } from "./Progress/ProgressTab";
 import { InspectTab } from "./Progress/InspectTab";
 import { InspectExerciseTab } from "./Progress/InspectExerciseTab";
+import { ExercisePageLayout } from "./Exercises/ExercisePageLayout";
+import { ExerciseEditPage } from "./pages/ExerciseEditPage";
+import { ExerciseSupersetEditPage } from "./pages/ExerciseSupersetEditPage";
 
 const queryClient = new QueryClient();
 
@@ -50,11 +53,11 @@ function App() {
                                         <Route path="copy" element={<DailyExerciseCopyPage />} />
                                         <Route
                                             path="superset/edit/:supersetId"
-                                            element={<ExerciseSupersetEditPage />}
+                                            element={<DailyExerciseSupersetEditPage />}
                                         />
                                     </Route>
-                                    <Route path="exercise" element={<DailyExercisePageLayout />}>
-                                        <Route path="edit/:exoId" element={<DailyExerciseEditPage />} />
+                                    <Route path="exercise" element={<ExercisePageLayout />}>
+                                        <Route path="edit/:exoId" element={<ExerciseEditPage />} />
                                         <Route
                                             path="superset/edit/:supersetId"
                                             element={<ExerciseSupersetEditPage />}

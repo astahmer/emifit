@@ -1,29 +1,21 @@
-import { SupersetForm } from "@/Exercises/SupersetForm";
+import { DailySupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { orm } from "@/orm";
-import { useExerciseList } from "@/orm-hooks";
-import { Exercise } from "@/orm-types";
+import { useCurrentDaily } from "@/orm-hooks";
+import { routeMap } from "@/routes";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
 
-export const ExerciseSupersetEditPage = () => {
-    const { supersetId } = useParams<{ supersetId: string }>();
-    const exerciseList = useExerciseList({ index: "by-superset", query: supersetId });
+export const DailyExerciseSupersetEditPage = () => {
+    const params = useParams<{ supersetId: string }>();
+    const supersetId = params.supersetId;
 
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (!supersetId) {
-            navigate(-1);
-        }
-    }, [supersetId, navigate]);
+    const daily = useCurrentDaily();
+    const exerciseList = daily?.exerciseList?.filter((exo) => exo.supersetId === supersetId);
 
-    return exerciseList.length ? <ExerciseSupersetEditForm exerciseList={exerciseList} /> : null;
-};
-
-const ExerciseSupersetEditForm = ({ exerciseList }: { exerciseList: Exercise[] }) => {
     const service = useInterpret(() =>
         makeExerciseFormMachine({
             exerciseCount: exerciseList.length,
@@ -47,16 +39,21 @@ const ExerciseSupersetEditForm = ({ exerciseList }: { exerciseList: Exercise[] }
         },
         {
             onSuccess: () => {
-                navigate(-1);
+                daily.invalidate();
+                navigate(routeMap.home);
             },
         }
     );
 
+    useEffect(() => {
+        if (!supersetId) {
+            navigate(routeMap.home);
+        }
+    }, [supersetId, navigate]);
+
     return (
         <ExerciseFormMachineProvider value={service}>
-            {exerciseList?.length && isInitialized && (
-                <SupersetForm category={exerciseList[0].category} onSubmit={() => editSupersetExerciseList.mutate()} />
-            )}
+            {exerciseList?.length && isInitialized && <DailySupersetForm onSubmit={editSupersetExerciseList.mutate} />}
         </ExerciseFormMachineProvider>
     );
 };

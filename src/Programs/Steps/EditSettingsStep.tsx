@@ -17,7 +17,7 @@ import { useSelector } from "@xstate/react";
 import { useForm } from "react-hook-form";
 import { AddTag, ExerciseName } from "@/Exercises/ExerciseName";
 import { ExerciseListCombobox } from "@/Exercises/ExerciseCombobox";
-import { Link as ReactLink } from "react-router-dom";
+import { Link as ReactLink, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { RadioCardButton } from "@/fields/RadioCard";
 import { requiredRule } from "@/functions/utils";
@@ -33,6 +33,8 @@ export function EditSettingsStep() {
 
     const form = useForm({ defaultValues: { programName } });
     const editExerciseList = useRef([]);
+
+    const navigate = useNavigate();
 
     return (
         <>
@@ -64,6 +66,9 @@ export function EditSettingsStep() {
                         minItems={1}
                         onSelectedItemsChange={(e) => (editExerciseList.current = e.selectedItems)}
                         initialSelectedItems={selectedExercises}
+                        getSelectedItemProps={({ selectedItem }) => ({
+                            onClick: (e) => navigate("/exercise/edit/" + selectedItem.id),
+                        })}
                         renderRight={() => (
                             <ButtonGroup alignItems="center" size="sm" colorScheme="telegram">
                                 <Button
@@ -106,7 +111,7 @@ export function EditSettingsStep() {
                         type="submit"
                         size="lg"
                     >
-                        {isEditingProgram ? "Edit" : "Create"} program
+                        {isEditingProgram ? "Update" : "Create"} program !
                     </Button>
                     {isEditingProgram && (
                         <>
