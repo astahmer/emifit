@@ -14,9 +14,9 @@ import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise, Program, WithExerciseList } from "@/orm-types";
 import { formatDailyIdToDailyEntryParam } from "@/orm-utils";
-import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
+import { currentDailyIdAtom, debugModeAtom, isDailyTodayAtom } from "@/store";
 import { CheckIcon } from "@chakra-ui/icons";
-import { Box, Divider, Flex, Heading, Spacer, Stack, Text } from "@chakra-ui/react";
+import { Box, Divider, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import confetti from "canvas-confetti";
 import { useAtomValue } from "jotai";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -113,6 +113,7 @@ const DailyExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) =
 
 export function DailyExerciseTaskItem({ exo }: { exo: Exercise }) {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
+    const debugMode = useAtomValue(debugModeAtom);
 
     return (
         <ExerciseTaskItem
@@ -125,7 +126,9 @@ export function DailyExerciseTaskItem({ exo }: { exo: Exercise }) {
                     </Flex>
                 ) : null
             }
-            renderAfterName={() => (isDailyToday ? <ExerciseMenu exo={exo} /> : <PastDailyExerciseMenu exo={exo} />)}
+            renderAfterName={() =>
+                isDailyToday || debugMode ? <ExerciseMenu exo={exo} /> : <PastDailyExerciseMenu exo={exo} />
+            }
         />
     );
 }
