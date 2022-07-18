@@ -1,4 +1,5 @@
 import { CustomDay } from "@/Calendar/CalendarButton";
+import { Show } from "@/components/Show";
 import { useCategoryList, useDailyList } from "@/orm-hooks";
 import { Box, Button, VStack } from "@chakra-ui/react";
 import {
@@ -13,18 +14,21 @@ import {
     CalendarValues,
     CalendarWeek,
 } from "@uselessdev/datepicker";
+import { ReactNode } from "react";
 import { useCalendarValues } from "./useCalendarValues";
 
 const MONTHS = 2;
-export const TwoMonthsDateRangeCalendar = ({ onSelectDates }: { onSelectDates: (dates: CalendarValues) => void }) => {
+export const TwoMonthsDateRangeCalendar = ({
+    renderButton,
+}: {
+    renderButton: (dates: CalendarValues) => ReactNode;
+}) => {
     const dailyList = useDailyList();
     const { setDates, ...dates } = useCalendarValues();
+
     const handleSelectDate = (dates: CalendarValues) => {
         console.log(dates);
         setDates(dates);
-        if (dates.start && dates.end) {
-            onSelectDates(dates);
-        }
     };
     const categoryList = useCategoryList();
 
@@ -50,14 +54,18 @@ export const TwoMonthsDateRangeCalendar = ({ onSelectDates }: { onSelectDates: (
                     </CalendarMonths>
                 </Box>
                 <VStack spacing={4} bgColor="gray.50" p={4} alignItems="stretch" borderEndRadius="md" flex={1}>
-                    <Button
-                        onClick={() => setDates({ start: null, end: null })}
-                        colorScheme="pink"
-                        size="md"
-                        disabled={!Boolean(dates.start || dates.end)}
-                    >
-                        Reset range
-                    </Button>
+                    <Show when={Boolean(dates.start || dates.end)}>
+                        <Button
+                            onClick={() => setDates({ start: null, end: null })}
+                            colorScheme="pink"
+                            size="md"
+                            disabled={!Boolean(dates.start || dates.end)}
+                            variant="outline"
+                        >
+                            Reset range
+                        </Button>
+                    </Show>
+                    {renderButton(dates)}
                 </VStack>
             </Box>
         </Calendar>

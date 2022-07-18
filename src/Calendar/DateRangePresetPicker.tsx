@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { CustomDateRangeCalendarButton } from "./CustomDateRangeCalendarButton";
 
-export const DateRangePresetPicker = () => {
+export const DateRangePresetPicker = ({ rangePresets }: { rangePresets?: RangePreset[] }) => {
     const { setDates } = useCalendarValues();
     const [activeRange, setActiveRange] = useState<RangePresetOrCustom>("1 week");
 
@@ -14,7 +14,7 @@ export const DateRangePresetPicker = () => {
 
     return (
         <Wrap ref={rangeContainerRef}>
-            {rangePresets.map((value) => (
+            {(rangePresets || baseRangePresets).map((value) => (
                 <WrapItem key={value}>
                     <Tag
                         colorScheme="pink"
@@ -39,7 +39,7 @@ export const DateRangePresetPicker = () => {
                             onClick={() => {
                                 if (activeRange !== "custom") {
                                     setActiveRange("custom");
-                                    setDates({ start: null, end: null });
+                                    setDates({ start: getRangeStart("1m"), end: new Date() });
                                 }
 
                                 return onOpen();
@@ -66,6 +66,6 @@ export const getRangeStart = (preset: RangePreset) => {
         .exhaustive();
 };
 
-export const rangePresets = ["1 week", "1m", "3m", "6m", "1y"] as const;
-export type RangePresetOrCustom = typeof rangePresets[number] | "custom";
+export const baseRangePresets = ["1 week", "1m", "3m", "6m", "1y"] as const;
+export type RangePresetOrCustom = typeof baseRangePresets[number] | "custom";
 export type RangePreset = Exclude<RangePresetOrCustom, "custom">;

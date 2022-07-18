@@ -1,6 +1,17 @@
-import { Popover, PopoverContent, PopoverTrigger, Portal, useDisclosure, useOutsideClick } from "@chakra-ui/react";
+import { Show } from "@/components/Show";
+import {
+    Button,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+    Portal,
+    useDisclosure,
+    useOutsideClick,
+} from "@chakra-ui/react";
 import { MutableRefObject, ReactNode } from "react";
+import { getRangeStart } from "./DateRangePresetPicker";
 import { TwoMonthsDateRangeCalendar } from "./TwoMonthsDateRangeCalendar";
+import { useCalendarValues } from "./useCalendarValues";
 
 export const CustomDateRangeCalendarButton = ({
     renderTrigger,
@@ -11,7 +22,20 @@ export const CustomDateRangeCalendarButton = ({
 }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    useOutsideClick({ ref: calendarRef, handler: onClose, enabled: isOpen });
+    const { setDates, ...dates } = useCalendarValues();
+    const handleClose = () => {
+        let { start, end } = dates;
+        if (!dates.start) {
+            start = getRangeStart("1m");
+        }
+        if (!dates.end) {
+            end = new Date();
+        }
+        setDates({ start, end });
+        onClose();
+    };
+
+    useOutsideClick({ ref: calendarRef, handler: handleClose, enabled: isOpen });
 
     return (
         <Popover placement="auto-start" isOpen={isOpen}>
@@ -25,7 +49,20 @@ export const CustomDateRangeCalendarButton = ({
                     _focus={{ boxShadow: "none" }}
                     ref={calendarRef}
                 >
-                    <TwoMonthsDateRangeCalendar onSelectDates={onClose} />
+                    <TwoMonthsDateRangeCalendar
+                        renderButton={(dates) => (
+                            <Show when={Boolean(dates.start || dates.end)}>
+                                <Button
+                                    onClick={handleClose}
+                                    colorScheme="pink"
+                                    size="md"
+                                    disabled={!Boolean(dates.start || dates.end)}
+                                >
+                                    Close
+                                </Button>
+                            </Show>
+                        )}
+                    />
                 </PopoverContent>
             </Portal>
         </Popover>
