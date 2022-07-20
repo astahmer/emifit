@@ -1,6 +1,6 @@
-import { MultiSelect } from "@/components/MultiSelect";
-import { SelectInput } from "@/components/SelectInput";
-import { TextInput } from "@/components/TextInput";
+import { MultiSelect } from "@/fields/MultiSelect";
+import { SelectInput } from "@/fields/SelectInput";
+import { TextInput } from "@/fields/TextInput";
 import { mergeProps } from "@/functions/mergeProps";
 import { toasts } from "@/functions/toasts";
 import { requiredRule, slugify } from "@/functions/utils";
@@ -146,7 +146,7 @@ export const AddTagForm = ({ onSuccess }: { onSuccess: () => void }) => {
         (values: TagFormValues) => {
             const { categoryList, addedCategoryList, removedCategoryList, ...tag } = values;
             return Promise.all([
-                orm.tag.add(tag),
+                orm.tag.add({ ...tag, name: tag.name.trim() }),
                 ...addedCategoryList.map((catId) => {
                     orm.category.upsert(catId, (current) => ({
                         ...current,

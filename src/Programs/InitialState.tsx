@@ -1,6 +1,6 @@
 import { FloatingButton } from "@/components/FloatingButton";
 import { HFlex } from "@/components/HFlex";
-import { MultiSelect } from "@/components/MultiSelect";
+import { MultiSelect } from "@/fields/MultiSelect";
 import { SortByDirection } from "@/components/SortByIconButton";
 import { useCategoryList, useProgramList } from "@/orm-hooks";
 import { Category, Program } from "@/orm-types";

@@ -59,7 +59,7 @@ export const useDailyListQuery = <Index extends StoreIndex<"daily"> = undefined>
                     } as Daily)
             );
         },
-        { initialData: [] }
+        { placeholderData: [] }
     );
 
     return query;
@@ -80,7 +80,7 @@ export const useCategoryListQuery = <Index extends StoreIndex<"category"> = unde
 
             return list.map((cat) => computeCategoryFromReferences(cat, tagListById));
         },
-        { initialData: [] }
+        { placeholderData: [] }
     );
 
     return query;
@@ -99,7 +99,7 @@ export const useCategoryQuery = (id: Category["id"]) => {
 
             return computeCategoryFromReferences(category, tagListById);
         },
-        { enabled: Boolean(id), initialData: null }
+        { enabled: Boolean(id), placeholderData: null }
     );
 
     return query;
@@ -114,7 +114,7 @@ export const useGroupListQuery = <Index extends StoreIndex<"group"> = undefined>
             const list = await orm.group.get(params);
             return list;
         },
-        { initialData: [] }
+        { placeholderData: [] }
     );
 
     return query;
@@ -133,7 +133,7 @@ export const useTagListQuery = <Index extends StoreIndex<"tag"> = undefined>(
             const list = await orm.tag.get(params);
             return list;
         },
-        { initialData: [] }
+        { placeholderData: [] }
     );
 
     return query;
@@ -157,7 +157,25 @@ export function useExerciseUnsortedList<Index extends StoreIndex<"exercise"> = u
             const tagListById = groupIn(tagList, "id");
             return list.map((exo) => computeExerciseFromReferences(exo, tagListById));
         },
-        { initialData: [] }
+        { placeholderData: [] }
+    );
+}
+export function useExerciseByIndexQuery<Index extends StoreIndex<"exercise"> = undefined>(
+    params: StoreQueryParams<"exercise", Index> = {}
+) {
+    const catQuery = useCategoryQuery(params.index === "by-category" ? (params.query as string) : undefined);
+    const canSeeEveryExercises = catQuery.data?.canSeeEveryExercises || false;
+
+    return useQuery<Exercise>(
+        [orm.exercise.name, "item", params, { canSeeEveryExercises }],
+        async () => {
+            const exerciseParams =
+                params.index === "by-category" ? (canSeeEveryExercises ? undefined : params) : params;
+            const [exo, tagList] = await Promise.all([orm.exercise.findBy(exerciseParams), orm.tag.get()]);
+            const tagListById = groupIn(tagList, "id");
+            return computeExerciseFromReferences(exo, tagListById);
+        },
+        { enabled: Boolean(params.query), placeholderData: null }
     );
 }
 
@@ -175,16 +193,16 @@ export const useExerciseListInDailyCategory = () => {
     return useExerciseList({ index: "by-category", query: daily.category });
 };
 
-export function useExerciseQuery(id: Exercise["id"]) {
+export function useExerciseByIdQuery(id: Exercise["id"]) {
     return useQuery<Exercise>(
-        [orm.exercise.name, "item", id],
+        [orm.exercise.name, "item", { index: "by-id", query: id }],
         async () => {
             const [exercise, tagList] = await Promise.all([orm.exercise.find(id), orm.tag.get()]);
             console.log(exercise);
             const tagListById = groupIn(tagList, "id");
             return computeExerciseFromReferences(exercise, tagListById);
         },
-        { enabled: Boolean(id), initialData: null }
+        { enabled: Boolean(id), placeholderData: null }
     );
 }
 
@@ -225,7 +243,7 @@ export const useProgramQuery = <Index extends StoreIndex<"program"> = undefined>
                 programListOrder || []
             );
         },
-        { initialData: [] }
+        { placeholderData: [] }
     );
 };
 

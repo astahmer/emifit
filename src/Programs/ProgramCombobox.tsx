@@ -1,4 +1,4 @@
-import { Combobox, ComboboxProps } from "@/components/Combobox";
+import { Combobox, ComboboxProps } from "@/fields/Combobox";
 import { Program } from "@/orm-types";
 import { useProgramList } from "@/orm-hooks";
 import { FormControl, FormErrorMessage, FormLabel, forwardRef } from "@chakra-ui/react";
@@ -9,7 +9,7 @@ export const ProgramCombobox = forwardRef(
             error,
             getItems,
             ...props
-        }: Omit<ComboboxProps, "items" | "getValue" | "itemToString" | "label"> & {
+        }: Omit<ComboboxProps<Program>, "items" | "getValue" | "itemToString" | "label"> & {
             error?: string;
             getItems?: (items: Program[]) => Program[];
         },

@@ -1,4 +1,4 @@
-import { MultiSelect, MultiSelectProps } from "@/components/MultiSelect";
+import { MultiSelect, MultiSelectProps } from "@/fields/MultiSelect";
 import { mergeProps } from "@/functions/mergeProps";
 import { Tag } from "@/orm-types";
 import { PickOptional } from "@/types";

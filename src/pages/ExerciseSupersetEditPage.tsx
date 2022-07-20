@@ -1,8 +1,8 @@
 import { SupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { orm } from "@/orm";
-import { useCurrentDaily } from "@/orm-hooks";
-import { routeMap } from "@/routes";
+import { useExerciseList } from "@/orm-hooks";
+import { Exercise } from "@/orm-types";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
@@ -10,12 +10,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
 
 export const ExerciseSupersetEditPage = () => {
-    const params = useParams<{ dailyId: string; supersetId: string }>();
-    const supersetId = params.supersetId;
+    const { supersetId } = useParams<{ supersetId: string }>();
+    const exerciseList = useExerciseList({ index: "by-superset", query: supersetId });
 
-    const daily = useCurrentDaily();
-    const exerciseList = daily?.exerciseList?.filter((exo) => exo.supersetId === supersetId);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!supersetId) {
+            navigate(-1);
+        }
+    }, [supersetId, navigate]);
 
+    return exerciseList.length ? <ExerciseSupersetEditForm exerciseList={exerciseList} /> : null;
+};
+
+const ExerciseSupersetEditForm = ({ exerciseList }: { exerciseList: Exercise[] }) => {
     const service = useInterpret(() =>
         makeExerciseFormMachine({
             exerciseCount: exerciseList.length,
@@ -39,21 +47,16 @@ export const ExerciseSupersetEditPage = () => {
         },
         {
             onSuccess: () => {
-                daily.invalidate();
-                navigate(routeMap.home);
+                navigate(-1);
             },
         }
     );
 
-    useEffect(() => {
-        if (!supersetId) {
-            navigate(routeMap.home);
-        }
-    }, [supersetId, navigate]);
-
     return (
         <ExerciseFormMachineProvider value={service}>
-            {exerciseList?.length && isInitialized && <SupersetForm onSubmit={editSupersetExerciseList.mutate} />}
+            {exerciseList?.length && isInitialized && (
+                <SupersetForm category={exerciseList[0].category} onSubmit={() => editSupersetExerciseList.mutate()} />
+            )}
         </ExerciseFormMachineProvider>
     );
 };

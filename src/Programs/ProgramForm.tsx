@@ -1,4 +1,4 @@
-import { RadioCard, RadioCardPicker } from "@/components/RadioCard";
+import { RadioCard, RadioCardPicker } from "@/fields/RadioCard";
 import { Exercise } from "@/orm-types";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
 import { useExerciseList } from "@/orm-hooks";

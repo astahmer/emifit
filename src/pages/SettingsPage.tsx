@@ -1,4 +1,4 @@
-import { SwitchInput } from "@/components/SwitchInput";
+import { SwitchInput } from "@/fields/SwitchInput";
 import { useCategoryList, useDailyList, useExerciseList, useGroupList, useProgramList, useTagList } from "@/orm-hooks";
 import { DataAccordions } from "@/Settings/DataAccordions";
 import { debugModeAtom } from "@/store";

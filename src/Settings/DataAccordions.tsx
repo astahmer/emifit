@@ -1,4 +1,4 @@
-import { ConfirmationButton } from "@/components/ConfirmationButton";
+import { ConfirmationButton } from "@/fields/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
 import { DynamicTable } from "@/components/DynamicTable";
 import { HFlex } from "@/components/HFlex";
@@ -25,7 +25,7 @@ import {
     Text,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "react-query";
-import { PersistModal } from "../components/PersistModal";
+import { PersistModal } from "../fields/PersistModal";
 import { AddCategoryForm, CategoryForm } from "./CategoryForm";
 import { GlobalExerciseForm, GlobalExerciseFormValues } from "./GlobalExerciseForm";
 import { AddGroupForm, GroupForm } from "./GroupForm";
@@ -509,19 +509,6 @@ const groupColumns = [
 const exerciseColumns = [
     { Header: "id", accessor: "id" },
     { Header: "name", accessor: "name" },
-    {
-        Header: "last date",
-        accessor: "createdAt",
-        Cell: (props) => <Text whiteSpace="nowrap">{printDate(new Date(props.value))}</Text>,
-    },
-    { Header: "category", accessor: "category" },
-    { Header: "sets count", accessor: "series", Cell: (props) => props.value.length },
-    {
-        Header: "tags",
-        accessor: "tags",
-        Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", "),
-        canBeSorted: false,
-    },
     {
         Header: "",
         accessor: "__actions",

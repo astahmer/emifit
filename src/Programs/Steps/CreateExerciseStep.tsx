@@ -1,4 +1,4 @@
-import { CheckboxButton } from "@/components/CheckboxCircle";
+import { CheckboxButton } from "@/fields/CheckboxCircle";
 import { CreateExerciseForm } from "@/Exercises/CreateExerciseForm";
 import { Exercise } from "@/orm-types";
 import { CheckIcon } from "@chakra-ui/icons";

@@ -60,9 +60,15 @@ export type EmifitSchema = {
         value: ExerciseWithReferences;
         indexes: {
             "by-name": ExerciseWithReferences["name"];
+            "by-slug": ExerciseWithReferences["slug"];
+            "by-daily": ExerciseWithReferences["dailyId"];
+            "by-program": ExerciseWithReferences["programId"];
+            "by-superset": ExerciseWithReferences["supersetId"];
             "by-category": ExerciseWithReferences["category"];
             "by-tags": ExerciseWithReferences["tags"];
             "by-parent": ExerciseWithReferences["madeFromExerciseId"];
+            "by-created-date": ExerciseWithReferences["createdAt"];
+            "by-from": ExerciseWithReferences["from"];
         };
     };
     program: {
@@ -107,6 +113,8 @@ const makeStore = <Key extends StoreName, StoreEntity extends Entity = EmifitSch
         name,
         tx: (mode?: IDBTransactionMode, options?: IDBTransactionOptions) => db.transaction(name, mode, options),
         find: (id: StoreEntity["id"]) => db.get(name, id) as Promise<StoreEntity>,
+        findBy: <Index extends StoreIndex<Key> = undefined>(params: StoreQueryParams<Key, Index> = {}) =>
+            db.getFromIndex(name, params.index, params.query as any) as Promise<StoreEntity>,
         get: <Index extends StoreIndex<Key> = undefined>(params: StoreQueryParams<Key, Index> = {}) =>
             params.index
                 ? db.getAllFromIndex(name, params.index, params.query as any, params.count)

@@ -1,4 +1,4 @@
-import { TextInput } from "@/components/TextInput";
+import { TextInput } from "@/fields/TextInput";
 import { mergeProps } from "@/functions/mergeProps";
 import { toasts } from "@/functions/toasts";
 import { requiredRule, slugify } from "@/functions/utils";
@@ -52,7 +52,7 @@ export const AddGroupForm = ({ onSuccess }: { onSuccess: () => void }) => {
     const queryClient = useQueryClient();
     const mutation = useMutation(
         (values: typeof defaultGroupValues) => {
-            return orm.group.add(values);
+            return orm.group.add({ ...values, name: values.name.trim() });
         },
         {
             onSuccess: () => {

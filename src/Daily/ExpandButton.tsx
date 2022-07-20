@@ -1,6 +1,5 @@
-import { isCompactViewAtom } from "@/store";
-import { IconButton, IconButtonProps, useDisclosure } from "@chakra-ui/react";
-import { useAtom, useAtomValue } from "jotai";
+import { useCompactContext } from "@/store";
+import { IconButton, IconButtonProps, useDisclosure, UseDisclosureProps } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { IoMdExpand } from "react-icons/io";
 import { MdOutlineViewCompact } from "react-icons/md";
@@ -18,14 +17,15 @@ export function ExpandButton(props: Partial<IconButtonProps>) {
 }
 
 export function CompactViewButton() {
-    const [isCompact, setCompact] = useAtom(isCompactViewAtom);
+    const [isCompact, setCompact] = useCompactContext();
 
     return <ExpandButton isActive={!isCompact} onClick={() => setCompact((current) => !current)} />;
 }
 
-export function useCompactState() {
-    const isCompact = useAtomValue(isCompactViewAtom);
-    const toggle = useDisclosure({ defaultIsOpen: false });
+/** 2 way binding: is controlled by isCompact value from context but also has it's own internal state */
+export function useCompactState(props?: UseDisclosureProps) {
+    const [isCompact] = useCompactContext();
+    const toggle = useDisclosure({ defaultIsOpen: false, ...props });
     const isHidden = !toggle.isOpen;
 
     const isFirstRenderRef = useRef(true);

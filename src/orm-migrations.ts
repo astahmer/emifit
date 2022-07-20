@@ -1,4 +1,5 @@
 import { IDBPDatabase, IDBPTransaction, StoreNames } from "idb";
+import { slugify } from "./functions/utils";
 import type { EmifitSchema } from "./orm";
 import type { Tag } from "./orm-types";
 
@@ -7,31 +8,25 @@ export const runMigrations: (
     oldVersion: number,
     newVersion: number | null,
     transaction: IDBPTransaction<EmifitSchema, StoreNames<EmifitSchema>[], "versionchange" | "readwrite">,
-    onVersionMigrate?: (
+    importData?: (
         currentVersion: number,
         tx: IDBPTransaction<EmifitSchema, StoreNames<EmifitSchema>[], "versionchange" | "readwrite">
     ) => void | Promise<void>
-) => Promise<void> = async (db, oldVersion, newVersion, transaction, onVersionMigrated) => {
+) => Promise<void> = async (db, oldVersion, newVersion, transaction, importData) => {
     let migrationVersion = oldVersion;
 
     const isVersionChange = transaction.mode === "versionchange";
-    const isImport = oldVersion === newVersion;
-    console.log({ db, oldVersion, newVersion, transaction, migrationVersion, isVersionChange, isImport });
+    console.log({ db, oldVersion, newVersion, transaction, migrationVersion, isVersionChange });
 
     const tx = transaction;
-    let hasRunCallback = false;
-    const run = () => {
-        if (hasRunCallback) {
-            return;
-        }
-        hasRunCallback = true;
-        console.log("running migration at version", migrationVersion);
-        if (onVersionMigrated) {
-            return onVersionMigrated(migrationVersion, tx);
-        }
-    };
 
     console.log("start migrating");
+
+    if (!isVersionChange && importData) {
+        console.log("import: running migrations at version", migrationVersion);
+        await importData(migrationVersion, tx);
+    }
+
     if (migrationVersion === 0 && isVersionChange) {
         console.log("create db object stores");
         const daily = db.createObjectStore("daily", { keyPath: "id" });
@@ -54,7 +49,6 @@ export const runMigrations: (
         console.log("migrated to version", migrationVersion);
     }
     if (migrationVersion === 1) {
-        await run();
         let cursor = await tx.objectStore("daily").index("by-time").openCursor();
 
         while (cursor) {
@@ -72,7 +66,6 @@ export const runMigrations: (
     if (migrationVersion >= 2 && migrationVersion <= 12) migrationVersion = 13;
 
     if (migrationVersion === 13) {
-        await run();
         const program = await tx.objectStore("program").getAll();
         const exerciseList = await tx.objectStore("exercise").getAll();
         const exerciseMap = new Map(exerciseList.map((e) => [e.id, e]));
@@ -92,7 +85,6 @@ export const runMigrations: (
     if (migrationVersion >= 13 && migrationVersion < 24) migrationVersion = 24;
 
     if (migrationVersion === 24) {
-        await run();
         const exerciseList = await tx.objectStore("exercise").getAll();
 
         const removedTagId = "CBarbell";
@@ -120,8 +112,6 @@ export const runMigrations: (
     }
 
     if (migrationVersion === 25 && isVersionChange) {
-        await run();
-
         const group = db.createObjectStore("group", { keyPath: "id" });
         group.createIndex("by-name", "name");
 
@@ -170,8 +160,144 @@ export const runMigrations: (
         migrationVersion++;
     }
 
-    if (oldVersion === newVersion) await run();
-    else if (!isVersionChange) await run();
+    // nothing changed between v25 -> v44
+    if (migrationVersion >= 25 && migrationVersion < 45) migrationVersion = 45;
+
+    // Add exercise "by-created-date" index
+    if (migrationVersion === 45) {
+        if (isVersionChange) {
+            const exerciseStore = tx.objectStore("exercise");
+            if (!exerciseStore.indexNames.contains("by-created-date")) {
+                exerciseStore.createIndex("by-created-date", "createdAt");
+            }
+            console.log("migrated to version", migrationVersion, `Add exercise "by-created-date" index`);
+        }
+        migrationVersion++;
+    }
+
+    // Format existing exercises to have a createdAt date as a Date object
+    if (migrationVersion === 46) {
+        let cursor = await tx.objectStore("exercise").openCursor();
+
+        while (cursor) {
+            if (typeof cursor.value.createdAt === "string") {
+                cursor.update({ ...cursor.value, createdAt: new Date(cursor.value.createdAt) });
+            }
+
+            cursor = await cursor.continue();
+        }
+        console.log(
+            "migrated to version",
+            migrationVersion,
+            `Format existing exercises to have a createdAt date as a Date object`
+        );
+        migrationVersion++;
+    }
+    // Format existing exercises to have a "dailyId" & "from" properties
+    if (migrationVersion === 47) {
+        let programCursor = await tx.objectStore("program").openCursor();
+
+        while (programCursor) {
+            let exoCursor = await tx.objectStore("exercise").openCursor();
+            while (exoCursor) {
+                if (programCursor.value.exerciseList.includes(exoCursor.value.id)) {
+                    exoCursor.update({
+                        ...exoCursor.value,
+                        programId: programCursor.value.id,
+                        from: programCursor.value.madeFromProgramId ? "program-clone" : "program",
+                    });
+                }
+                exoCursor = await exoCursor.continue();
+            }
+
+            programCursor = await programCursor.continue();
+        }
+
+        let dailyCursor = await tx.objectStore("daily").openCursor();
+
+        while (dailyCursor) {
+            let exoCursor = await tx.objectStore("exercise").openCursor();
+            while (exoCursor) {
+                if (dailyCursor.value.exerciseList.includes(exoCursor.value.id)) {
+                    exoCursor.update({ ...exoCursor.value, dailyId: dailyCursor.value.id, from: "daily" });
+                }
+                exoCursor = await exoCursor.continue();
+            }
+
+            dailyCursor = await dailyCursor.continue();
+        }
+
+        console.log(
+            "migrated to version",
+            migrationVersion,
+            `Format existing exercises to have a "dailyId" & "from" properties`
+        );
+        migrationVersion++;
+    }
+
+    if (migrationVersion === 48) {
+        if (isVersionChange) {
+            const exerciseStore = tx.objectStore("exercise");
+            if (!exerciseStore.indexNames.contains("by-from")) {
+                exerciseStore.createIndex("by-from", "from");
+            }
+            if (!exerciseStore.indexNames.contains("by-daily")) {
+                exerciseStore.createIndex("by-daily", "dailyId");
+            }
+            if (!exerciseStore.indexNames.contains("by-program")) {
+                exerciseStore.createIndex("by-program", "programId");
+            }
+            console.log(
+                "migrated to version",
+                migrationVersion,
+                "Add exercise 'by-from', 'by-daily', 'by-program' indexes"
+            );
+        }
+        migrationVersion++;
+    }
+
+    // Add exercise.slug + fix exercise.name by trimming whitespaces
+    if (migrationVersion === 49) {
+        let exerciseCursor = await tx.objectStore("exercise").openCursor();
+
+        while (exerciseCursor) {
+            const name = exerciseCursor.value.name.trim();
+            exerciseCursor.update({ ...exerciseCursor.value, name, slug: slugify(name) });
+            exerciseCursor = await exerciseCursor.continue();
+        }
+
+        console.log(
+            "migrated to version",
+            migrationVersion,
+            `Add exercise.slug + fix exercise.name by trimming whitespaces`
+        );
+        migrationVersion++;
+    }
+    // Add exercise.slug index
+    if (migrationVersion === 50) {
+        if (isVersionChange) {
+            const exerciseStore = tx.objectStore("exercise");
+            if (!exerciseStore.indexNames.contains("by-slug")) {
+                exerciseStore.createIndex("by-slug", "slug");
+            }
+
+            console.log("migrated to version", migrationVersion, `Add exercise.slug index`);
+        }
+        migrationVersion++;
+    }
+
+    // Add exercise.superset index
+    if (migrationVersion === 51) {
+        if (isVersionChange) {
+            const exerciseStore = tx.objectStore("exercise");
+            if (!exerciseStore.indexNames.contains("by-superset")) {
+                exerciseStore.createIndex("by-superset", "supersetId");
+            }
+
+            console.log("migrated to version", migrationVersion, `Add exercise.superset index`);
+        }
+        migrationVersion++;
+    }
 
     console.log("done migrating");
 };

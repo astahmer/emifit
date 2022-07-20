@@ -6,13 +6,14 @@ import { Box, Button, Divider } from "@chakra-ui/react";
 import { useSelector } from "@xstate/react";
 import { match } from "ts-pattern";
 import { useExerciseFormMachine } from "./ExerciseFormMachine";
-import { getRouteTypeFromPathname } from "../pages/ExercisePageLayout";
+import { getRouteTypeFromPathname } from "../Daily/DailyExercisePageLayout";
+import { ComponentProps } from "react";
 
-export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => void | Promise<void> }) {
-    const query = useCurrentDailyQuery();
-    const daily = query.data;
-    const exoNameList = daily.exerciseList.map((exo) => exo.name);
-
+export function SingleExerciseForm({
+    onSubmit,
+    ...props
+}: { onSubmit: (exo: Exercise) => void | Promise<void> } & Partial<ComponentProps<typeof CreateExerciseForm>> &
+    Pick<ComponentProps<typeof CreateExerciseForm>, "category">) {
     const service = useExerciseFormMachine();
     const isInitialized = useSelector(service, () => service.initialized);
 
@@ -25,11 +26,10 @@ export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => 
     return (
         <CreateExerciseForm
             id="single-form"
+            {...props}
             defaultValues={isInitialized ? service.state.context.singleForm : undefined}
-            category={daily.category}
             onSubmit={onSubmit}
             onChange={(values) => service.send({ type: "UpdateForm", form: values })}
-            getExerciseItems={(items) => items.filter((item) => !exoNameList.includes(item.name))}
             renderSubmit={() => {
                 const canSubmit = useSelector(service, (state) => state.matches("single.canSubmit"));
 
@@ -54,6 +54,20 @@ export function SingleExerciseForm({ onSubmit }: { onSubmit: (exo: Exercise) => 
                     )
                 );
             }}
+        />
+    );
+}
+
+export function DailySingleExerciseForm({ onSubmit }: Omit<ComponentProps<typeof SingleExerciseForm>, "category">) {
+    const query = useCurrentDailyQuery();
+    const daily = query.data;
+    const exoNameList = daily.exerciseList.map((exo) => exo.name);
+
+    return (
+        <SingleExerciseForm
+            category={daily.category}
+            getExerciseItems={(items) => items.filter((item) => !exoNameList.includes(item.name))}
+            onSubmit={onSubmit}
         />
     );
 }

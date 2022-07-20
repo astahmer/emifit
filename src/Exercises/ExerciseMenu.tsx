@@ -1,4 +1,4 @@
-import { ConfirmationButton } from "@/components/ConfirmationButton";
+import { ConfirmationButton } from "@/fields/ConfirmationButton";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
@@ -6,7 +6,7 @@ import { printDailyDate } from "@/orm-utils";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, HStack, IconButton } from "@chakra-ui/react";
 import { useMutation } from "react-query";
-import { useNavigate } from "react-router-dom";
+import { Link as ReactLink } from "react-router-dom";
 import { FaRegCopy } from "react-icons/fa";
 
 export function ExerciseMenu({ exo }: { exo: Exercise }) {
@@ -24,13 +24,12 @@ export function ExerciseMenu({ exo }: { exo: Exercise }) {
         { onSuccess: daily.invalidate }
     );
 
-    const navigate = useNavigate();
-
     return (
         <HStack ml="auto" mt="2" aria-label="menu">
             <IconButton
+                as={ReactLink}
+                to={`/daily/entry/${printDailyDate(daily.date)}/exercise/edit/${exo.id}`}
                 icon={<EditIcon />}
-                onClick={() => navigate(`/daily/entry/${printDailyDate(daily.date)}/exercise/edit/${exo.id}`)}
                 aria-label="Edit"
                 size="sm"
                 colorScheme="pink"
@@ -58,13 +57,12 @@ export function ExerciseMenu({ exo }: { exo: Exercise }) {
 }
 
 export function PastDailyExerciseMenu({ exo }: { exo: Exercise }) {
-    const navigate = useNavigate();
-
     return (
         <Box ml="auto" mt="2" aria-label="menu">
             <IconButton
+                as={ReactLink}
+                to={`/daily/entry/${printDailyDate(new Date())}/exercise/copy?exoId=${exo.id}`}
                 icon={<FaRegCopy />}
-                onClick={() => navigate(`/daily/entry/${printDailyDate(new Date())}/exercise/copy?exoId=${exo.id}`)}
                 aria-label="Copy exercise"
                 size="sm"
                 colorScheme="pink"
@@ -91,16 +89,14 @@ export function SupersetExerciseMenu({ exerciseList }: { exerciseList: Exercise[
         { onSuccess: daily.invalidate }
     );
 
-    const navigate = useNavigate();
     const firstExo = exerciseList[0];
 
     return (
         <HStack ml="auto" mt="2" aria-label="menu">
             <IconButton
+                as={ReactLink}
+                to={`/daily/entry/${printDailyDate(daily.date)}/exercise/superset/edit/${firstExo.supersetId}`}
                 icon={<EditIcon />}
-                onClick={() =>
-                    navigate(`/daily/entry/${printDailyDate(daily.date)}/exercise/superset/edit/${firstExo.supersetId}`)
-                }
                 aria-label="Edit"
                 size="sm"
                 colorScheme="pink"

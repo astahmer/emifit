@@ -1,4 +1,4 @@
-import { CalendarButton } from "@/components/CalendarButton";
+import { CalendarButton } from "@/Calendar/CalendarButton";
 import { DailyEntry } from "@/Daily/DailyEntry";
 import { currentDateAtom } from "@/store";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
@@ -7,7 +7,7 @@ import { addDays, format, isFuture } from "date-fns";
 import { useAtom } from "jotai";
 import { Outlet } from "react-router-dom";
 
-export const HomePage = () => {
+export const DailyPage = () => {
     return (
         <>
             <Header />
@@ -16,7 +16,7 @@ export const HomePage = () => {
     );
 };
 
-export const HomePageLayout = () => {
+export const DailyPageLayout = () => {
     return (
         <>
             <Header />

@@ -6,9 +6,9 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import { DailyEntry } from "./Daily/DailyEntry";
 import { makeDb } from "./orm";
-import { ExerciseAddPage } from "./pages/ExerciseAddPage";
-import { ExerciseEditPage } from "./pages/ExerciseEditPage";
-import { HomePage, HomePageLayout } from "./pages/HomePage";
+import { DailyExerciseAddPage } from "./pages/DailyExerciseAddPage";
+import { DailyExerciseEditPage } from "./pages/DailyExerciseEditPage";
+import { DailyPage, DailyPageLayout } from "./pages/DailyPage";
 import { ProgramsPage } from "./pages/ProgramsPage";
 import { ProgressPage } from "./pages/ProgressPage";
 import { SettingsPage } from "./pages/SettingsPage";
@@ -17,12 +17,19 @@ import { routeMap } from "./routes";
 import { browserHistory, store } from "./store";
 import { ClickToComponent } from "click-to-react-component";
 import "./App.css";
-import { ExerciseSupersetEditPage } from "./pages/ExerciseSupersetEditPage";
-import { ExercisePageLayout } from "./pages/ExercisePageLayout";
+import { DailyExerciseSupersetEditPage } from "./pages/DailyExerciseSupersetEditPage";
+import { DailyExercisePageLayout } from "./Daily/DailyExercisePageLayout";
 import { appTheme } from "./theme";
 import { Layout } from "./Layout";
 import { ExerciseLibraryPage } from "./pages/ExerciseLibraryPage";
-import { ExerciseCopyPage } from "./pages/ExerciseCopyPage";
+import { DailyExerciseCopyPage } from "./pages/DailyExerciseCopyPage";
+import { CompareTab } from "./Progress/CompareTab";
+import { ProgressTab } from "./Progress/ProgressTab";
+import { InspectTab } from "./Progress/InspectTab";
+import { InspectExerciseTab } from "./Progress/InspectExerciseTab";
+import { ExercisePageLayout } from "./Exercises/ExercisePageLayout";
+import { ExerciseEditPage } from "./pages/ExerciseEditPage";
+import { ExerciseSupersetEditPage } from "./pages/ExerciseSupersetEditPage";
 
 const queryClient = new QueryClient();
 
@@ -35,21 +42,36 @@ function App() {
                         <HistoryRouter history={browserHistory}>
                             <Routes>
                                 <Route path="/" element={<Layout />}>
-                                    <Route index element={<HomePage />} />
-                                    <Route path="daily" element={<HomePageLayout />}>
+                                    <Route index element={<DailyPage />} />
+                                    <Route path="daily" element={<DailyPageLayout />}>
                                         <Route index element={<DailyEntry />} />
                                         <Route path="entry/:dailyId" element={<DailyEntry />} />
                                     </Route>
-                                    <Route path="daily/entry/:dailyId/exercise" element={<ExercisePageLayout />}>
-                                        <Route path="add" element={<ExerciseAddPage />} />
+                                    <Route path="daily/entry/:dailyId/exercise" element={<DailyExercisePageLayout />}>
+                                        <Route path="add" element={<DailyExerciseAddPage />} />
+                                        <Route path="edit/:exoId" element={<DailyExerciseEditPage />} />
+                                        <Route path="copy" element={<DailyExerciseCopyPage />} />
+                                        <Route
+                                            path="superset/edit/:supersetId"
+                                            element={<DailyExerciseSupersetEditPage />}
+                                        />
+                                    </Route>
+                                    <Route path="exercise" element={<ExercisePageLayout />}>
                                         <Route path="edit/:exoId" element={<ExerciseEditPage />} />
-                                        <Route path="copy" element={<ExerciseCopyPage />} />
                                         <Route
                                             path="superset/edit/:supersetId"
                                             element={<ExerciseSupersetEditPage />}
                                         />
                                     </Route>
-                                    <Route path={routeMap.progress} element={<ProgressPage />} />
+                                    <Route path={routeMap.progress} element={<ProgressPage />}>
+                                        <Route index element={<ProgressTab />} />
+                                        <Route path="inspect" element={<InspectTab />} />
+                                        <Route path="compare" element={<CompareTab />} />
+                                    </Route>
+                                    <Route
+                                        path={routeMap.progress + "/inspect/:exoSlug"}
+                                        element={<InspectExerciseTab />}
+                                    />
                                     <Route path={routeMap.settings} element={<SettingsPage />} />
                                     <Route path={routeMap.programs} element={<ProgramsPage />} />
                                     <Route path={routeMap.exerciseLibrary} element={<ExerciseLibraryPage />} />

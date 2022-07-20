@@ -1,7 +1,9 @@
+import { SetState } from "@pastable/core";
 import { CalendarDate } from "@uselessdev/datepicker";
 import { isToday } from "date-fns";
 import { createBrowserHistory } from "history";
 import { atom, unstable_createStore } from "jotai";
+import { createContextWithHook } from "./functions/createContextWithHook";
 import { printDate } from "./functions/utils";
 import { getDailyIdFromUrl, parseDailyDateFromUrl, printDailyDate } from "./orm-utils";
 
@@ -28,7 +30,7 @@ browserHistory.listen((update) => {
         // -> when navigating using BottomTabs.Add when today's daily has not been created yet
         if (
             update.location.pathname.startsWith("/daily/entry/") &&
-            update.location.pathname.includes(getDailyIdFromUrl(update.location.pathname))
+            update.location.pathname.endsWith(getDailyIdFromUrl(update.location.pathname))
         ) {
             log("history 2", update, parseDailyDateFromUrl(window.location.href));
             return store.set(currentDateAtom, parseDailyDateFromUrl(window.location.href));
@@ -52,7 +54,7 @@ export const currentDateAtom = atom<CalendarDate>(today);
 export const currentDailyIdAtom = atom((get) => printDate(get(currentDateAtom)));
 export const isDailyTodayAtom = atom((get) => isToday(get(currentDateAtom)));
 
-export const isCompactViewAtom = atom(true);
+export const [CompactProvider, useCompactContext] = createContextWithHook<[boolean, SetState<boolean>]>("Compact");
 
 store.sub(currentDateAtom, () => {
     // Only ever update the location.pahtname if the user is on the homepage either as "/" or from "/daily/entry/:id"

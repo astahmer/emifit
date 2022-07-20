@@ -1,4 +1,4 @@
-import { CheckboxButton } from "@/components/CheckboxCircle";
+import { CheckboxButton } from "@/fields/CheckboxCircle";
 import { FloatingButton } from "@/components/FloatingButton";
 import { ExerciseAccordionList } from "@/Exercises/ExerciseAccordionList";
 import { ExerciseListCombobox } from "@/Exercises/ExerciseCombobox";

@@ -1,4 +1,4 @@
-import { ConfirmationButton } from "@/components/ConfirmationButton";
+import { ConfirmationButton } from "@/fields/ConfirmationButton";
 import { loadFromJSON, saveAsJSON } from "@/functions/json";
 import { computeSnapshotFromExport, ExportedData, getDatabaseSnapshot } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";

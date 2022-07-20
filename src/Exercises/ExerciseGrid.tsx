@@ -2,10 +2,9 @@ import { Scrollable } from "@/components/Scrollable";
 import { useCompactState } from "@/Daily/ExpandButton";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { Exercise, WithExerciseList } from "@/orm-types";
-import { isCompactViewAtom } from "@/store";
+import { useCompactContext } from "@/store";
 import { Box, Divider, Flex, Grid, Heading, Stack } from "@chakra-ui/react";
 import { chunk, WithChildren } from "@pastable/core";
-import { useAtomValue } from "jotai";
 import { Fragment } from "react";
 import { ExerciseSetList, ExerciseSetListOverview } from "./ExerciseSetList";
 
@@ -19,7 +18,7 @@ export const ExerciseGridView = ({ exerciseList, children }: WithExerciseList & 
 };
 
 export function ExerciseGrid({ exerciseList }: { exerciseList: Exercise[] }) {
-    const isCompact = useAtomValue(isCompactViewAtom);
+    const [isCompact] = useCompactContext();
 
     return (
         <Stack p="4">
@@ -57,7 +56,7 @@ function ExerciseGridItem({ exo }: { exo: Exercise }) {
                 </Heading>
             </Flex>
             <ExerciseSetListOverview setList={exo.series} />
-            <ExerciseTagList mt="2" tagList={exo.tags} isHidden={toggle.isHidden} />
+            <ExerciseTagList mt="2" tagList={exo.tags} isPreview={toggle.isHidden} />
             {toggle.isHidden ? null : <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />}
         </Flex>
     );

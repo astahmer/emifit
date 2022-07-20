@@ -6,6 +6,7 @@ export const makeId = () => nanoid(10);
 
 /** Also serves as daily.id */
 export const printDate = (date: Date | number) => format(new Date(date), "MM/dd/yyyy");
+export const displayDate = (date: Date | number) => format(new Date(date), "dd/MM/yyyy");
 
 /** Also used to parse a daily.id */
 export const parseDate = (date: string) => parse(date, "MM/dd/yyyy", new Date());

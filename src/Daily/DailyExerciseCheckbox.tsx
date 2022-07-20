@@ -1,4 +1,4 @@
-import { CheckboxSquare } from "@/components/CheckboxCircle";
+import { CheckboxSquare } from "@/fields/CheckboxCircle";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
@@ -6,7 +6,7 @@ import { isDailyTodayAtom } from "@/store";
 import { useAtomValue } from "jotai";
 import { useMutation } from "react-query";
 
-export function ExerciseCheckbox({ exo }: { exo: Exercise }) {
+export function DailyExerciseCheckbox({ exo }: { exo: Exercise }) {
     const daily = useCurrentDaily();
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 

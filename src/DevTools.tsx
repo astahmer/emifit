@@ -1,11 +1,11 @@
 import { Box, Button, Stack } from "@chakra-ui/react";
-import { useAtomValue, useSetAtom } from "jotai";
-import { SwitchInput } from "./components/SwitchInput";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { SwitchInput } from "./fields/SwitchInput";
 import { toasts } from "./functions/toasts";
 import { orm } from "./orm";
 import { currentDailyIdAtom, debugModeAtom, showSkeletonsAtom } from "./store";
 import { useCurrentDailyInvalidate } from "./orm-hooks";
-import { ConfirmationButton } from "./components/ConfirmationButton";
+import { ConfirmationButton } from "./fields/ConfirmationButton";
 import { useLocation } from "react-router-dom";
 
 export function DevTools() {
@@ -38,8 +38,17 @@ const DevToolsContent = () => {
     const dailyId = useAtomValue(currentDailyIdAtom);
     const invalidate = useCurrentDailyInvalidate();
 
+    const [debugMode, setDebugMode] = useAtom(debugModeAtom);
+
     return (
         <Stack fontSize="sm">
+            <SwitchInput
+                ml="auto"
+                id="debugModeSwitch"
+                label="Debug mode"
+                onChange={(e) => setDebugMode(e.target.checked)}
+                isChecked={debugMode}
+            />
             <SwitchInput label="With skeletons" onChange={(e) => setShowSkeletons(e.target.checked)} />
             <ConfirmationButton
                 onConfirm={() => {

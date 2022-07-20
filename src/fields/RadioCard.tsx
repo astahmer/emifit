@@ -3,6 +3,7 @@ import {
     BoxProps,
     Button,
     ButtonProps,
+    Flex,
     forwardRef,
     HTMLChakraProps,
     Stack,
@@ -56,11 +57,15 @@ export const RadioCard = forwardRef(({ children, getButtonProps, getLabelProps, 
     );
 });
 
-export function RadioCardPicker({ renderOptions, ...props }: RadioCardPickerProps) {
+export function RadioCardPicker({
+    renderOptions,
+    getStackProps,
+    ...props
+}: RadioCardPickerProps & { getStackProps?: () => BoxProps }) {
     const { getRootProps, getRadioProps } = useRadioGroup({ ...props, name: "category" });
 
     return (
-        <Stack direction="row" {...getRootProps()} textAlign="center" justifyContent="space-around" w="100%">
+        <Stack direction="row" spacing="4" textAlign="center" w="100%" {...getStackProps?.()} {...getRootProps()}>
             {renderOptions(getRadioProps)}
         </Stack>
     );

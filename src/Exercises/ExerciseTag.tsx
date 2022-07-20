@@ -9,17 +9,17 @@ export const ExerciseTag = ({ tag, ...props }: { tag: Tag } & BadgeProps) => (
 
 export const ExerciseTagList = ({
     tagList,
-    isHidden,
+    isPreview,
     ...props
-}: { tagList: Tag[]; isHidden?: boolean } & WrapProps) => {
+}: { tagList: Tag[]; isPreview?: boolean } & WrapProps) => {
     return (
         <Wrap {...props}>
-            {tagList.slice(0, isHidden ? 2 : undefined).map((tag) => (
+            {tagList.slice(0, isPreview ? 2 : undefined).map((tag) => (
                 <WrapItem key={tag.id}>
                     <ExerciseTag tag={tag} />
                 </WrapItem>
             ))}
-            {isHidden && tagList.length > 2 ? (
+            {isPreview && tagList.length > 2 ? (
                 <WrapItem>
                     <ExerciseTag tag={{ id: "...", name: "...", groupId: "none" }} />
                 </WrapItem>

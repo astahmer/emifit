@@ -1,4 +1,4 @@
-import { ConfirmationButton } from "@/components/ConfirmationButton";
+import { ConfirmationButton } from "@/fields/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
 import { HFlex } from "@/components/HFlex";
 import { serializeExercise, serializeProgram } from "@/functions/snapshot";

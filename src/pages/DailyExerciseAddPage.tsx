@@ -1,9 +1,9 @@
 import { Show } from "@/components/Show";
-import { SwitchInput } from "@/components/SwitchInput";
-import { SupersetForm } from "@/Exercises/SupersetForm";
+import { SwitchInput } from "@/fields/SwitchInput";
+import { DailySupersetForm } from "@/Exercises/SupersetForm";
 import { serializeExercise } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
-import { makeId, printDate } from "@/functions/utils";
+import { makeId, printDate, slugify } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCurrentDailyInvalidate, useDailyQuery } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
@@ -14,10 +14,9 @@ import { useInterpret, useSelector } from "@xstate/react";
 import { useMutation, useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
-import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
+import { DailySingleExerciseForm } from "../Exercises/SingleExerciseForm";
 
-export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
-    console.log({ exercise });
+export const DailyExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
     const query = useDailyQuery(printDate(new Date()));
     const daily = query.data;
 
@@ -35,7 +34,8 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
 
     const addExerciseToDaily = useMutation(
         async (exo: Exercise) => {
-            await orm.exercise.add(serializeExercise(exo));
+            const name = exo.name.trim();
+            await orm.exercise.add({ ...serializeExercise(exo), name, slug: slugify(name) });
             return orm.daily.upsert(daily.id, (current) => ({
                 ...current,
                 exerciseList: (current.exerciseList || []).concat(exo.id),
@@ -81,7 +81,6 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
             },
         }
     );
-    console.log({ isInitialized });
 
     return (
         <ExerciseFormMachineProvider value={service}>
@@ -94,9 +93,9 @@ export const ExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
                     />
                 </Box>
                 {!isSuperset ? (
-                    <SingleExerciseForm onSubmit={addExerciseToDaily.mutate} />
+                    <DailySingleExerciseForm onSubmit={addExerciseToDaily.mutate} />
                 ) : (
-                    <SupersetForm onSubmit={addExerciseSupersetToDaily.mutate} />
+                    <DailySupersetForm onSubmit={addExerciseSupersetToDaily.mutate} />
                 )}
             </Show>
         </ExerciseFormMachineProvider>

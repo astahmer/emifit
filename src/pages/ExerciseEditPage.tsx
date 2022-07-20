@@ -1,9 +1,8 @@
 import { serializeExercise } from "@/functions/snapshot";
 import { toasts } from "@/functions/toasts";
 import { orm } from "@/orm";
-import { useCurrentDaily } from "@/orm-hooks";
+import { useExerciseByIdQuery } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
-import { routeMap } from "@/routes";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect } from "react";
 import { useMutation } from "react-query";
@@ -12,44 +11,49 @@ import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercis
 import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";
 
 export const ExerciseEditPage = () => {
-    const params = useParams<{ dailyId: string; exoId: string }>();
-    const exerciseId = params.exoId;
+    const { exoId: exerciseId } = useParams<{ exoId: string }>();
+    const exerciseQ = useExerciseByIdQuery(exerciseId);
+    const exercise = exerciseQ.data;
 
-    const daily = useCurrentDaily();
-    const exercise = daily?.exerciseList?.find((exo) => exo.id === exerciseId);
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        if (!exerciseId) {
+            navigate(-1);
+        }
+
+        if (exercise?.supersetId) {
+            navigate(-1);
+            toasts.warning("Exercises in supersets cannot be edited from this page.");
+        }
+    }, [exerciseId, navigate, exercise?.supersetId]);
+
+    return exercise ? <ExerciseEditForm exercise={exercise} /> : null;
+};
+
+const ExerciseEditForm = ({ exercise }: { exercise: Exercise }) => {
     const service = useInterpret(() =>
-        makeExerciseFormMachine({ singleForm: { ...exercise, nbSeries: exercise.series.length } })
+        makeExerciseFormMachine({
+            singleForm: exercise ? { ...exercise, nbSeries: exercise.series.length } : undefined,
+        })
     );
     const isInitialized = useSelector(service, () => service.initialized);
 
     const navigate = useNavigate();
     const editExerciseById = useMutation(
         (exo: Exercise) =>
-            orm.exercise.upsert(exerciseId, (current) => ({ ...current, ...serializeExercise(exo), id: exerciseId })),
+            orm.exercise.upsert(exercise.id, (current) => ({ ...current, ...serializeExercise(exo), id: exercise.id })),
         {
             onSuccess: (_, vars) => {
-                daily.invalidate();
-                navigate(routeMap.home);
+                navigate(-1);
                 toasts.success(`Exercise <${vars.name}> updated !`);
             },
         }
     );
 
-    useEffect(() => {
-        if (!exerciseId) {
-            navigate(routeMap.home);
-        }
-
-        if (exercise.supersetId) {
-            navigate(routeMap.home);
-            toasts.warning("Exercises in supersets cannot be edited from this page.");
-        }
-    }, [exerciseId, navigate, exercise.supersetId]);
-
     return (
         <ExerciseFormMachineProvider value={service}>
-            {exercise && isInitialized && <SingleExerciseForm onSubmit={editExerciseById.mutate} />}
+            {isInitialized && <SingleExerciseForm category={exercise.category} onSubmit={editExerciseById.mutate} />}
         </ExerciseFormMachineProvider>
     );
 };

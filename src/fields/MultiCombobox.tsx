@@ -22,6 +22,7 @@ import {
     UseComboboxReturnValue,
     useMultipleSelection,
     UseMultipleSelectionProps,
+    UseMultipleSelectionReturnValue,
 } from "downshift";
 import { ForwardedRef, forwardRef, ReactNode, Ref, useCallback, useMemo, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";
@@ -50,7 +51,8 @@ export type MultiComboboxProps<Item = any> = {
     }) => Item[];
 } & InputProps &
     Pick<UseComboboxProps<Item>, "itemToString" | "onSelectedItemChange"> &
-    Pick<UseMultipleSelectionProps<Item>, "onSelectedItemsChange" | "initialSelectedItems">;
+    Pick<UseMultipleSelectionProps<Item>, "onSelectedItemsChange" | "initialSelectedItems"> &
+    Partial<Pick<UseMultipleSelectionReturnValue<Item>, "getSelectedItemProps">>;
 
 function MultiComboboxBase<Item = any>({
     externalRef,
@@ -65,6 +67,7 @@ function MultiComboboxBase<Item = any>({
     initialSelectedItems,
     minItems,
     getSuggestions,
+    getSelectedItemProps: getSelectedItemPropsProp,
     ...props
 }: MultiComboboxProps<Item>) {
     const { getSelectedItemProps, getDropdownProps, addSelectedItem, removeSelectedItem, selectedItems } =
@@ -121,7 +124,7 @@ function MultiComboboxBase<Item = any>({
                 items.filter((item) =>
                     (typeof item === "string" ? item : itemToString(item))
                         .toLowerCase()
-                        .startsWith(inputValue.toLowerCase())
+                        .includes(inputValue.toLowerCase())
                 )
             );
         },
@@ -168,7 +171,13 @@ function MultiComboboxBase<Item = any>({
             {label?.(getLabelProps)}
             <Wrap>
                 {selectedItems.map((item, index) => (
-                    <WrapItem key={getValue(item)} {...getSelectedItemProps({ selectedItem: item, index })}>
+                    <WrapItem
+                        key={getValue(item)}
+                        {...mergeProps(
+                            getSelectedItemProps({ selectedItem: item, index }),
+                            getSelectedItemPropsProp?.({ selectedItem: item, index }) || {}
+                        )}
+                    >
                         <Tag size="lg" colorScheme="pink" borderRadius="full" variant="subtle">
                             <TagLabel>{typeof item === "string" ? item : itemToString(item)}</TagLabel>
                             {canRemoveItems && <TagCloseButton onClick={() => removeSelectedItem(item)} />}
