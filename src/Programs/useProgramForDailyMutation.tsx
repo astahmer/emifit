@@ -7,7 +7,7 @@ import { useCurrentDaily } from "@/orm-hooks";
 import { Program } from "@/orm-types";
 import { currentDailyIdAtom } from "@/store";
 import { useAtomValue } from "jotai";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export function useProgramForDailyMutation() {
     const dailyId = useAtomValue(currentDailyIdAtom);

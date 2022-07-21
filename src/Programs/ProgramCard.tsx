@@ -28,7 +28,7 @@ import {
 import { useAtomValue } from "jotai";
 import { ReactNode } from "react";
 import { HiOutlineDuplicate } from "react-icons/hi";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useProgramForDailyMutation } from "./useProgramForDailyMutation";
 
 export type ProgramCardProps = { program: Program; headerRight?: () => ReactNode; defaultIsOpen?: boolean };

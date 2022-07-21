@@ -12,7 +12,7 @@ import { Button, Heading, Icon, Stack } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import { useRef } from "react";
 import { BiExport, BiImport } from "react-icons/bi";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { DataAccordions } from "./DataAccordions";
 
 export const ExportImportData = () => {

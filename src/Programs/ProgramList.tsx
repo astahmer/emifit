@@ -2,7 +2,7 @@ import { orm } from "@/orm";
 import { Box } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditableProgramCard, EditableProgramCardProps } from "./ProgramCard";
 import { ReorderItemBox } from "../components/ReorderItemBox";
 import { Program } from "@/orm-types";

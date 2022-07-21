@@ -5,7 +5,7 @@ import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
 import { useCurrentDailyInvalidate } from "@/orm-hooks";
 import { Alert, AlertIcon, Box, Divider, Text } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useLastFilledDaily, useLastFilledDailyDate } from "./useLastFilledDailyDate";
 import { GoToClosestPreviousDailyEntryButton } from "./GoToClosestPreviousDailyEntryButton";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";

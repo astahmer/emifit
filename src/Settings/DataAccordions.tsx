@@ -24,7 +24,7 @@ import {
     MenuList,
     Text,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PersistModal } from "../fields/PersistModal";
 import { AddCategoryForm, CategoryForm } from "./CategoryForm";
 import { GlobalExerciseForm, GlobalExerciseFormValues } from "./GlobalExerciseForm";

@@ -29,7 +29,7 @@ import {
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { MdChecklist, MdGridView, MdList } from "react-icons/md";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { match } from "ts-pattern";
 import { useProgramForDailyMutation } from "../Programs/useProgramForDailyMutation";

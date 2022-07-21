@@ -10,7 +10,7 @@ import { Category } from "@/orm-types";
 import { Box, Stack } from "@chakra-ui/react";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ColorPicker } from "chakra-color-picker";
 
 const defaultCategoryValues: Category = { id: "", name: "", tagList: [], color: "" };

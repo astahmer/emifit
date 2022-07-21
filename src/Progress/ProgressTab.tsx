@@ -13,7 +13,7 @@ import { Box, Divider, Heading, Stack, Stat, StatGroup, StatLabel, StatNumber, T
 import { getSum } from "pastable";
 import { CalendarValues } from "@uselessdev/datepicker";
 import { ComponentPropsWithoutRef, useState } from "react";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { DateRangePresetPicker, getRangeStart } from "../Calendar/DateRangePresetPicker";

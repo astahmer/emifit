@@ -10,7 +10,7 @@ import { Box, Flex, Icon } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
 import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export const DailyExerciseListView = ({ exerciseList }: WithExerciseList) => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);

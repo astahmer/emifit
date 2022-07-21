@@ -11,7 +11,7 @@ import { Box, FormLabel, Stack, Tag as ChakraTag, Text } from "@chakra-ui/react"
 import { getDiff } from "pastable";
 import { useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export type TagFormValues = Tag & {
     categoryList: Category[];

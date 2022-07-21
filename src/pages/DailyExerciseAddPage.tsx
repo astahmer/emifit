@@ -11,7 +11,7 @@ import { makeExercise } from "@/orm-utils";
 import { routeMap } from "@/routes";
 import { Box } from "@chakra-ui/react";
 import { useInterpret, useSelector } from "@xstate/react";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
 import { DailySingleExerciseForm } from "../Exercises/SingleExerciseForm";

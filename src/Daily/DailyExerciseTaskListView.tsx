@@ -20,7 +20,7 @@ import { Box, Divider, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import confetti from "canvas-confetti";
 import { useAtomValue } from "jotai";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { GoBackToTodayEntryButton } from "./GoBackToTodayEntryButton";
 import { ExerciseTaskItem } from "../Exercises/ExerciseTaskItem";

@@ -18,7 +18,7 @@ import {
     useFormContext,
     UseFormReturn,
 } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { ExerciseCombobox } from "./ExerciseCombobox";
 import { TagMultiSelect } from "./TagMultiSelect";
 

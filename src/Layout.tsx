@@ -13,7 +13,7 @@ import {
 import { useAtomValue, useSetAtom } from "jotai";
 import { ErrorBoundary } from "react-error-boundary";
 import { useHotkeys } from "react-hotkeys-hook";
-import { ReactQueryDevtools } from "react-query/devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet } from "react-router-dom";
 import { BottomTabs } from "./components/BottomTabs";
 import { ErrorFallback } from "./components/ErrorFallback";

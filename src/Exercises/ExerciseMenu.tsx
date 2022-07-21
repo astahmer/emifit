@@ -5,7 +5,7 @@ import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, HStack, IconButton } from "@chakra-ui/react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { FaRegCopy } from "react-icons/fa";
 

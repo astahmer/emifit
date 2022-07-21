@@ -1,6 +1,6 @@
 import { sortArrayOfObjectByPropFromArray } from "pastable";
 import { useAtomValue } from "jotai";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { groupIn } from "./functions/groupBy";
 import {
     computeCategoryFromReferences,

@@ -3,7 +3,7 @@ import { currentDateAtom } from "@/store";
 import { ChevronLeftIcon } from "@chakra-ui/icons";
 import { ButtonProps } from "@chakra-ui/react";
 import { useSetAtom } from "jotai";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useLastFilledDailyDate } from "./useLastFilledDailyDate";
 
 export const GoToClosestPreviousDailyEntryButton = (props: ButtonProps) => {

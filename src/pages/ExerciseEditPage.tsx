@@ -5,7 +5,7 @@ import { useExerciseByIdQuery } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect } from "react";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { ExerciseFormMachineProvider, makeExerciseFormMachine } from "../Exercises/ExerciseFormMachine";
 import { SingleExerciseForm } from "../Exercises/SingleExerciseForm";

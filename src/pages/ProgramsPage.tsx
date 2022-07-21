@@ -13,7 +13,7 @@ import { useMachine } from "@xstate/react";
 import confetti from "canvas-confetti";
 import { useAtomValue } from "jotai";
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { InitialState } from "../Programs/InitialState";
 import { ProgramForm } from "../Programs/ProgramForm";

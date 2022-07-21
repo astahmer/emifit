@@ -4,7 +4,7 @@ import { useCurrentDaily } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { isDailyTodayAtom } from "@/store";
 import { useAtomValue } from "jotai";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export function DailyExerciseCheckbox({ exo }: { exo: Exercise }) {
     const daily = useCurrentDaily();

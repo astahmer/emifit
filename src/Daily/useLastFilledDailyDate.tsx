@@ -2,7 +2,7 @@ import { printDate } from "@/functions/utils";
 import { orm } from "@/orm";
 import { currentDateAtom } from "@/store";
 import { useAtomValue } from "jotai";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 export const useLastFilledDailyDate = () => {
     const currentDate = useAtomValue(currentDateAtom);

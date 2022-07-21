@@ -2,7 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { WithChildren } from "pastable";
 import { Provider } from "jotai";
 import { useEffect, useState } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Route, Routes, unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import { DailyEntry } from "./Daily/DailyEntry";
 import { makeDb } from "./orm";
