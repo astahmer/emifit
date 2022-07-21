@@ -136,7 +136,7 @@ export interface DynamicTableProps<RowData extends ObjectLiteral = any> extends 
     columns: TableOptions<RowData>["columns"];
     data: TableOptions<RowData>["data"];
     getHeaderProps?: (column: ColumnDef<RowData>, colIndex: number) => TableColumnHeaderProps;
-    getRowProps?: (row: ColumnDef<RowData>, rowIndex: number) => TableRowProps;
+    getRowProps?: (row: Row<RowData>, rowIndex: number) => TableRowProps;
     getCellProps?: (cell: Cell<RowData, any>, rowIndex: number, cellIndex: number) => TableCellProps;
     renderSubRow?: ({ row }: { row: Row<RowData> }) => ReactNode;
     isHeaderSticky?: boolean;

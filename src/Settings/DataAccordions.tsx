@@ -93,7 +93,7 @@ export const DataAccordions = ({
                                 data={programList}
                                 isHeaderSticky
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
-                                getRowProps={(row) => ({ ...(row as any).getToggleRowExpandedProps() })}
+                                getRowProps={(row) => ({ onClick: row.getToggleExpandedHandler() })}
                                 renderSubRow={({ row }) => (
                                     <VFlex pb="4">
                                         <Box>Exercise list:</Box>
@@ -123,7 +123,7 @@ export const DataAccordions = ({
                                 data={dailyList}
                                 isHeaderSticky
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
-                                getRowProps={(row) => ({ ...(row as any).getToggleRowExpandedProps() })}
+                                getRowProps={(row) => ({ onClick: (row as any).getToggleExpandedHandler() })}
                                 renderSubRow={({ row }) => (
                                     <VFlex pb="4">
                                         <Box>Exercise list:</Box>
