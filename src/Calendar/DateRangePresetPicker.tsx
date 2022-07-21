@@ -2,24 +2,20 @@ import { useCalendarValues } from "@/Calendar/useCalendarValues";
 import { createContextWithHook } from "@/functions/createContextWithHook";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Tag, TagLabel, TagLeftIcon, Wrap, WrapItem } from "@chakra-ui/react";
+import { getClosestNbIn } from "@pastable/core";
 import { CalendarValues } from "@uselessdev/datepicker";
-import { subMonths, subWeeks, subYears, closestIndexTo } from "date-fns";
+import { subMonths, subWeeks, subYears, closestIndexTo, differenceInDays } from "date-fns";
 import { useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { CustomDateRangeCalendarButton } from "./CustomDateRangeCalendarButton";
 
-export const DateRangePresetPicker = ({
-    rangePresets,
-    initialRange,
-}: {
-    rangePresets?: RangePreset[];
-    initialRange?: RangePresetOrCustom;
-}) => {
-    const { setDates } = useCalendarValues();
+export const DateRangePresetPicker = ({ rangePresets }: { rangePresets?: RangePresetOrCustom[] }) => {
+    const { setDates, ...dates } = useCalendarValues();
 
-    const presets = rangePresets || baseRangePresets;
-    const defaultRange = initialRange || presets[0];
-    const datesRange = presets.map((range) => getRangeStart(range));
+    const presets = Array.from(rangePresets || baseRangePresets);
+    const { inferedRange, datesRange } = getInferedRange(presets, dates);
+    const defaultRange = inferedRange || presets[0];
+
     const fallbackIndex = closestIndexTo(getRangeStart(defaultRange === "custom" ? "1m" : defaultRange), datesRange);
     const fallbackDates = { start: datesRange[fallbackIndex], end: new Date() };
 
@@ -88,3 +84,17 @@ export const getRangeStart = (preset: RangePreset) => {
 export const baseRangePresets = ["1 week", "1m", "3m", "6m", "1y"] as const;
 export type RangePresetOrCustom = typeof baseRangePresets[number] | "custom";
 export type RangePreset = Exclude<RangePresetOrCustom, "custom">;
+
+/** Get infered Range in array of presets from provided start/end dates */
+const getInferedRange = (presets: RangePresetOrCustom[], dates: CalendarValues) => {
+    const now = new Date();
+
+    const datesRange = presets.filter((r) => r !== "custom").map((range) => getRangeStart(range as RangePreset));
+    const rangeDiffs = datesRange.map((date) => differenceInDays(now, date));
+
+    const inferedRangeDiff = getClosestNbIn(rangeDiffs, Math.abs(differenceInDays(now, dates.start)));
+    const inferedRangeIndex = rangeDiffs.findIndex((diff) => diff === inferedRangeDiff);
+    const inferedRange = presets[inferedRangeIndex];
+
+    return { inferedRange, datesRange };
+};
