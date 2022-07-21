@@ -23,7 +23,6 @@ export const ExerciseLibraryItem = ({
     index: number;
     exerciseList: Exercise[];
 }) => {
-    console.log(exercise.name, exerciseList);
     const ctx = useAccordionContext();
     const isFocused = ctx.focusedIndex === index;
 

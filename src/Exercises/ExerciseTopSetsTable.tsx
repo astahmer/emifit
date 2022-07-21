@@ -4,9 +4,9 @@ import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Badge, Stack, Text } from "@chakra-ui/react";
+import { ColumnDef } from "@tanstack/react-table";
 import { findBy } from "pastable";
 import { Link as ReactLink } from "react-router-dom";
-import { Row } from "react-table";
 
 export const ExerciseTopSetsTable = ({ exerciseList }: { exerciseList: Exercise[] }) => {
     const { listWithTops, topKg, topReps } = getExerciseListWithTops(exerciseList);
@@ -24,31 +24,31 @@ export const ExerciseTopSetsTable = ({ exerciseList }: { exerciseList: Exercise[
 
 const columns = [
     {
-        Header: "Date",
-        accessor: "createdAt",
+        header: "Date",
+        accessorKey: "createdAt",
         sortType: "datetime",
-        Cell: (props) => (
+        cell: (props) => (
             <Stack
                 direction="row"
                 as={ReactLink}
-                to={`/daily/entry/${printDailyDate(new Date(props.value))}`}
+                to={`/daily/entry/${printDailyDate(new Date(props.getValue<string | Date>()))}`}
                 color="pink.300"
                 alignItems="center"
                 spacing="1.5"
             >
                 <ExternalLinkIcon color="pink.700" opacity="0.6" boxSize="3" />
                 <Text color="pink.300" fontWeight="bold">
-                    {new Date(props.value).toLocaleDateString()}
+                    {new Date(props.getValue<string | Date>()).toLocaleDateString()}
                 </Text>
             </Stack>
         ),
     },
     {
-        Header: "top kg",
-        accessor: "topKg",
-        Cell: (props) => {
+        header: "top kg",
+        accessorKey: "topKg",
+        cell: (props) => {
             const exo = props.row.original as ExerciseWithTops;
-            const list = props.sortedRows as Row<ExerciseWithTops>[];
+            const list = props.table.getSortedRowModel().rows;
 
             const sortedIndex = findBy(list, "original.id", exo.id, true);
             const next = list[sortedIndex + 1];
@@ -57,7 +57,7 @@ const columns = [
             return (
                 <Stack direction="row" alignItems="center">
                     <Text {...(exo.isTopKg ? { color: "pink.300", fontWeight: "bold" } : undefined)}>
-                        {props.value}
+                        {props.getValue<number>()}
                     </Text>
                     <Show when={diff !== 0}>
                         <Badge
@@ -74,11 +74,11 @@ const columns = [
         },
     },
     {
-        Header: "top reps",
-        accessor: "topReps",
-        Cell: (props) => {
+        header: "top reps",
+        accessorKey: "topReps",
+        cell: (props) => {
             const exo = props.row.original as ExerciseWithTops;
-            const list = props.sortedRows as Row<ExerciseWithTops>[];
+            const list = props.table.getSortedRowModel().rows;
 
             const sortedIndex = findBy(list, "original.id", exo.id, true);
             const next = list[sortedIndex + 1];
@@ -87,7 +87,7 @@ const columns = [
             return (
                 <Stack direction="row" alignItems="center">
                     <Text {...(exo.isTopReps ? { color: "pink.300", fontWeight: "bold" } : undefined)}>
-                        {props.value}
+                        {props.getValue<number>()}
                     </Text>
                     <Show when={diff !== 0}>
                         <Badge
@@ -103,9 +103,9 @@ const columns = [
             );
         },
     },
-];
+] as Array<ColumnDef<ExerciseWithTops>>;
 
-interface ExerciseWithTops extends Exercise {
+export interface ExerciseWithTops extends Exercise {
     isTopKg: boolean;
     isTopReps: boolean;
     topKg: number;

@@ -80,11 +80,7 @@ export const Layout = () => {
             onOpen();
         },
     });
-    const drawerDragProps = useSwipeable({
-        delta: 30,
-        onSwipedLeft: onClose,
-        onSwipeStart: (info) => console.log(info),
-    });
+    const drawerDragProps = useSwipeable({ delta: 30, onSwipedLeft: onClose });
 
     const [isCompact, setIsCompact] = useState(true);
 

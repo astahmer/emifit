@@ -30,6 +30,7 @@ import { AddCategoryForm, CategoryForm } from "./CategoryForm";
 import { GlobalExerciseForm, GlobalExerciseFormValues } from "./GlobalExerciseForm";
 import { AddGroupForm, GroupForm } from "./GroupForm";
 import { AddTagForm, TagForm, TagFormValues } from "./TagForm";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 export const DataAccordions = ({
     withActions,
@@ -96,7 +97,7 @@ export const DataAccordions = ({
                                 renderSubRow={({ row }) => (
                                     <VFlex pb="4">
                                         <Box>Exercise list:</Box>
-                                        <ProgramCardExerciseList program={row.original as Program} />
+                                        <ProgramCardExerciseList exerciseList={row.original.exerciseList} />
                                     </VFlex>
                                 )}
                                 initialSortBy={[{ id: "name", desc: false }]}
@@ -126,7 +127,7 @@ export const DataAccordions = ({
                                 renderSubRow={({ row }) => (
                                     <VFlex pb="4">
                                         <Box>Exercise list:</Box>
-                                        <ProgramCardExerciseList program={row.original as Program} />
+                                        <ProgramCardExerciseList exerciseList={row.original.exerciseList} />
                                     </VFlex>
                                 )}
                                 initialSortBy={[{ id: "id", desc: true }]}
@@ -249,15 +250,17 @@ export const DataAccordions = ({
         </Accordion>
     );
 };
+
+const makeTagColumn = createColumnHelper<Tag>();
 const tagsColumns = [
-    { Header: "id", accessor: "id" },
-    { Header: "name", accessor: "name" },
-    { Header: "group", accessor: "groupId" },
+    makeTagColumn.accessor("id", { header: "id" }),
+    makeTagColumn.accessor("name", { header: "name" }),
+    makeTagColumn.accessor("groupId", { header: "group" }),
     {
-        Header: "",
-        accessor: "__actions",
-        canBeSorted: false,
-        Cell: ({ row }) => {
+        header: "",
+        accessorKey: "__actions",
+        enableSorting: false,
+        cell: ({ row }) => {
             const tag = row.original as Tag;
             const categoryList = useCategoryList().filter((category) =>
                 category.tagList.map((tag) => tag.id).includes(tag.id)
@@ -340,14 +343,14 @@ const tagsColumns = [
                 </Menu>
             );
         },
-    },
+    } as ColumnDef<Tag>,
 ];
 const categoryColumns = [
-    { Header: "id", accessor: "id" },
+    { header: "id", accessorKey: "id" },
     {
-        Header: "name",
-        accessor: "name",
-        Cell: (props) => (
+        header: "name",
+        accessorKey: "name",
+        cell: (props) => (
             <Flex alignItems="center">
                 <Box
                     mr="2"
@@ -358,21 +361,21 @@ const categoryColumns = [
                     minW="10px"
                     bg={props.row.original.color || "pink.300"}
                 />
-                <Text>{props.value}</Text>
+                <Text>{props.getValue()}</Text>
             </Flex>
         ),
     },
     {
-        Header: "tagList",
-        accessor: "tagList",
-        Cell: (props) => (props.value as Tag[]).map((t) => t.name).join(", "),
-        canBeSorted: false,
+        header: "tagList",
+        accessorKey: "tagList",
+        cell: (props) => (props.getValue() as Tag[]).map((t) => t.name).join(", "),
+        enableSorting: false,
     },
     {
-        Header: "",
-        accessor: "__actions",
-        canBeSorted: false,
-        Cell: ({ row }) => {
+        header: "",
+        accessorKey: "__actions",
+        enableSorting: false,
+        cell: ({ row }) => {
             const category = row.original as Category;
 
             const queryClient = useQueryClient();
@@ -442,14 +445,16 @@ const categoryColumns = [
         },
     },
 ];
+
+const columnHelper = createColumnHelper<Group>();
 const groupColumns = [
-    { Header: "id", accessor: "id" },
-    { Header: "name", accessor: "name" },
+    columnHelper.accessor("id", { header: "id" }),
+    columnHelper.accessor("name", { header: "name" }),
     {
-        Header: "",
-        accessor: "__actions",
-        canBeSorted: false,
-        Cell: ({ row }) => {
+        header: "",
+        accessorKey: "__actions",
+        enableSorting: false,
+        cell: ({ row }) => {
             const group = row.original as Group;
 
             const queryClient = useQueryClient();
@@ -504,16 +509,17 @@ const groupColumns = [
                 </Menu>
             );
         },
-    },
+    } as ColumnDef<Group>,
 ];
+const makeExerciseColumn = createColumnHelper<Exercise>();
 const exerciseColumns = [
-    { Header: "id", accessor: "id" },
-    { Header: "name", accessor: "name" },
+    makeExerciseColumn.accessor("id", { header: "id" }),
+    makeExerciseColumn.accessor("name", { header: "name" }),
     {
-        Header: "",
-        accessor: "__actions",
-        canBeSorted: false,
-        Cell: ({ row }) => {
+        header: "",
+        accessorKey: "__actions",
+        enableSorting: false,
+        cell: ({ row }) => {
             const exercise = row.original as Exercise;
             const queryClient = useQueryClient();
 
@@ -562,27 +568,28 @@ const exerciseColumns = [
                 </Menu>
             );
         },
-    },
+    } as ColumnDef<Exercise>,
 ];
 const programColumns = [
-    { Header: "id", accessor: "id" },
-    { Header: "name", accessor: "name" },
-    { Header: "category", accessor: "category" },
-    { Header: "exo", accessor: "exerciseList", Cell: (props) => props.value.length },
+    { header: "id", accessorKey: "id" },
+    { header: "name", accessorKey: "name" },
+    { header: "category", accessorKey: "category" },
+    { header: "exo", accessorKey: "exerciseList", cell: (props) => props.getValue<Array<Exercise>>().length },
     {
-        Header: "",
-        accessor: "__openRow",
-        Cell: ({ row }) => (row.isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />),
+        header: "",
+        accessorKey: "__openRow",
+        cell: ({ row }) => (row.getIsExpanded() ? <ChevronUpIcon /> : <ChevronDownIcon />),
     },
-];
+] as Array<ColumnDef<Program>>;
+
 const dailyColumns = [
-    { Header: "id", accessor: "id" },
-    { Header: "category", accessor: "category" },
-    { Header: "exo", accessor: "exerciseList", Cell: (props) => props.value.length },
-    { Header: "program", accessor: "programId" },
+    { header: "id", accessorKey: "id" },
+    { header: "category", accessorKey: "category" },
+    { header: "exo", accessorKey: "exerciseList", cell: (props) => props.getValue<Array<Exercise>>().length },
+    { header: "program", accessorKey: "programId" },
     {
-        Header: "",
-        accessor: "__openRow",
-        Cell: ({ row }) => (row.isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />),
+        header: "",
+        accessorKey: "__openRow",
+        cell: ({ row }) => (row.getIsExpanded() ? <ChevronUpIcon /> : <ChevronDownIcon />),
     },
-];
+] as Array<ColumnDef<Daily>>;

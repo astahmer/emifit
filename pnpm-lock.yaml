@@ -9,10 +9,10 @@ specifiers:
   '@rollup/plugin-replace': ^4.0.0
   '@tanstack/react-query': ^4.0.10
   '@tanstack/react-query-devtools': ^4.0.10
+  '@tanstack/react-table': ^8.3.0
   '@types/canvas-confetti': ^1.4.3
   '@types/react': ^18.0.15
   '@types/react-dom': ^18.0.6
-  '@types/react-table': ^7.7.12
   '@uselessdev/datepicker': ^2.5.1
   '@vitejs/plugin-react': ^2.0.0
   '@xstate/react': ^3.0.0
@@ -42,7 +42,6 @@ specifiers:
   react-icons: ^4.4.0
   react-router-dom: ^6.3.0
   react-swipeable: ^7.0.0
-  react-table: ^7.8.0
   react-textarea-autosize: ^8.3.4
   react-use: ^17.4.0
   react-virtual: ^2.10.4
@@ -69,6 +68,7 @@ dependencies:
   '@emotion/styled': 11.9.3_y2x62d5bbinncmisoeyv36jqse
   '@tanstack/react-query': 4.0.10_biqbaboplfbrettd7655fr4n2y
   '@tanstack/react-query-devtools': 4.0.10_react@18.2.0
+  '@tanstack/react-table': 8.3.0_biqbaboplfbrettd7655fr4n2y
   '@uselessdev/datepicker': 2.5.1_s22c2wpudv3w36yc23cio2l7pi
   '@xstate/react': 3.0.0_ad54ufqkthlhcdffkpeqdmqmtm
   browser-fs-access: 0.31.0
@@ -92,7 +92,6 @@ dependencies:
   react-icons: 4.4.0_react@18.2.0
   react-router-dom: 6.3.0_biqbaboplfbrettd7655fr4n2y
   react-swipeable: 7.0.0_react@18.2.0
-  react-table: 7.8.0_react@18.2.0
   react-textarea-autosize: 8.3.4_3hx2ussxxho4jajbwrd6gq34qe
   react-use: 17.4.0_biqbaboplfbrettd7655fr4n2y
   react-virtual: 2.10.4_react@18.2.0
@@ -106,7 +105,6 @@ devDependencies:
   '@types/canvas-confetti': 1.4.3
   '@types/react': 18.0.15
   '@types/react-dom': 18.0.6
-  '@types/react-table': 7.7.12
   '@vitejs/plugin-react': 2.0.0_vite@3.0.2
   axios: 0.27.2
   dotenv: 16.0.1
@@ -2551,6 +2549,23 @@ packages:
       use-sync-external-store: 1.2.0_react@18.2.0
     dev: false
 
+  /@tanstack/react-table/8.3.0_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-SIMorxHQ68glcoYZO7KSqvyy5ldlCKRTvYBSnWbWvy4xSgRa2D7GGWq8rLPsMerNUYoEljokun3/mf7kP8FQQA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      '@tanstack/table-core': 8.3.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@tanstack/table-core/8.3.0:
+    resolution: {integrity: sha512-xcspAAv+GN+WMrX6qaFrPxBVYxlFfyu4qddiTwXOaTQOLdgLP/3GbipDoL7gC2l3Iz9KFCDXWjhW79xta3w5rg==}
+    engines: {node: '>=12'}
+    dev: false
+
   /@types/canvas-confetti/1.4.3:
     resolution: {integrity: sha512-UwFPTsW1ZwVyo/ETp4hPSikSD7yl2V42E3VWBF5P/0+DHO4iajyceWv7hfNdZ2AX5tkZnuViiBWOqyCPohU2FQ==}
     dev: true
@@ -2594,12 +2609,6 @@ packages:
 
   /@types/react-dom/18.0.6:
     resolution: {integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==}
-    dependencies:
-      '@types/react': 18.0.15
-    dev: true
-
-  /@types/react-table/7.7.12:
-    resolution: {integrity: sha512-bRUent+NR/WwtDGwI/BqhZ8XnHghwHw0HUKeohzB5xN3K2qKWYE5w19e7GCuOkL1CXD9Gi1HFy7TIm2AvgWUHg==}
     dependencies:
       '@types/react': 18.0.15
     dev: true
@@ -4686,14 +4695,6 @@ packages:
     resolution: {integrity: sha512-NI7KGfQ6gwNFN0Hor3vytYW3iRfMMaivGEuxcADOOfBCx/kqwXE8IfHFxEcxSUkxCYf38COLKYd9EMYZghqaUA==}
     peerDependencies:
       react: ^16.8.3 || ^17 || ^18
-    dependencies:
-      react: 18.2.0
-    dev: false
-
-  /react-table/7.8.0_react@18.2.0:
-    resolution: {integrity: sha512-hNaz4ygkZO4bESeFfnfOft73iBUj8K5oKi1EcSHPAibEydfsX2MyU6Z8KCr3mv3C9Kqqh71U+DhZkFvibbnPbA==}
-    peerDependencies:
-      react: ^16.8.3 || ^17.0.0-0 || ^18.0.0
     dependencies:
       react: 18.2.0
     dev: false

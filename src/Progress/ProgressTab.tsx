@@ -1,25 +1,26 @@
 import { DynamicTable } from "@/components/DynamicTable";
 import { Show } from "@/components/Show";
+import { VFlex } from "@/components/VFlex";
 import { SwitchInput } from "@/fields/SwitchInput";
 import { createContextWithHook } from "@/functions/createContextWithHook";
 import { groupBy } from "@/functions/groupBy";
-import { displayDate, parseDate } from "@/functions/utils";
+import { displayDate } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCategoryList } from "@/orm-hooks";
 import { DailyWithReferences, ExerciseWithReferences } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Box, Divider, Flex, Heading, Stack, Stat, StatGroup, StatLabel, StatNumber, Text } from "@chakra-ui/react";
-import { getSum } from "pastable";
-import { CalendarValues } from "@uselessdev/datepicker";
-import { ComponentPropsWithoutRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { CalendarValues } from "@uselessdev/datepicker";
+import { getSum } from "pastable";
+import { ComponentPropsWithoutRef, useState } from "react";
 import { Link as ReactLink } from "react-router-dom";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { DateRangePresetPicker, getRangeStart } from "../Calendar/DateRangePresetPicker";
 import { CalendarValuesProvider } from "../Calendar/useCalendarValues";
 import { CenteredSpinner } from "./CenteredSpinner";
-import { VFlex } from "@/components/VFlex";
 
 export type UnitMode = "count" | "percent";
 const [UnitModeContext, useUnitMode] = createContextWithHook<UnitMode>("UnitMode");
@@ -133,7 +134,6 @@ const TopKgInDateRange = ({ exerciseList }: { exerciseList: ExerciseWithReferenc
         .filter((exo) => exo.series.some((set) => set.kg === topKgInDateRange))
         .map((exo) => ({
             ...exo,
-            dailyDate: parseDate(exo.dailyId),
             topKg: Math.max(...exo.series.map((set) => set.kg)),
             topReps: Math.max(...exo.series.map((set) => set.reps)),
         }));
@@ -146,22 +146,24 @@ const TopKgInDateRange = ({ exerciseList }: { exerciseList: ExerciseWithReferenc
             <DynamicTable
                 columns={columns}
                 data={exerciseListWithTopKgs}
-                initialSortBy={[{ id: "dailyDate", desc: true }]}
+                initialSortBy={[{ id: "createdAt", desc: true }]}
             />
         </>
     );
 };
 
+type ExerciseWithTopKgAndReps = ExerciseWithReferences & { topKg: number; topReps: number };
+
+const makeExoColumn = createColumnHelper<ExerciseWithTopKgAndReps>();
 const columns = [
-    {
-        Header: "Date",
-        accessor: "dailyDate",
-        sortType: "datetime",
-        Cell: (props) => (
+    makeExoColumn.accessor("createdAt", {
+        header: "Date",
+        sortingFn: "datetime",
+        cell: (props) => (
             <Stack
                 direction="row"
                 as={ReactLink}
-                to={`/daily/entry/${printDailyDate(new Date(props.value))}`}
+                to={`/daily/entry/${printDailyDate(new Date(props.getValue()))}`}
                 color="pink.300"
                 alignItems="center"
                 spacing="1.5"
@@ -172,11 +174,11 @@ const columns = [
                 </Text>
             </Stack>
         ),
-    },
-    { Header: "Exo", accessor: "name" },
-    { Header: "Kg", accessor: "topKg" },
-    { Header: "Reps", accessor: "topReps" },
-];
+    }),
+    { header: "Exo", accessorKey: "name" },
+    { header: "Kg", accessorKey: "topKg" },
+    { header: "Reps", accessorKey: "topReps" },
+] as Array<ColumnDef<ExerciseWithTopKgAndReps>>;
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 const RADIAN = Math.PI / 180;
 const PieGraph = ({ data }: Pick<ComponentPropsWithoutRef<typeof Pie>, "data">) => {

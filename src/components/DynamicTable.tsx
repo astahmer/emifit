@@ -1,23 +1,34 @@
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import {
+    Box,
+    chakra,
     Table,
+    TableCellProps,
+    TableColumnHeaderProps,
     TableProps,
+    TableRowProps,
     Tbody,
     Td,
     Th,
     Thead,
     Tr,
-    chakra,
-    TableRowProps,
-    TableColumnHeaderProps,
-    TableCellProps,
-    Box,
 } from "@chakra-ui/react";
-import { isDefined, ObjectLiteral } from "pastable";
+import {
+    Cell,
+    ColumnDef,
+    flexRender,
+    getCoreRowModel,
+    getExpandedRowModel,
+    getSortedRowModel,
+    Row,
+    SortingState,
+    TableOptions,
+    useReactTable,
+} from "@tanstack/react-table";
+import { isDefined, mergeProps, ObjectLiteral } from "pastable";
 import { Fragment, ReactNode, useEffect } from "react";
-import { Cell, Column, Row, TableOptions, UseExpandedOptions, useExpanded, useSortBy, useTable } from "react-table";
 
-export function DynamicTable({
+export function DynamicTable<RowData>({
     columns,
     data,
     getHeaderProps,
@@ -28,37 +39,38 @@ export function DynamicTable({
     getRowProps,
     initialSortBy,
     hiddenColumns = [],
-}: DynamicTableProps) {
-    const table = useTable(
-        {
-            columns,
-            data,
-            autoResetExpanded: false,
-            defaultColumn,
-            initialState: { hiddenColumns, sortBy: initialSortBy || [] },
-        } as TableOptions<UseExpandedOptions<{}>>,
-        useSortBy,
-        useExpanded
-    );
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, visibleColumns } = table;
+}: DynamicTableProps<RowData>) {
+    const table = useReactTable<RowData>({
+        columns,
+        data,
+        autoResetExpanded: false,
+        renderFallbackValue: "--",
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getExpandedRowModel: getExpandedRowModel(),
+        initialState: {
+            columnVisibility: Object.fromEntries(hiddenColumns.map((id) => [id, true])),
+            sorting: initialSortBy as SortingState,
+        },
+    });
 
     useEffect(() => {
         if (hiddenColumns?.length) {
-            table.setHiddenColumns(hiddenColumns);
+            table.setColumnVisibility(Object.fromEntries(hiddenColumns.map((id) => [id, true])));
         }
     }, [hiddenColumns]);
 
     return (
-        <Table {...getTableProps()} size={size}>
+        <Table size={size}>
             <Thead>
-                {headerGroups.map((headerGroup) => (
-                    <Tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map((column, colIndex) => (
+                {table.getHeaderGroups().map((headerGroup) => (
+                    <Tr key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
                             <Th
-                                {...column.getHeaderProps(
-                                    (column as any).canBeSorted !== false ? (column as any).getSortByToggleProps() : {}
-                                )}
-                                isNumeric={(column as any).isNumeric}
+                                key={header.id}
+                                colSpan={header.colSpan}
+                                {...{ onClick: header.column.getToggleSortingHandler() }}
+                                isNumeric={(header.column.columnDef.meta as any)?.isNumeric}
                                 css={
                                     isHeaderSticky
                                         ? { position: "sticky", top: 0, backgroundColor: "white" }
@@ -66,11 +78,17 @@ export function DynamicTable({
                                 }
                             >
                                 <Box display="flex" alignItems="flex-end">
-                                    {column.render("Header", getHeaderProps?.(column, colIndex))}
-                                    {(column as any).canBeSorted !== false && (
+                                    {flexRender(
+                                        header.column.columnDef.header,
+                                        mergeProps(
+                                            (getHeaderProps?.(header.column, header.index) as any) || {},
+                                            header.getContext()
+                                        )
+                                    )}
+                                    {header.column.getCanSort() !== false && (
                                         <chakra.span pl="2" transform="translateY(-1px)">
-                                            {(column as any).isSorted ? (
-                                                (column as any).isSortedDesc ? (
+                                            {header.column.getIsSorted() !== false ? (
+                                                header.column.getIsSorted() === "desc" ? (
                                                     <TriangleDownIcon aria-label="sorted descending" />
                                                 ) : (
                                                     <TriangleUpIcon aria-label="sorted ascending" />
@@ -84,22 +102,26 @@ export function DynamicTable({
                     </Tr>
                 ))}
             </Thead>
-            <Tbody {...getTableBodyProps()}>
-                {rows.map((row, rowIndex) => {
-                    prepareRow(row);
-                    const { key, ...rowProps } = row.getRowProps(getRowProps?.(row, rowIndex));
+            <Tbody>
+                {table.getRowModel().rows.map((row, rowIndex) => {
                     return (
-                        <Fragment key={key}>
-                            <Tr key={key} {...rowProps}>
-                                {row.cells.map((cell, cellIndex) => (
-                                    <Td {...cell.getCellProps()} isNumeric={(cell.column as any).isNumeric}>
-                                        {cell.render("Cell", getCellProps?.(cell, rowIndex, cellIndex))}
+                        <Fragment key={row.id}>
+                            <Tr {...getRowProps?.(row, rowIndex)}>
+                                {row.getVisibleCells().map((cell, cellIndex) => (
+                                    <Td key={cell.id} isNumeric={(cell.column.columnDef.meta as any)?.isNumeric}>
+                                        {flexRender(
+                                            cell.column.columnDef.cell,
+                                            mergeProps(
+                                                (getCellProps?.(cell, rowIndex, cellIndex) as any) || {},
+                                                cell.getContext()
+                                            )
+                                        )}
                                     </Td>
                                 ))}
                             </Tr>
-                            {renderSubRow && (row as any).isExpanded && (
+                            {renderSubRow && row.getIsExpanded() && (
                                 <Tr>
-                                    <Td colSpan={visibleColumns.length}>{renderSubRow({ row })}</Td>
+                                    <Td colSpan={table.getVisibleFlatColumns().length}>{renderSubRow({ row })}</Td>
                                 </Tr>
                             )}
                         </Fragment>
@@ -113,10 +135,10 @@ export function DynamicTable({
 export interface DynamicTableProps<RowData extends ObjectLiteral = any> extends Pick<TableProps, "size"> {
     columns: TableOptions<RowData>["columns"];
     data: TableOptions<RowData>["data"];
-    getHeaderProps?: (column: Column, colIndex: number) => TableColumnHeaderProps;
-    getRowProps?: (row: Column, rowIndex: number) => TableRowProps;
-    getCellProps?: (cell: Cell, rowIndex: number, cellIndex: number) => TableCellProps;
-    renderSubRow?: ({ row }: { row: Row }) => ReactNode;
+    getHeaderProps?: (column: ColumnDef<RowData>, colIndex: number) => TableColumnHeaderProps;
+    getRowProps?: (row: ColumnDef<RowData>, rowIndex: number) => TableRowProps;
+    getCellProps?: (cell: Cell<RowData, any>, rowIndex: number, cellIndex: number) => TableCellProps;
+    renderSubRow?: ({ row }: { row: Row<RowData> }) => ReactNode;
     isHeaderSticky?: boolean;
     hiddenColumns?: string[];
     initialSortBy?: ReactTableSortBy<RowData>[];
@@ -124,4 +146,7 @@ export interface DynamicTableProps<RowData extends ObjectLiteral = any> extends 
 
 type ReactTableSortBy<RowData extends ObjectLiteral = any> = { id: keyof RowData & {}; desc?: boolean };
 
-const defaultColumn = { Cell: ({ cell: { value } }) => (isDefined(value) ? String(value) : "--") };
+const defaultColumn = { cell: ({ cell }) => (isDefined(cell.getValue()) ? String(cell.getValue()) : "--") } as Partial<
+    ColumnDef<any>
+    // defaultColumn: defaultColumn as Partial<ColumnDef<RowData>>,
+>;

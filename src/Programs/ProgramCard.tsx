@@ -6,7 +6,7 @@ import { onError, successToast } from "@/functions/toasts";
 import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
-import { Program } from "@/orm-types";
+import { Exercise, Program } from "@/orm-types";
 import { isDailyTodayAtom } from "@/store";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon, DeleteIcon, DragHandleIcon, EditIcon } from "@chakra-ui/icons";
 import {
@@ -60,7 +60,7 @@ export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCard
             </Flex>
             <Collapse in={isOpen} animateOpacity>
                 <Stack p="4" pl="2" w="100%" pos="relative">
-                    <ProgramCardExerciseList program={program} />
+                    <ProgramCardExerciseList exerciseList={program.exerciseList} />
                     {isDailyToday && program.category === daily.category && (
                         <ConfirmationButton
                             onConfirm={() => programMutation.mutate(program)}
@@ -78,9 +78,9 @@ export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCard
     );
 };
 
-export const ProgramCardExerciseList = ({ program }: { program: Program }) => (
+export const ProgramCardExerciseList = ({ exerciseList }: { exerciseList: Exercise[] }) => (
     <UnorderedList color="grey" listStyleType="none">
-        {program.exerciseList.map((exo) => (
+        {exerciseList.map((exo) => (
             <ListItem key={exo.id}>
                 - {exo.name} ({exo.series.length} set)
             </ListItem>
