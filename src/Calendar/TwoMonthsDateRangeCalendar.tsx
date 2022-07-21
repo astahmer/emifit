@@ -1,4 +1,5 @@
 import { CustomDay } from "@/Calendar/CalendarButton";
+import { VFlex } from "@/components/VFlex";
 import { Show } from "@/components/Show";
 import { useCategoryList, useDailyList } from "@/orm-hooks";
 import { Box, Button, VStack } from "@chakra-ui/react";
@@ -37,7 +38,7 @@ export const TwoMonthsDateRangeCalendar = ({
             months={MONTHS}
             disableFutureDates
         >
-            <Box d="flex" flexDir="column">
+            <VFlex>
                 <Box position="relative">
                     <CalendarControls>
                         <CalendarPrevButton />
@@ -70,7 +71,7 @@ export const TwoMonthsDateRangeCalendar = ({
                     </Show>
                     {renderButton(dates)}
                 </VStack>
-            </Box>
+            </VFlex>
         </Calendar>
     );
 };

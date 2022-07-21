@@ -1,5 +1,5 @@
 import { ConfirmationButton } from "@/fields/ConfirmationButton";
-import { HFlex } from "@/components/HFlex";
+import { VFlex } from "@/components/VFlex";
 import { RadioCardButton } from "@/fields/RadioCard";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { ExerciseGridView } from "@/Exercises/ExerciseGrid";
@@ -184,7 +184,7 @@ const TodayEmptyExerciseList = () => {
     }, [showProgramCombobox, hasProgram]);
 
     return (
-        <HFlex h="100%" justifyContent="center">
+        <VFlex h="100%" justifyContent="center">
             <Box m="4">
                 <Alert status="info" rounded="full" justifyContent="center">
                     <AlertIcon />
@@ -209,7 +209,7 @@ const TodayEmptyExerciseList = () => {
                 </Box>
             </Stack>
             {showProgramCombobox && <ProgramSearch />}
-        </HFlex>
+        </VFlex>
     );
 };
 
@@ -257,7 +257,7 @@ const PastEmptyExerciseList = () => {
     const lastFilledDaily = useLastFilledDailyDate();
 
     return (
-        <HFlex h="100%" justifyContent="center">
+        <VFlex h="100%" justifyContent="center">
             <Box m="4">
                 <Alert status="warning" rounded="full" justifyContent="center">
                     <AlertIcon />
@@ -276,6 +276,6 @@ const PastEmptyExerciseList = () => {
             <Box alignSelf="center">
                 <GoBackToTodayEntryButton />
             </Box>
-        </HFlex>
+        </VFlex>
     );
 };

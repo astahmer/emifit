@@ -64,7 +64,7 @@ export const InspectTab = () => {
                                 <Divider my="1" />
                             </Box>
                         )}
-                        <Box as={ReactLink} to={exo.slug} py="1" px="4" d="flex" alignItems="center">
+                        <Flex as={ReactLink} to={exo.slug} py="1" px="4" alignItems="center">
                             <ExerciseListItem
                                 exo={{
                                     ...exo,
@@ -84,7 +84,7 @@ export const InspectTab = () => {
                             <Flex h="100%" alignItems="center" pr="4">
                                 <ChevronRightIcon />
                             </Flex>
-                        </Box>
+                        </Flex>
                     </Fragment>
                 ))}
             </Flex>

@@ -21,6 +21,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { ExerciseCombobox } from "./ExerciseCombobox";
 import { TagMultiSelect } from "./TagMultiSelect";
+import { VFlex } from "@/components/VFlex";
 
 const formDefaultValues: Pick<Exercise, "name" | "tags" | "series" | "note"> & { nbSeries: number } = {
     name: "",
@@ -76,14 +77,12 @@ export const CreateExerciseForm = ({
 
     return (
         <FormProvider {...form}>
-            <Box
+            <VFlex
                 id={id}
                 as="form"
                 onSubmit={form.handleSubmit(onCreate)}
                 h={shouldOverflow ? "100%" : undefined}
                 minH={shouldOverflow ? 0 : undefined}
-                d="flex"
-                flexDirection="column"
             >
                 <Stack p="8" pt="4" overflow={shouldOverflow ? "auto" : undefined} h="100%" minH={0}>
                     {renderFormTop?.()}
@@ -148,7 +147,7 @@ export const CreateExerciseForm = ({
                     <div>
                         <Button
                             mt="8"
-                            isFullWidth
+                            w="100%"
                             leftIcon={<AddIcon />}
                             colorScheme="pink"
                             variant="outline"
@@ -168,7 +167,7 @@ export const CreateExerciseForm = ({
                 <Box mb="2" flexShrink={0}>
                     {renderSubmit?.(form)}
                 </Box>
-            </Box>
+            </VFlex>
         </FormProvider>
     );
 };

@@ -1,9 +1,9 @@
+import { VFlex } from "@/components/VFlex";
 import { displayDate, printDate } from "@/functions/utils";
 import { useCategoryList, useCategoryQuery, useDailyList } from "@/orm-hooks";
 import { Category, Daily } from "@/orm-types";
 import { isDailyTodayAtom } from "@/store";
 import {
-    Box,
     Button,
     Circle,
     Popover,
@@ -122,12 +122,12 @@ export function DailyCalendarDay({
     if (!hasSomeExerciseThatDay) return <>{format(day, "d")}</>;
 
     return (
-        <Box d="flex" flexDirection="column" alignItems="center">
+        <VFlex alignItems="center">
             <Text color={!(calendarDay.isInRange || calendarDay.isSelected) ? bgColor : undefined}>
                 {format(day, "d")}
             </Text>
             <Circle size="4px" bgColor={bgColor} />
-        </Box>
+        </VFlex>
     );
 }
 

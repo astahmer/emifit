@@ -3,7 +3,7 @@ import { TextInput } from "@/fields/TextInput";
 import { requiredRule } from "@/functions/utils";
 import { useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
-import { Box, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Stack, Text } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 
 export type GlobalExerciseFormValues = Pick<Exercise, "name">;
@@ -36,15 +36,15 @@ export const GlobalExerciseForm = ({
                 error={form.formState.errors.name}
             />
             <Show when={canShowStats}>
-                <Box d="flex" alignItems="center">
+                <Flex alignItems="center">
                     <Text fontSize="2xl" fontWeight="bold">
                         {exerciseList.length}
                     </Text>
                     <Text ml="1">total occurences :</Text>
-                </Box>
+                </Flex>
                 <div>
                     <Box ml="4" opacity="0.8">
-                        <Box d="flex" alignItems="center">
+                        <Flex alignItems="center">
                             <Text fontSize="lg" mr="3">
                                 -
                             </Text>
@@ -54,8 +54,8 @@ export const GlobalExerciseForm = ({
                             <Text fontSize="xs" ml="2">
                                 from daily entries
                             </Text>
-                        </Box>
-                        <Box d="flex" alignItems="center">
+                        </Flex>
+                        <Flex alignItems="center">
                             <Text fontSize="lg" mr="3">
                                 -
                             </Text>
@@ -65,7 +65,7 @@ export const GlobalExerciseForm = ({
                             <Text fontSize="xs" ml="2">
                                 from programs
                             </Text>
-                        </Box>
+                        </Flex>
                     </Box>
                 </div>
             </Show>

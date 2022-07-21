@@ -57,11 +57,10 @@ export const CompareTab = () => {
             </ExerciseFiltersProvider>
             <Flex flexDirection="column" pt="2" overflowY="auto">
                 {exerciseList.map((exo) => (
-                    <Box
+                    <Flex
                         key={exo.id}
                         py="1"
                         px="4"
-                        d="flex"
                         onClickCapture={(e) => (e.preventDefault(), selection.toggle(exo))}
                     >
                         <Flex h="100%" alignItems="center" pr="4">
@@ -72,7 +71,7 @@ export const CompareTab = () => {
                             />
                         </Flex>
                         <ExerciseListItem exo={exo} shouldShowAllTags />
-                    </Box>
+                    </Flex>
                 ))}
             </Flex>
         </>

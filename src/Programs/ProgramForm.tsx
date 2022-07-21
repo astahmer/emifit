@@ -8,6 +8,7 @@ import { CreateExerciseStep } from "./Steps/CreateExerciseStep";
 import { EditSettingsStep } from "./Steps/EditSettingsStep";
 import { PickCategoryStep } from "./Steps/PickCategoryStep";
 import { PickExercisesStep } from "./Steps/PickExercisesStep";
+import { VFlex } from "@/components/VFlex";
 
 export function ProgramForm() {
     const interpret = useProgramInterpret();
@@ -25,8 +26,8 @@ export function ProgramForm() {
     const onSubmit = (exercise: Exercise) => send({ type: "CreateExercise", exercise });
 
     return (
-        <Box d="flex" flexDirection="column" m="auto" w="100%" h="100%" minH={0}>
-            <Box d="flex" flexDirection="column" m="auto" w="100%" maxH="100%">
+        <VFlex m="auto" w="100%" h="100%" minH={0}>
+            <VFlex m="auto" w="100%" maxH="100%">
                 <PickCategoryStep />
                 {interpret.state.matches("creating.maybeCreatingExercise.shouldCreateChoice") && (
                     <>
@@ -59,10 +60,10 @@ export function ProgramForm() {
                     <PickExercisesStep hasSelectedExercises={hasSelectedExercises} />
                 )}
                 {interpret.state.matches("creating.editSettings") && <EditSettingsStep />}
-            </Box>
+            </VFlex>
             {interpret.state.matches("creating.maybeCreatingExercise.creatingExercise") && isCategorySelected && (
                 <CreateExerciseStep {...{ hasSelectedExercises, category: catId, onSubmit }} />
             )}
-        </Box>
+        </VFlex>
     );
 }

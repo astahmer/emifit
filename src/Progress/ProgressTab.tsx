@@ -9,7 +9,7 @@ import { useCategoryList } from "@/orm-hooks";
 import { DailyWithReferences, ExerciseWithReferences } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { Box, Divider, Heading, Stack, Stat, StatGroup, StatLabel, StatNumber, Text } from "@chakra-ui/react";
+import { Box, Divider, Flex, Heading, Stack, Stat, StatGroup, StatLabel, StatNumber, Text } from "@chakra-ui/react";
 import { getSum } from "pastable";
 import { CalendarValues } from "@uselessdev/datepicker";
 import { ComponentPropsWithoutRef, useState } from "react";
@@ -19,6 +19,7 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { DateRangePresetPicker, getRangeStart } from "../Calendar/DateRangePresetPicker";
 import { CalendarValuesProvider } from "../Calendar/useCalendarValues";
 import { CenteredSpinner } from "./CenteredSpinner";
+import { VFlex } from "@/components/VFlex";
 
 export type UnitMode = "count" | "percent";
 const [UnitModeContext, useUnitMode] = createContextWithHook<UnitMode>("UnitMode");
@@ -91,8 +92,8 @@ export const ProgressTab = () => {
 
     return (
         <CalendarValuesProvider value={{ ...dates, setDates }}>
-            <Box d="flex" flexDir="column" position="sticky" top="0" bgColor="white" pb="4">
-                <Box d="flex" alignItems="center" mb="4">
+            <VFlex position="sticky" top="0" bgColor="white" pb="4">
+                <Flex alignItems="center" mb="4">
                     <Heading as="h3" fontSize="sm" whiteSpace="nowrap">
                         From {displayDate(dates.start)} to {displayDate(dates.end)}{" "}
                     </Heading>
@@ -101,9 +102,9 @@ export const ProgressTab = () => {
                         label="Use %"
                         onChange={(e) => setUnitMode((current) => (current === "percent" ? "count" : "percent"))}
                     />
-                </Box>
+                </Flex>
                 <DateRangePresetPicker />
-            </Box>
+            </VFlex>
             <UnitModeContext value={unitMode}>
                 <Box w="100%" h="300px" my="4">
                     {/* TODO circle skeleton */}

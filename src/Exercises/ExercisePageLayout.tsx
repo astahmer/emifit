@@ -1,3 +1,4 @@
+import { VFlex } from "@/components/VFlex";
 import { getRouteTypeFromPathname } from "@/Daily/DailyExercisePageLayout";
 import { Box, Heading } from "@chakra-ui/react";
 import { Outlet, useLocation } from "react-router-dom";
@@ -15,11 +16,11 @@ export function ExercisePageLayout() {
         .run();
 
     return (
-        <Box id="DailyExercisePageLayout" as="section" d="flex" flexDirection="column" h="100%" p="4" w="100%">
+        <VFlex id="DailyExercisePageLayout" as="section" h="100%" p="4" w="100%">
             <Heading as="h1">{title}</Heading>
-            <Box id="DailyExercisePageLayoutOutlet" d="flex" flexDirection="column" mt="auto" minH="0">
+            <VFlex id="DailyExercisePageLayoutOutlet" mt="auto" minH="0">
                 <Outlet />
-            </Box>
-        </Box>
+            </VFlex>
+        </VFlex>
     );
 }

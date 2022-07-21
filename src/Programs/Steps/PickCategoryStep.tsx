@@ -1,5 +1,5 @@
 import { CheckboxButton } from "@/fields/CheckboxCircle";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Flex, Heading } from "@chakra-ui/react";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { useProgramInterpret } from "../useProgramInterpret";
 import { useExerciseList } from "@/orm-hooks";
@@ -26,7 +26,7 @@ export function PickCategoryStep() {
                 <CheckboxButton isActive={isCategorySelected} aria-label="Pick a category" />
                 First, pick a category :
             </Heading>
-            <Box d="flex" w="100%" p="4">
+            <Flex w="100%" p="4">
                 <CategoryRadioPicker
                     defaultValue={category}
                     onChange={(categoryId) =>
@@ -42,7 +42,7 @@ export function PickCategoryStep() {
                             : undefined
                     }
                 />
-            </Box>
+            </Flex>
         </>
     );
 }

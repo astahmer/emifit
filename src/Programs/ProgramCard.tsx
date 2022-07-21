@@ -1,6 +1,6 @@
 import { ConfirmationButton } from "@/fields/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
-import { HFlex } from "@/components/HFlex";
+import { VFlex } from "@/components/VFlex";
 import { serializeExercise, serializeProgram } from "@/functions/snapshot";
 import { onError, successToast } from "@/functions/toasts";
 import { makeId } from "@/functions/utils";
@@ -15,6 +15,7 @@ import {
     Button,
     chakra,
     Collapse,
+    Flex,
     Icon,
     ListItem,
     Menu,
@@ -39,24 +40,24 @@ export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCard
     const programMutation = useProgramForDailyMutation();
 
     return (
-        <HFlex w="100%" bgColor="white">
-            <Box d="flex" alignItems="center">
+        <VFlex w="100%" bgColor="white">
+            <Flex alignItems="center">
                 <Box alignSelf="center" h="30px" w="1px" opacity={0.8} bgColor="pink.100" />
-                <Box d="flex" alignItems="center" w="100%" onClick={onToggle}>
-                    <HFlex justifyContent="space-around" p="4">
+                <Flex alignItems="center" w="100%" onClick={onToggle}>
+                    <VFlex justifyContent="space-around" p="4">
                         {isOpen ? <ChevronUpIcon fontSize="20px" /> : <ChevronDownIcon fontSize="20px" />}
-                    </HFlex>
-                    <HFlex alignItems="flex-start" py="4">
+                    </VFlex>
+                    <VFlex alignItems="flex-start" py="4">
                         <chakra.span color="pink.300" fontWeight="bold">
                             {program.name}
                         </chakra.span>
                         <Badge variant="subtle" colorScheme="pink" fontSize="x-small">
                             {program.category}
                         </Badge>
-                    </HFlex>
-                </Box>
+                    </VFlex>
+                </Flex>
                 {headerRight?.()}
-            </Box>
+            </Flex>
             <Collapse in={isOpen} animateOpacity>
                 <Stack p="4" pl="2" w="100%" pos="relative">
                     <ProgramCardExerciseList program={program} />
@@ -73,7 +74,7 @@ export const ProgramCard = ({ program, headerRight, defaultIsOpen }: ProgramCard
                     )}
                 </Stack>
             </Collapse>
-        </HFlex>
+        </VFlex>
     );
 };
 
@@ -165,7 +166,7 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
                         Edit program
                     </MenuItem>
                     <MenuItem
-                        icon={<Icon as={HiOutlineDuplicate} fontSize="md" d="flex" />}
+                        icon={<Icon as={HiOutlineDuplicate} fontSize="md" display="flex" />}
                         onClick={() => cloneMutation.mutate(program)}
                     >
                         Clone program
@@ -180,9 +181,9 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
                     />
                 </MenuList>
             </Menu>
-            <HFlex justifyContent="space-around" p="4" ml="auto">
+            <VFlex justifyContent="space-around" p="4" ml="auto">
                 <Icon as={DragHandleIcon} size="24px" />
-            </HFlex>
+            </VFlex>
         </>
     );
 };

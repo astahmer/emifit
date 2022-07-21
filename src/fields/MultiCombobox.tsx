@@ -184,7 +184,7 @@ function MultiComboboxBase<Item = any>({
                         </Tag>
                     </WrapItem>
                 ))}
-                <WrapItem d="flex" alignItems="center" w="100%">
+                <WrapItem display="flex" alignItems="center" w="100%">
                     <Flex {...getComboboxProps()} direction="column" w="100%">
                         <InputGroup w="100%">
                             {renderInput ? (

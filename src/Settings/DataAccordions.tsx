@@ -1,7 +1,7 @@
 import { ConfirmationButton } from "@/fields/ConfirmationButton";
 import { DotsIconButton } from "@/components/DotsIconButton";
 import { DynamicTable } from "@/components/DynamicTable";
-import { HFlex } from "@/components/HFlex";
+import { VFlex } from "@/components/VFlex";
 import { onError, toasts } from "@/functions/toasts";
 import { printDate } from "@/functions/utils";
 import { orm, StoreQueryParams } from "@/orm";
@@ -94,10 +94,10 @@ export const DataAccordions = ({
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
                                 getRowProps={(row) => ({ ...(row as any).getToggleRowExpandedProps() })}
                                 renderSubRow={({ row }) => (
-                                    <HFlex pb="4">
+                                    <VFlex pb="4">
                                         <Box>Exercise list:</Box>
                                         <ProgramCardExerciseList program={row.original as Program} />
-                                    </HFlex>
+                                    </VFlex>
                                 )}
                                 initialSortBy={[{ id: "name", desc: false }]}
                             />
@@ -124,10 +124,10 @@ export const DataAccordions = ({
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
                                 getRowProps={(row) => ({ ...(row as any).getToggleRowExpandedProps() })}
                                 renderSubRow={({ row }) => (
-                                    <HFlex pb="4">
+                                    <VFlex pb="4">
                                         <Box>Exercise list:</Box>
                                         <ProgramCardExerciseList program={row.original as Program} />
-                                    </HFlex>
+                                    </VFlex>
                                 )}
                                 initialSortBy={[{ id: "id", desc: true }]}
                             />
@@ -185,7 +185,7 @@ export const DataAccordions = ({
                     <AccordionPanel pb={4}>
                         <Box overflow="auto" maxH="600px">
                             <DynamicTable
-                                columns={categoryColumns}
+                                columns={categoryColumns as any}
                                 data={categoryList}
                                 isHeaderSticky
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}

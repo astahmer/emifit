@@ -1,11 +1,12 @@
-import { Box, Heading } from "@chakra-ui/react";
+import { VFlex } from "@/components/VFlex";
+import { Heading } from "@chakra-ui/react";
 import { ExerciseLibrary } from "../Exercises/ExerciseLibrary";
 
 export const ExerciseLibraryPage = () => {
     return (
-        <Box id="ExerciseLibraryPage" d="flex" flexDirection="column" h="100%" p="4" w="100%" pos="relative">
+        <VFlex id="ExerciseLibraryPage" h="100%" p="4" w="100%" pos="relative">
             <Heading as="h1">Exercise Library</Heading>
             <ExerciseLibrary />
-        </Box>
+        </VFlex>
     );
 };

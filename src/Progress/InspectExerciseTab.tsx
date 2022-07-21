@@ -29,6 +29,7 @@ import { ComponentPropsWithoutRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { CenteredSpinner } from "./CenteredSpinner";
+import { VFlex } from "@/components/VFlex";
 
 export const InspectExerciseTab = () => {
     const { exoSlug } = useParams();
@@ -49,14 +50,14 @@ export const InspectExerciseTab = () => {
             <Show when={Boolean(exerciseList.length)} fallback={<CenteredSpinner h="100%" />}>
                 <Box h="100%" minH={0} overflowX="hidden" overflowY="auto">
                     <CalendarValuesProvider value={{ ...dates, setDates }}>
-                        <Box d="flex" flexDir="column" bgColor="white" pb="4" px="4">
-                            <Box d="flex" alignItems="center" mb="4">
+                        <VFlex bgColor="white" pb="4" px="4">
+                            <Flex alignItems="center" mb="4">
                                 <Heading as="h3" fontSize="sm" whiteSpace="nowrap">
                                     From {displayDate(dates.start)} to {displayDate(dates.end)}{" "}
                                 </Heading>
-                            </Box>
+                            </Flex>
                             <DateRangePresetPicker rangePresets={baseRangePresets.slice(1)} />
-                        </Box>
+                        </VFlex>
                     </CalendarValuesProvider>
                     <Divider my="2" />
                     <ExerciseTopSetsTable exerciseList={exerciseList} />

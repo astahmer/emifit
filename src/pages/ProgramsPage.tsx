@@ -8,7 +8,7 @@ import { useProgramQuery } from "@/orm-hooks";
 import { ProgramInterpretProvider } from "@/Programs/useProgramInterpret";
 import { routeMap } from "@/routes";
 import { browserHistory, debugModeAtom } from "@/store";
-import { Box, Heading, Tag } from "@chakra-ui/react";
+import { Box, Flex, Heading, Tag } from "@chakra-ui/react";
 import { useMachine } from "@xstate/react";
 import confetti from "canvas-confetti";
 import { useAtomValue } from "jotai";
@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { InitialState } from "../Programs/InitialState";
 import { ProgramForm } from "../Programs/ProgramForm";
 import { programFormMachine } from "../Programs/programFormMachine";
+import { VFlex } from "@/components/VFlex";
 
 export const ProgramsPage = () => {
     const navigate = useNavigate();
@@ -106,8 +107,8 @@ export const ProgramsPage = () => {
 
     return (
         <ProgramInterpretProvider value={interpret}>
-            <Box id="ProgramsPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
-                <Box d="flex" alignItems="center">
+            <VFlex id="ProgramsPage" h="100%" p="4" w="100%">
+                <Flex alignItems="center">
                     <Heading as="h1">Programs</Heading>
                     {state.matches("initial") && (
                         <SortByIconButton
@@ -117,14 +118,14 @@ export const ProgramsPage = () => {
                             onSortByDirectionChange={setSortByDirection}
                         />
                     )}
-                </Box>
+                </Flex>
                 {query.isFetched && (
                     <>
                         {state.matches("initial") && <InitialState sortByDirection={sortByDirection} />}
                         {state.matches("creating") && <ProgramForm />}
                     </>
                 )}
-            </Box>
+            </VFlex>
             {debugMode && (
                 <Box position="fixed" top="10px" w="100%" textAlign="center">
                     <Tag wordBreak="break-all">{printStatesPathValue(state)}</Tag>

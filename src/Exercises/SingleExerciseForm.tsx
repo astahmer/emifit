@@ -40,7 +40,7 @@ export function SingleExerciseForm({
                             <Box py="4">
                                 <Button
                                     mt="4"
-                                    isFullWidth
+                                    w="100%"
                                     leftIcon={<CheckIcon />}
                                     colorScheme="pink"
                                     variant="solid"

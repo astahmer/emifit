@@ -94,7 +94,7 @@ export function Carousel<T = any>({
                 parentRef.current = ref;
                 initialPosRef.current = ref.getBoundingClientRect();
             }}
-            d="flex"
+            display="flex"
             drag="x"
             style={{ x }}
             animate={controls}
@@ -189,7 +189,7 @@ interface CarouselConfig {
 const DebugCarousel = () => {
     return (
         <>
-            <Box d="flex" w="100%">
+            <Box display="flex" w="100%">
                 <Box w="100%" h="2px" border="1px solid black" />
                 <Box pos="absolute" left="50%" translateX="-50%" flexShrink={0} h="100px" border="1px solid red" />
                 <Box w="100%" h="2px" border="1px solid black" />

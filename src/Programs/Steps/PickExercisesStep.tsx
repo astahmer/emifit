@@ -55,7 +55,7 @@ export function PickExercisesStep({ hasSelectedExercises }: { hasSelectedExercis
             {interpret.state.matches("creating.selectingExercises.hasSelection") && (
                 <Button
                     mt="4"
-                    isFullWidth
+                    w="100%"
                     leftIcon={<ArrowForwardIcon />}
                     colorScheme="pink"
                     variant="solid"

@@ -39,7 +39,7 @@ export function CreateExerciseStep({
                                 <Divider />
                                 <Button
                                     mt="4"
-                                    isFullWidth
+                                    w="100%"
                                     leftIcon={<CheckIcon />}
                                     colorScheme="pink"
                                     variant="solid"

@@ -1,4 +1,5 @@
 import { CalendarButton } from "@/Calendar/CalendarButton";
+import { VFlex } from "@/components/VFlex";
 import { DailyEntry } from "@/Daily/DailyEntry";
 import { currentDateAtom } from "@/store";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
@@ -37,7 +38,7 @@ const Header = () => {
                 icon={<ChevronLeftIcon fontSize="32px" />}
                 onClick={() => setDate((current) => addDays(current, -1))}
             />
-            <Box d="flex-column" pos="relative">
+            <VFlex pos="relative">
                 <Box
                     pos="absolute"
                     bottom="100%"
@@ -51,7 +52,7 @@ const Header = () => {
                     {format(currentDate, "EEEE")}
                 </Box>
                 <CalendarButton selectedDate={currentDate} onChange={setDate} />
-            </Box>
+            </VFlex>
             <IconButton
                 variant="unstyled"
                 aria-label="Next day"

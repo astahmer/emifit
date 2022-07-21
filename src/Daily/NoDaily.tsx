@@ -1,4 +1,4 @@
-import { HFlex } from "@/components/HFlex";
+import { VFlex } from "@/components/VFlex";
 import { CategoryRadioPicker } from "@/Exercises/CategoryRadioPicker";
 import { orm } from "@/orm";
 import { currentDailyIdAtom, isDailyTodayAtom } from "@/store";
@@ -14,9 +14,9 @@ export const NoDaily = () => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
 
     return (
-        <HFlex h="100%" justifyContent="center">
+        <VFlex h="100%" justifyContent="center">
             {isDailyToday ? <EmptyTodayDaily /> : <EmptyPastDay />}
-        </HFlex>
+        </VFlex>
     );
 };
 const EmptyTodayDaily = () => {

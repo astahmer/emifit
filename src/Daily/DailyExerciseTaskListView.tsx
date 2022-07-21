@@ -84,13 +84,13 @@ const DailyExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) =
                                 </Box>
                             )}
                             <Box px="4" pt="2">
-                                <Box d="flex" alignItems="flex-end">
+                                <Flex alignItems="flex-end">
                                     <Heading as="h3" size={"sm"} opacity={"0.5"} color="pink.500">
                                         Superset {supersetIndex}
                                     </Heading>
 
                                     {isDailyToday && <SupersetExerciseMenu exerciseList={exoOrSuperset} />}
-                                </Box>
+                                </Flex>
                                 <ExerciseGrid exerciseList={exoOrSuperset} />
                             </Box>
                         </Fragment>

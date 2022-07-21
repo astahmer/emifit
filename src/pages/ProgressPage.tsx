@@ -10,7 +10,7 @@ export const ProgressPage = () => {
         <Tabs
             variant="soft-rounded"
             id="ProgressPage"
-            d="flex"
+            display="flex"
             flexDirection="column"
             maxH="100%"
             w="100%"

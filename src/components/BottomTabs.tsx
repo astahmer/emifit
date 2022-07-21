@@ -7,7 +7,7 @@ import { GiProgression } from "react-icons/gi";
 import { AiFillHome } from "react-icons/ai";
 import { FiSettings } from "react-icons/fi";
 import { Link as ReactLink, useLocation } from "react-router-dom";
-import { HFlex } from "./HFlex";
+import { VFlex } from "./VFlex";
 import { useDailyQuery } from "@/orm-hooks";
 import { printDailyDate } from "@/orm-utils";
 import { printDate } from "@/functions/utils";
@@ -36,20 +36,20 @@ export const BottomTabs = () => {
             >
                 <TabList>
                     <Tab as={ReactLink} to="/" w="100%" h="58px">
-                        <HFlex alignItems="center">
+                        <VFlex alignItems="center">
                             <Icon as={AiFillHome} />
                             <chakra.span fontSize="xs">Home</chakra.span>
-                        </HFlex>
+                        </VFlex>
                     </Tab>
                     <Tab as={ReactLink} to="/progress" w="100%" h="58px">
-                        <HFlex alignItems="center">
+                        <VFlex alignItems="center">
                             <Icon as={GiProgression} fontSize="sm" />
                             <chakra.span fontSize="xs">Progress</chakra.span>
-                        </HFlex>
+                        </VFlex>
                     </Tab>
                     <Tab as={ReactLink} to={addExerciseLink} w="100%" h="58px">
                         {location.pathname === addExerciseLink ? (
-                            <HFlex alignItems="center">
+                            <VFlex alignItems="center">
                                 <CheckCircleIcon
                                     color="pink.400"
                                     fontSize="30px"
@@ -58,25 +58,25 @@ export const BottomTabs = () => {
                                     )}
                                 />
                                 {/* <chakra.span fontSize="xs">Create exercise</chakra.span> */}
-                            </HFlex>
+                            </VFlex>
                         ) : (
-                            <HFlex alignItems="center">
+                            <VFlex alignItems="center">
                                 <Icon as={IoIosAddCircle} color={"pink.400"} fontSize="38px" />
                                 {/* <chakra.span fontSize="xs">Add exercise</chakra.span> */}
-                            </HFlex>
+                            </VFlex>
                         )}
                     </Tab>
                     <Tab as={ReactLink} to="/programs" w="100%" h="58px">
-                        <HFlex alignItems="center">
+                        <VFlex alignItems="center">
                             <Icon as={IoListSharp} fontSize="lg" />
                             <chakra.span fontSize="xs">Programs</chakra.span>
-                        </HFlex>
+                        </VFlex>
                     </Tab>
                     <Tab as={ReactLink} to="/settings" w="100%" h="58px">
-                        <HFlex alignItems="center">
+                        <VFlex alignItems="center">
                             <Icon as={FiSettings} />
                             <chakra.span fontSize="xs">Settings</chakra.span>
-                        </HFlex>
+                        </VFlex>
                     </Tab>
                 </TabList>
             </Tabs>

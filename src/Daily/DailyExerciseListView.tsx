@@ -1,4 +1,4 @@
-import { HFlex } from "@/components/HFlex";
+import { VFlex } from "@/components/VFlex";
 import { ReorderItemBox } from "@/components/ReorderItemBox";
 import { ExerciseListItem } from "@/Exercises/ExerciseListItem";
 import { orm } from "@/orm";
@@ -92,9 +92,9 @@ const ReorderExerciseItem = ({
         >
             <Flex bg="white">
                 <ExerciseListItem exo={exercise} withSetListOverview />
-                <HFlex justifyContent="space-around" p="4" ml="auto">
+                <VFlex justifyContent="space-around" p="4" ml="auto">
                     <Icon as={DragHandleIcon} size="24px" />
-                </HFlex>
+                </VFlex>
             </Flex>
         </ReorderItemBox>
     );

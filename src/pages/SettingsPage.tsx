@@ -1,3 +1,4 @@
+import { VFlex } from "@/components/VFlex";
 import { SwitchInput } from "@/fields/SwitchInput";
 import { useCategoryList, useDailyList, useExerciseList, useGroupList, useProgramList, useTagList } from "@/orm-hooks";
 import { DataAccordions } from "@/Settings/DataAccordions";
@@ -10,7 +11,7 @@ export const SettingsPage = () => {
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
 
     return (
-        <Box id="SettingsPage" d="flex" flexDirection="column" h="100%" p="4" w="100%">
+        <VFlex id="SettingsPage" h="100%" p="4" w="100%">
             <Flex>
                 <Heading as="h1">Settings</Heading>
                 <chakra.span ml="auto">
@@ -23,7 +24,7 @@ export const SettingsPage = () => {
                 <Box mt="auto">
                     <Stack spacing="4" mt="8" pt="8">
                         <ExportImportData />
-                        <Box d="flex">
+                        <Flex>
                             <SwitchInput
                                 ml="auto"
                                 id="debugModeSwitch"
@@ -31,7 +32,7 @@ export const SettingsPage = () => {
                                 onChange={(e) => setDebugMode(e.target.checked)}
                                 isChecked={debugMode}
                             />
-                        </Box>
+                        </Flex>
                     </Stack>
                 </Box>
                 {debugMode && (
@@ -40,7 +41,7 @@ export const SettingsPage = () => {
                     </Box>
                 )}
             </Flex>
-        </Box>
+        </VFlex>
     );
 };
 

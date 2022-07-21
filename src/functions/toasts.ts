@@ -2,7 +2,7 @@ import { ToastId, UseToastOptions, createStandaloneToast } from "@chakra-ui/reac
 import { getRandomString } from "pastable";
 
 // Toasts
-const toast = createStandaloneToast();
+export const { ToastContainer, toast } = createStandaloneToast();
 const baseToastConfig: UseToastOptions & UniqueToastOptions = {
     duration: 1500,
     isClosable: true,
@@ -12,12 +12,13 @@ const baseToastConfig: UseToastOptions & UniqueToastOptions = {
 };
 
 type ToastStatus = Exclude<UseToastOptions["status"], undefined> | "default";
-export const toastConfigs: Record<ToastStatus, UseToastOptions> = {
+const toastConfigs: Record<ToastStatus, UseToastOptions> = {
     default: { ...baseToastConfig },
     success: { ...baseToastConfig, status: "success" },
     error: { ...baseToastConfig, status: "error" },
     info: { ...baseToastConfig, status: "info" },
     warning: { ...baseToastConfig, status: "warning" },
+    loading: { ...baseToastConfig, status: "loading" },
 };
 
 const toastMap = new Map<ToastId, ToastOptions>();

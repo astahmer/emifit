@@ -1,5 +1,5 @@
 import { FloatingButton } from "@/components/FloatingButton";
-import { HFlex } from "@/components/HFlex";
+import { VFlex } from "@/components/VFlex";
 import { MultiSelect } from "@/fields/MultiSelect";
 import { SortByDirection } from "@/components/SortByIconButton";
 import { useCategoryList, useProgramList } from "@/orm-hooks";
@@ -57,12 +57,12 @@ export function InitialState({ sortByDirection }: { sortByDirection: SortByDirec
             )}
             {Boolean(filteredProgramList.length) ? (
                 <>
-                    <HFlex h="100%" overflow="auto">
+                    <VFlex h="100%" overflow="auto">
                         <ProgramList
                             programList={filteredProgramList}
                             onEdit={(program) => send({ type: "StartEditingProgram", program })}
                         />
-                    </HFlex>
+                    </VFlex>
                     <Box mt="auto">
                         <Button
                             w="100%"
@@ -104,7 +104,7 @@ export function InitialState({ sortByDirection }: { sortByDirection: SortByDirec
                     />
                 </>
             ) : (
-                <Box d="flex" flexDirection="column" m="auto" mt="auto" alignItems="center">
+                <VFlex m="auto" mt="auto" alignItems="center">
                     <EmptyProgramList />
                     <Button
                         leftIcon={<AddIcon />}
@@ -117,7 +117,7 @@ export function InitialState({ sortByDirection }: { sortByDirection: SortByDirec
                     >
                         Create program
                     </Button>
-                </Box>
+                </VFlex>
             )}
         </>
     );

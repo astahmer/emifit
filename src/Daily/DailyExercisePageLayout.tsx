@@ -1,3 +1,4 @@
+import { VFlex } from "@/components/VFlex";
 import { DailyExerciseTaskListSkeleton } from "@/Daily/DailyExerciseTaskListSkeleton";
 import { useCurrentDailyQuery } from "@/orm-hooks";
 import { currentDailyIdAtom, showSkeletonsAtom } from "@/store";
@@ -27,17 +28,17 @@ export function DailyExercisePageLayout() {
     }
 
     return (
-        <Box id="DailyExercisePageLayout" as="section" d="flex" flexDirection="column" h="100%" p="4" w="100%">
+        <VFlex id="DailyExercisePageLayout" as="section" h="100%" p="4" w="100%">
             <Heading as="h1">{title} </Heading>
             <Heading as="h2" size="md">
                 Daily {dailyId} - {daily?.category}
             </Heading>
             {daily && (
-                <Box id="DailyExercisePageLayoutOutlet" d="flex" flexDirection="column" mt="auto" minH="0">
+                <VFlex id="DailyExercisePageLayoutOutlet" mt="auto" minH="0">
                     <Outlet />
-                </Box>
+                </VFlex>
             )}
-        </Box>
+        </VFlex>
     );
 }
 

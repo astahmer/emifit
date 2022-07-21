@@ -6,6 +6,7 @@ import {
     Button,
     ButtonGroup,
     Divider,
+    Flex,
     FormControl,
     FormLabel,
     IconButton,
@@ -55,7 +56,7 @@ export function EditSettingsStep() {
                                     />
                                 </WrapItem>
                             ))}
-                            <WrapItem d="flex" alignItems="center">
+                            <WrapItem display="flex" alignItems="center">
                                 <AddTag onClick={() => send({ type: "StartEditingExerciseList" })} />
                             </WrapItem>
                         </Wrap>
@@ -104,7 +105,7 @@ export function EditSettingsStep() {
                     />
                     <Button
                         mt="4"
-                        isFullWidth
+                        w="100%"
                         leftIcon={<CheckIcon />}
                         colorScheme="pink"
                         variant="solid"
@@ -116,13 +117,13 @@ export function EditSettingsStep() {
                     {isEditingProgram && (
                         <>
                             <Divider my="4" />
-                            <Box d="flex" justifyContent="center">
+                            <Flex justifyContent="center">
                                 <ReactLink to="/programs" state={{}} replace>
                                     <RadioCardButton as="div" onClick={() => send("Reset")}>
                                         Cancel & go back to program list
                                     </RadioCardButton>
                                 </ReactLink>
-                            </Box>
+                            </Flex>
                         </>
                     )}
                 </Box>
