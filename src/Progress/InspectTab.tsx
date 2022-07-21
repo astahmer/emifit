@@ -70,14 +70,14 @@ export const InspectTab = () => {
                                     ...exo,
                                     // hijacking the name prop (which should only be a string) to customize the render
                                     // @ts-ignore
-                                    name: (
+                                    name: groupedByNames[exo.name] ? (
                                         <Flex alignItems="center">
                                             <Text fontSize="md">{exo.name}</Text>
                                             <Text ml="1" fontSize="xs">
                                                 ({groupedByNames[exo.name].length})
                                             </Text>
                                         </Flex>
-                                    ),
+                                    ) : null,
                                 }}
                                 shouldShowAllTags
                             />

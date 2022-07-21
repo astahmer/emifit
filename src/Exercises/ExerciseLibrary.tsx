@@ -65,7 +65,7 @@ export const ExerciseLibrary = () => {
                             key={exo.id}
                             exercise={exo}
                             index={index}
-                            exerciseList={groupedByNames[exo.name]}
+                            exerciseList={groupedByNames[exo.name] || []}
                         />
                     ))}
                 </Accordion>
