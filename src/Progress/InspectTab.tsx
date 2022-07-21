@@ -8,7 +8,7 @@ import { Exercise } from "@/orm-types";
 import { getMostRecentsExerciseById } from "@/orm-utils";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Box, Divider, Flex, Text } from "@chakra-ui/react";
-import { sortBy } from "@pastable/core";
+import { sortBy } from "pastable";
 import { useInterpret, useSelector } from "@xstate/react";
 import { Fragment, useEffect } from "react";
 import { Link as ReactLink } from "react-router-dom";

@@ -4,7 +4,7 @@ import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Badge, Stack, Text } from "@chakra-ui/react";
-import { findBy } from "@pastable/core";
+import { findBy } from "pastable";
 import { Link as ReactLink } from "react-router-dom";
 import { Row } from "react-table";
 

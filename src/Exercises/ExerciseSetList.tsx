@@ -1,7 +1,7 @@
 import { Show } from "@/components/Show";
 import { Serie } from "@/orm-types";
 import { OrderedList, ListProps, ListItem, Text, TextProps } from "@chakra-ui/react";
-import { getSum } from "@pastable/core";
+import { getSum } from "pastable";
 
 export const ExerciseSetList = ({ setList, ...props }: { setList: Serie[] } & ListProps) => {
     return (

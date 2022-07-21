@@ -1,4 +1,4 @@
-import { ObjectLiteral } from "@pastable/core";
+import { ObjectLiteral } from "pastable";
 import { State, AnyState } from "xstate";
 
 export const getStatesPathValue = (state: AnyState) => {

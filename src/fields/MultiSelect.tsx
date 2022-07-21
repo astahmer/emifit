@@ -12,7 +12,7 @@ import {
     Text,
     useMergeRefs,
 } from "@chakra-ui/react";
-import { isDefined, ObjectLiteral } from "@pastable/core";
+import { isDefined, ObjectLiteral } from "pastable";
 import { useSelect, UseSelectProps, UseSelectReturnValue } from "downshift";
 import { ForwardedRef, forwardRef, ReactNode, useCallback, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";

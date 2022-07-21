@@ -1,4 +1,4 @@
-import { AnyFunction } from "@pastable/core";
+import { AnyFunction } from "pastable";
 
 /** Returns a callback that will return true if all functions passed with the same arguments returns true */
 export const needsAll =

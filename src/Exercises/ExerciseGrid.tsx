@@ -4,7 +4,7 @@ import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { Exercise, WithExerciseList } from "@/orm-types";
 import { useCompactContext } from "@/store";
 import { Box, Divider, Flex, Grid, Heading, Stack } from "@chakra-ui/react";
-import { chunk, WithChildren } from "@pastable/core";
+import { chunk, WithChildren } from "pastable";
 import { Fragment } from "react";
 import { ExerciseSetList, ExerciseSetListOverview } from "./ExerciseSetList";
 

@@ -10,7 +10,7 @@ import { Exercise, Tag } from "@/orm-types";
 import { getMostRecentsExerciseById } from "@/orm-utils";
 import { SearchIcon } from "@chakra-ui/icons";
 import { Accordion, Box, ButtonGroup, Divider, Flex, IconButton, Portal, Stack, Text } from "@chakra-ui/react";
-import { sortBy } from "@pastable/core";
+import { sortBy } from "pastable";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect, useRef } from "react";
 import { ExerciseFiltersMachine, ExerciseFiltersProvider, useExerciseFilters } from "./ExerciseFiltersMachine";

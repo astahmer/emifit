@@ -8,7 +8,7 @@ import { useCategoryList, useCategoryQuery, useExerciseUnsortedList } from "@/or
 import { Exercise } from "@/orm-types";
 import { getMostRecentsExerciseById } from "@/orm-utils";
 import { Box, Flex } from "@chakra-ui/react";
-import { sortBy, useSelection } from "@pastable/core";
+import { sortBy, useSelection } from "pastable";
 import { useInterpret, useSelector } from "@xstate/react";
 import { useEffect } from "react";
 

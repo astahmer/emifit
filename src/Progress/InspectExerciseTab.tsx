@@ -23,7 +23,7 @@ import {
     Tag,
     Text,
 } from "@chakra-ui/react";
-import { getSum, roundTo, sortBy } from "@pastable/core";
+import { getSum, roundTo, sortBy } from "pastable";
 import { CalendarValues } from "@uselessdev/datepicker";
 import { ComponentPropsWithoutRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";

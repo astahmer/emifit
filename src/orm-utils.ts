@@ -1,4 +1,4 @@
-import { sortBy } from "@pastable/core";
+import { sortBy } from "pastable";
 import { CalendarDate } from "@uselessdev/datepicker";
 import { groupBy } from "./functions/groupBy";
 import { makeId, parseDate, printDate } from "./functions/utils";

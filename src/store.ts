@@ -1,4 +1,4 @@
-import { SetState } from "@pastable/core";
+import { SetState } from "pastable";
 import { CalendarDate } from "@uselessdev/datepicker";
 import { isToday } from "date-fns";
 import { createBrowserHistory } from "history";

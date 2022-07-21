@@ -6,7 +6,6 @@ specifiers:
   '@chakra-ui/react': ^1.8.8
   '@emotion/react': ^11.9.3
   '@emotion/styled': ^11.9.3
-  '@pastable/core': ^0.1.19
   '@rollup/plugin-replace': ^4.0.0
   '@types/canvas-confetti': ^1.4.2
   '@types/react': ^17.0.47
@@ -30,6 +29,7 @@ specifiers:
   idb-keyval: ^6.2.0
   jotai: ^1.7.2
   nanoid: ^3.3.4
+  pastable: ^2.0.10
   prettier: ^2.7.1
   prettier-plugin-sorted: ^2.0.0
   react: ^17.0.2
@@ -66,7 +66,6 @@ dependencies:
   '@chakra-ui/react': 1.8.8_lk7gby2pivbvjf2ttcjmllmfqy
   '@emotion/react': 11.9.3_7xvhny4l7yi42slhiqkpgmpofm
   '@emotion/styled': 11.9.3_i64ertekxmxppn657xiekwuutq
-  '@pastable/core': 0.1.19_x6decagdfvsmexnecnpsspjiuu
   '@uselessdev/datepicker': 2.5.1_nqukqlzpcrtivirlhxgprfpzhi
   '@xstate/react': 2.0.1_qoz6orvt26se6gmwe4ax5kvcum
   browser-fs-access: 0.25.3
@@ -81,6 +80,7 @@ dependencies:
   idb-keyval: 6.2.0
   jotai: 1.7.3_p7pxrswgihturvz7fdvuzu3z7u
   nanoid: 3.3.4
+  pastable: 2.0.10_react@17.0.2+xstate@4.32.1
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-error-boundary: 3.1.4_react@17.0.2
@@ -2369,70 +2369,6 @@ packages:
       fastq: 1.13.0
     dev: true
 
-  /@pastable/core/0.1.19_x6decagdfvsmexnecnpsspjiuu:
-    resolution: {integrity: sha512-cdptU4uFwr/1AJRc46xV/MvlKG4N1xuA8GZXt77J1kx/juHN1gUFrF7z0ZEtiWb/JpL/OdiSUhQwXJ1PpGVBFg==}
-    engines: {node: '>=14.x'}
-    peerDependencies:
-      jotai: '*'
-      react: '>=17'
-    peerDependenciesMeta:
-      jotai:
-        optional: true
-      react:
-        optional: true
-    dependencies:
-      '@pastable/react': 0.1.15_mcfqj6vjpxetfosb576w2eirly
-      '@pastable/typings': 0.0.8
-      '@pastable/utils': 0.1.15
-      jotai: 1.7.3_p7pxrswgihturvz7fdvuzu3z7u
-      react: 17.0.2
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@babel/template'
-      - '@urql/core'
-      - immer
-      - optics-ts
-      - react-query
-      - valtio
-      - wonka
-      - xstate
-    dev: false
-
-  /@pastable/react/0.1.15_mcfqj6vjpxetfosb576w2eirly:
-    resolution: {integrity: sha512-z8TJ+oDquGYnqH/EqgFgCu8RIdlMOuvcwtrwru274b2ewrxpWVo+K0UKeAnUTnmbPnIl4cKzXqp/bPswDjs/mQ==}
-    engines: {node: '>=14.x'}
-    peerDependenciesMeta:
-      jotai:
-        optional: true
-    dependencies:
-      '@pastable/typings': 0.0.8
-      '@pastable/utils': 0.1.15
-      jotai: 1.7.3_p7pxrswgihturvz7fdvuzu3z7u
-      react: 17.0.2
-    transitivePeerDependencies:
-      - '@babel/core'
-      - '@babel/template'
-      - '@urql/core'
-      - immer
-      - optics-ts
-      - react-query
-      - valtio
-      - wonka
-      - xstate
-    dev: false
-
-  /@pastable/typings/0.0.8:
-    resolution: {integrity: sha512-GSqDTkiU1EWTgausgl3M6ZS2DsHajYOVwNvI2rRL0qPXrT9cmhvi2TVSe8BjQArV+sQER/88He72Nsg1dq30ng==}
-    engines: {node: '>=14.x'}
-    dev: false
-
-  /@pastable/utils/0.1.15:
-    resolution: {integrity: sha512-ETHR3YTHHTxpSQ2kkm8Ld76Wm4SS0NQsT/ozJX61IC8NMxKg6ynC7bDhNqNpBNq63WgbWq99ytByoQhsR0lLRQ==}
-    engines: {node: '>=14.x'}
-    dependencies:
-      '@pastable/typings': 0.0.8
-    dev: false
-
   /@popperjs/core/2.11.5:
     resolution: {integrity: sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==}
     dev: false
@@ -4368,6 +4304,22 @@ packages:
       lines-and-columns: 1.2.4
     dev: false
 
+  /pastable/2.0.10_react@17.0.2+xstate@4.32.1:
+    resolution: {integrity: sha512-oaieZ/HYcGoMoImA7hlnEt1dx5tH2zT4NSgSdYRrNnnKh2CCs0gX8IXeTYWkwMDsFIlF31RrLetZpYsssurE7w==}
+    engines: {node: '>=14.x'}
+    peerDependencies:
+      react: '>=17'
+      xstate: '>=4.32.1'
+    dependencies:
+      '@babel/core': 7.18.6
+      react: 17.0.2
+      ts-toolbelt: 9.6.0
+      type-fest: 2.17.0
+      xstate: 4.32.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /path-is-absolute/1.0.1:
     resolution: {integrity: sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==}
     engines: {node: '>=0.10.0'}
@@ -5231,7 +5183,6 @@ packages:
 
   /ts-toolbelt/9.6.0:
     resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
-    dev: true
 
   /tsconfig-resolver/2.2.0:
     resolution: {integrity: sha512-Imw1t5hpIOGeAhtDPuSldXZkoTCc1w4D3ldGVWNecJ62ABDnp6zgqGSzUhPc9o3mO/XHm8DN+eaHBmNmp6gBDQ==}
@@ -5277,6 +5228,11 @@ packages:
     resolution: {integrity: sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==}
     engines: {node: '>=10'}
     dev: true
+
+  /type-fest/2.17.0:
+    resolution: {integrity: sha512-U+g3/JVXnOki1kLSc+xZGPRll3Ah9u2VIG6Sn9iH9YX6UkPERmt6O/0fIyTgsd2/whV0+gAaHAg8fz6sG1QzMA==}
+    engines: {node: '>=12.20'}
+    dev: false
 
   /typescript/3.9.10:
     resolution: {integrity: sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==}

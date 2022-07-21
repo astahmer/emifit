@@ -1,5 +1,5 @@
 import { ToastId, UseToastOptions, createStandaloneToast } from "@chakra-ui/react";
-import { getRandomString } from "@pastable/core";
+import { getRandomString } from "pastable";
 
 // Toasts
 const toast = createStandaloneToast();

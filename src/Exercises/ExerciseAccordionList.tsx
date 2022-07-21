@@ -17,7 +17,7 @@ import {
     useCheckboxGroup,
     UseCheckboxGroupReturn,
 } from "@chakra-ui/react";
-import { sortArrayOfObjectByPropFromArray } from "@pastable/core";
+import { sortArrayOfObjectByPropFromArray } from "pastable";
 import { useSelector } from "@xstate/react";
 import { CheckboxSquare } from "../fields/CheckboxCircle";
 import { ExerciseTagList } from "./ExerciseTag";

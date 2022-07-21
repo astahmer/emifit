@@ -2,7 +2,7 @@ import { useCalendarValues } from "@/Calendar/useCalendarValues";
 import { createContextWithHook } from "@/functions/createContextWithHook";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Tag, TagLabel, TagLeftIcon, Wrap, WrapItem } from "@chakra-ui/react";
-import { getClosestNbIn } from "@pastable/core";
+import { getClosestNbIn } from "pastable";
 import { CalendarValues } from "@uselessdev/datepicker";
 import { subMonths, subWeeks, subYears, closestIndexTo, differenceInDays } from "date-fns";
 import { useRef, useState } from "react";

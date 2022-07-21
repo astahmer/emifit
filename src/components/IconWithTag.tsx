@@ -1,5 +1,5 @@
 import { chakra, ChakraProps } from "@chakra-ui/react";
-import { WithChildren } from "@pastable/core";
+import { WithChildren } from "pastable";
 import { ReactNode } from "react";
 
 const defaultTagProps: ChakraProps = {

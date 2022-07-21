@@ -1,6 +1,6 @@
 import { getStatesPathValue } from "@/functions/xstate-utils";
 import { Exercise, Program } from "@/orm-types";
-import { omit } from "@pastable/core";
+import { omit } from "pastable";
 import { assign, createMachine } from "xstate";
 
 interface ProgramCtx {

@@ -10,7 +10,7 @@ import { DailyWithReferences, ExerciseWithReferences } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Box, Divider, Heading, Stack, Stat, StatGroup, StatLabel, StatNumber, Text } from "@chakra-ui/react";
-import { getSum } from "@pastable/core";
+import { getSum } from "pastable";
 import { CalendarValues } from "@uselessdev/datepicker";
 import { ComponentPropsWithoutRef, useState } from "react";
 import { useQuery } from "react-query";

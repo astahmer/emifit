@@ -8,7 +8,7 @@ import { orm } from "@/orm";
 import { useCategoryList, useGroupList } from "@/orm-hooks";
 import { Category, Tag } from "@/orm-types";
 import { Box, FormLabel, Stack, Tag as ChakraTag, Text } from "@chakra-ui/react";
-import { getDiff } from "@pastable/core";
+import { getDiff } from "pastable";
 import { useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";

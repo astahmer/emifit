@@ -3,7 +3,7 @@ import { useCurrentDailyQuery } from "@/orm-hooks";
 import { getRouteTypeFromPathname } from "@/Daily/DailyExercisePageLayout";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Box, Button, Divider, Heading, Stack } from "@chakra-ui/react";
-import { makeArrayOf } from "@pastable/core";
+import { makeArrayOf } from "pastable";
 import { useSelector } from "@xstate/react";
 import { ComponentProps, Fragment } from "react";
 import { match } from "ts-pattern";

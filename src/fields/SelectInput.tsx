@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Select, SelectProps, forwardRef, FormErrorMessage } from "@chakra-ui/react";
 
 import { TextInputProps } from "@/fields/TextInput";
-import { WithChildren } from "@pastable/core";
+import { WithChildren } from "pastable";
 
 export const SelectInput = forwardRef(
     (

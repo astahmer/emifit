@@ -1,4 +1,4 @@
-import { ObjectLiteral } from "@pastable/core";
+import { ObjectLiteral } from "pastable";
 
 export function groupBy<Key extends keyof T, T extends ObjectLiteral>(
     array: T[],

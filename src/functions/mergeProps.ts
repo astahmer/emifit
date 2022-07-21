@@ -1,4 +1,4 @@
-import { callAll, ObjectLiteral } from "@pastable/core";
+import { callAll, ObjectLiteral } from "pastable";
 
 export const mergeProps = <Left extends ObjectLiteral, Right extends Partial<Left & {}>>(left: Left, right: Right) => {
     const result = { ...left, ...right };

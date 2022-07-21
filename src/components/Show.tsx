@@ -1,4 +1,4 @@
-import { WithChildren } from "@pastable/core";
+import { WithChildren } from "pastable";
 import { ReactElement, ReactNode } from "react";
 
 export function Show({

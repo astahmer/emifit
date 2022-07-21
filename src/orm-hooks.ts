@@ -1,4 +1,4 @@
-import { sortArrayOfObjectByPropFromArray } from "@pastable/core";
+import { sortArrayOfObjectByPropFromArray } from "pastable";
 import { useAtomValue } from "jotai";
 import { useQuery, useQueryClient } from "react-query";
 import { groupIn } from "./functions/groupBy";

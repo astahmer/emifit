@@ -1,6 +1,6 @@
 import { isSwipingCarouselRef } from "@/store";
 import { Box, BoxProps, ChakraComponent } from "@chakra-ui/react";
-import { getClosestNbIn } from "@pastable/core";
+import { getClosestNbIn } from "pastable";
 import { ForwardRefComponent, HTMLMotionProps, motion, PanInfo, useAnimation, useMotionValue } from "framer-motion";
 import { ReactNode, useLayoutEffect, useRef, useState } from "react";
 

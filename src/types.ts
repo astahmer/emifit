@@ -1,4 +1,4 @@
-import { SetState } from "@pastable/core";
+import { SetState } from "pastable";
 import tb from "ts-toolbelt";
 
 export interface WithOnChange<Value = any> {

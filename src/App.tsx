@@ -1,5 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react";
-import { WithChildren } from "@pastable/core";
+import { WithChildren } from "pastable";
 import { Provider } from "jotai";
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";

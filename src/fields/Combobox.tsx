@@ -11,7 +11,7 @@ import {
     ListItem,
     useMergeRefs,
 } from "@chakra-ui/react";
-import { callAll } from "@pastable/core";
+import { callAll } from "pastable";
 import { useCombobox, UseComboboxProps, UseComboboxReturnValue } from "downshift";
 import { ForwardedRef, forwardRef, ReactNode, Ref, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";

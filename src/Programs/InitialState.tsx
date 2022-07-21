@@ -7,7 +7,7 @@ import { Category, Program } from "@/orm-types";
 import { useProgramInterpret } from "@/Programs/useProgramInterpret";
 import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import { Alert, AlertIcon, Box, Button, Divider, FormLabel, IconButton, Text } from "@chakra-ui/react";
-import { sortBy, useSelection } from "@pastable/core";
+import { sortBy, useSelection } from "pastable";
 import { useState } from "react";
 import { ProgramCombobox } from "./ProgramCombobox";
 import { ProgramList } from "./ProgramList";

@@ -13,7 +13,7 @@ import {
     TableCellProps,
     Box,
 } from "@chakra-ui/react";
-import { isDefined, ObjectLiteral } from "@pastable/core";
+import { isDefined, ObjectLiteral } from "pastable";
 import { Fragment, ReactNode, useEffect } from "react";
 import { Cell, Column, Row, TableOptions, UseExpandedOptions, useExpanded, useSortBy, useTable } from "react-table";
 

@@ -42,7 +42,7 @@ import { GoToClosestPreviousDailyEntryButton } from "./Daily/GoToClosestPrevious
 import { useLastFilledDailyDate } from "./Daily/useLastFilledDailyDate";
 import { createContextWithHook } from "./functions/createContextWithHook";
 import { useCurrentDailyCategory } from "./orm-hooks";
-import { on } from "@pastable/core";
+import { on } from "pastable";
 import { createMachine } from "xstate";
 import { useInterpret } from "@xstate/react";
 
