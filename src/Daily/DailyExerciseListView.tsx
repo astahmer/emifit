@@ -9,7 +9,7 @@ import { DragHandleIcon } from "@chakra-ui/icons";
 import { Box, Flex, Icon } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
 import { useAtomValue } from "jotai";
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
 export const DailyExerciseListView = ({ exerciseList }: WithExerciseList) => {
@@ -52,8 +52,9 @@ const ReoderableExerciseListView = ({ exerciseList }: WithExerciseList) => {
             as={Reorder.Group}
             axis="y"
             values={items}
-            // TODO react 18 transition
-            onReorder={(newOrder) => setItems((current) => (newOrder.join() === current.join() ? current : newOrder))}
+            onReorder={(newOrder) =>
+                startTransition(() => setItems((current) => (newOrder.join() === current.join() ? current : newOrder)))
+            }
             listStyleType="none"
             layoutScroll
             overflowY="auto"

@@ -1,7 +1,7 @@
 import { orm } from "@/orm";
 import { Box } from "@chakra-ui/react";
 import { Reorder, useMotionValue } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditableProgramCard, EditableProgramCardProps } from "./ProgramCard";
 import { ReorderItemBox } from "../components/ReorderItemBox";
@@ -31,8 +31,9 @@ export function ProgramList({
             as={Reorder.Group}
             axis="y"
             values={items}
-            // TODO react 18 transition
-            onReorder={(newOrder) => setItems((current) => (newOrder.join() === current.join() ? current : newOrder))}
+            onReorder={(newOrder) =>
+                startTransition(() => setItems((current) => (newOrder.join() === current.join() ? current : newOrder)))
+            }
             listStyleType="none"
             mb="6"
         >
