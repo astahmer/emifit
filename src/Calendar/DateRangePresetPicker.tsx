@@ -17,8 +17,9 @@ export const DateRangePresetPicker = ({
 }) => {
     const { setDates } = useCalendarValues();
 
-    const defaultRange = initialRange || rangePresets[0];
-    const datesRange = rangePresets.map((range) => getRangeStart(range));
+    const presets = rangePresets || baseRangePresets;
+    const defaultRange = initialRange || presets[0];
+    const datesRange = presets.map((range) => getRangeStart(range));
     const fallbackIndex = closestIndexTo(getRangeStart(defaultRange === "custom" ? "1m" : defaultRange), datesRange);
     const fallbackDates = { start: datesRange[fallbackIndex], end: new Date() };
 
@@ -28,7 +29,7 @@ export const DateRangePresetPicker = ({
 
     return (
         <Wrap ref={rangeContainerRef}>
-            {(rangePresets || baseRangePresets).map((value) => (
+            {presets.map((value) => (
                 <WrapItem key={value}>
                     <Tag
                         colorScheme="pink"

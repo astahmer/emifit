@@ -67,7 +67,7 @@ if (reload) {
 export default defineConfig({
     base: "/",
     root: "./",
-    build: { outDir: "./dist", sourcemap: true },
+    build: { outDir: "./dist", sourcemap: true, minify: false },
     plugins: [
         // https://jotai.org/docs/guides/vite
         react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } }),
