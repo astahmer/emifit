@@ -103,7 +103,11 @@ export function computeExerciseFromExoId(
 ) {
     return (id: Exercise["id"]): Exercise => {
         const exo = exerciseListById[id];
-        return { ...exo, tags: exo.tags.map((id) => tagListById[id]).filter(Boolean) };
+        return {
+            ...exo,
+            createdAt: new Date(exo.createdAt),
+            tags: exo.tags.map((id) => tagListById[id]).filter(Boolean),
+        };
     };
 }
 export const computeExerciseFromReferences = (
@@ -111,6 +115,7 @@ export const computeExerciseFromReferences = (
     tagListById: Record<string, Tag>
 ): Exercise => ({
     ...exo,
+    createdAt: new Date(exo.createdAt),
     tags: exo.tags.map((id) => tagListById[id]).filter(Boolean),
 });
 
