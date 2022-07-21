@@ -47,7 +47,11 @@ export function computeSnapshotFromExport(data: ExportedData): DatabaseSnapshot 
             date: new Date(d.date),
             exerciseList: d.exerciseList.map(computeExerciseFromExoId(exerciseListById, tagListById)),
         })) as Daily[],
-        exerciseList: data.exerciseList.map((exo) => computeExerciseFromReferences(exo, tagListById)),
+        exerciseList: data.exerciseList.map((exo) => ({
+            ...exo,
+            ...computeExerciseFromReferences(exo, tagListById),
+            createdAt: new Date(exo.createdAt),
+        })),
         programList: data.programList.map((p) => ({
             ...p,
             createdAt: new Date(p.createdAt),

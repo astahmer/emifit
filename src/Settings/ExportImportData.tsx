@@ -33,7 +33,10 @@ export const ExportImportData = () => {
         async () => {
             const imported = await loadFromJSON<ExportedData>();
             console.log(imported);
-            snapshotRef.current = imported;
+            snapshotRef.current = {
+                ...imported,
+                exerciseList: imported.exerciseList.map((e) => ({ ...e, createdAt: new Date(e.createdAt) })),
+            };
             return computeSnapshotFromExport(imported);
         },
         {
