@@ -7,8 +7,8 @@ specifiers:
   '@emotion/react': ^11.9.3
   '@emotion/styled': ^11.9.3
   '@rollup/plugin-replace': ^4.0.0
-  '@tanstack/react-query': ^4.0.9
-  '@tanstack/react-query-devtools': ^4.0.8
+  '@tanstack/react-query': ^4.0.10
+  '@tanstack/react-query-devtools': ^4.0.10
   '@types/canvas-confetti': ^1.4.3
   '@types/react': ^18.0.15
   '@types/react-dom': ^18.0.6
@@ -16,8 +16,8 @@ specifiers:
   '@uselessdev/datepicker': ^2.5.1
   '@vitejs/plugin-react': ^2.0.0
   '@xstate/react': ^3.0.0
-  axios: ^0.25.0
-  browser-fs-access: ^0.25.3
+  axios: ^0.27.2
+  browser-fs-access: ^0.31.0
   canvas-confetti: ^1.5.1
   chakra-color-picker: ^0.0.6
   click-to-react-component: ^1.0.8
@@ -30,7 +30,7 @@ specifiers:
   idb: ^7.0.2
   idb-keyval: ^6.2.0
   jotai: ^1.7.6
-  nanoid: ^3.3.4
+  nanoid: ^4.0.0
   pastable: ^2.0.10
   prettier: ^2.7.1
   prettier-plugin-sorted: ^2.0.0
@@ -53,7 +53,7 @@ specifiers:
   valtio: ^1.6.3
   vite: ^3.0.2
   vite-plugin-checker: ^0.4.9
-  vite-plugin-pwa: ^0.11.13
+  vite-plugin-pwa: ^0.12.3
   vite-plugin-qrcode: ^0.1.1
   workbox-core: ^6.5.3
   workbox-precaching: ^6.5.3
@@ -67,11 +67,11 @@ dependencies:
   '@chakra-ui/react': 2.2.4_tij2njokttso6734ktuzwjh5a4
   '@emotion/react': 11.9.3_szkdlbnthht4v3jvm76fn7u6na
   '@emotion/styled': 11.9.3_y2x62d5bbinncmisoeyv36jqse
-  '@tanstack/react-query': 4.0.9_biqbaboplfbrettd7655fr4n2y
-  '@tanstack/react-query-devtools': 4.0.8_react@18.2.0
+  '@tanstack/react-query': 4.0.10_biqbaboplfbrettd7655fr4n2y
+  '@tanstack/react-query-devtools': 4.0.10_react@18.2.0
   '@uselessdev/datepicker': 2.5.1_s22c2wpudv3w36yc23cio2l7pi
   '@xstate/react': 3.0.0_ad54ufqkthlhcdffkpeqdmqmtm
-  browser-fs-access: 0.25.3
+  browser-fs-access: 0.31.0
   canvas-confetti: 1.5.1
   chakra-color-picker: 0.0.6_p2fele4lr7yqgx7ru2esjxf37u
   click-to-react-component: 1.0.8_bb2bxwco6ptpubzwpazr52qf6i
@@ -82,7 +82,7 @@ dependencies:
   idb: 7.0.2
   idb-keyval: 6.2.0
   jotai: 1.7.6_wbk5k65t3i7ewrqf275m4lzrde
-  nanoid: 3.3.4
+  nanoid: 4.0.0
   pastable: 2.0.10_react@18.2.0+xstate@4.32.1
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
@@ -108,7 +108,7 @@ devDependencies:
   '@types/react-dom': 18.0.6
   '@types/react-table': 7.7.12
   '@vitejs/plugin-react': 2.0.0_vite@3.0.2
-  axios: 0.25.0
+  axios: 0.27.2
   dotenv: 16.0.1
   esno: 0.16.3
   prettier: 2.7.1
@@ -117,7 +117,7 @@ devDependencies:
   typescript: 4.7.4
   vite: 3.0.2
   vite-plugin-checker: 0.4.9_vite@3.0.2
-  vite-plugin-pwa: 0.11.13_vite@3.0.2
+  vite-plugin-pwa: 0.12.3_vite@3.0.2
   vite-plugin-qrcode: 0.1.1_vite@3.0.2
   workbox-core: 6.5.3
   workbox-precaching: 6.5.3
@@ -2522,8 +2522,8 @@ packages:
     resolution: {integrity: sha512-NTjRc/qWlUx+76NCYiwqTYfJw2xIzSilI5w/F1QzE140dNUBlUl+72CbX0cIdJuTYGOD0W9x5xqZ+JcNAOIJ1A==}
     dev: false
 
-  /@tanstack/react-query-devtools/4.0.8_react@18.2.0:
-    resolution: {integrity: sha512-dlr0gUyohhFnr+Mf/YyVbCTCbOq1Zk2tAfzSZcyrSNqXXN+KLypYkFm2F7mq+uqwq2I9L12gZ0kekvfbeCmxEQ==}
+  /@tanstack/react-query-devtools/4.0.10_react@18.2.0:
+    resolution: {integrity: sha512-3J7LLYQjfjTI0DbPo0bA+M3l4kdvYSWAqihpeG1u93WVyZj0OEFviUv+4cK7+k2AVgQJAPMZ5xvtewKxOOFVrw==}
     dependencies:
       '@tanstack/match-sorter-utils': 8.1.1
       '@types/use-sync-external-store': 0.0.3
@@ -2532,8 +2532,8 @@ packages:
       - react
     dev: false
 
-  /@tanstack/react-query/4.0.9_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-xRb4jsRU4pDlNtHqYYHNAtLiQzwscQRQeHezF/CY0yQkEloqCot0baerndjizh88CavA2iDOMvC0DUfAytNJGg==}
+  /@tanstack/react-query/4.0.10_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-Wn5QhZUE5wvr6rGClV7KeQIUsdTmYR9mgmMZen7DSRWauHW2UTynFg3Kkf6pw+XlxxOLsyLWwz/Q6q1lSpM3TQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -2759,15 +2759,20 @@ packages:
     resolution: {integrity: sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==}
     dev: true
 
+  /asynckit/0.4.0:
+    resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
+    dev: true
+
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
     dev: true
 
-  /axios/0.25.0:
-    resolution: {integrity: sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==}
+  /axios/0.27.2:
+    resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
     dependencies:
       follow-redirects: 1.15.1
+      form-data: 4.0.0
     transitivePeerDependencies:
       - debug
     dev: true
@@ -2851,8 +2856,8 @@ packages:
       fill-range: 7.0.1
     dev: true
 
-  /browser-fs-access/0.25.3:
-    resolution: {integrity: sha512-lTac51rwk/4kCYDsxzN9Tct9rx4F2SAIfTstvYHlVP+AlFGpKPFM9KqKIMsHbyZoGEdFL8l/d271eEZH6qst8w==}
+  /browser-fs-access/0.31.0:
+    resolution: {integrity: sha512-OndIM5LkmHfx01D3YuVvPpW3fochBeXFS3yhDzcD/Yk7S3lx5RZGltnf7xwbr5V0B8XuN2becZmtceOQFZgQPw==}
     dev: false
 
   /browserslist/4.21.2:
@@ -2989,6 +2994,13 @@ packages:
 
   /color-name/1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
+    dev: true
+
+  /combined-stream/1.0.8:
+    resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
+    engines: {node: '>= 0.8'}
+    dependencies:
+      delayed-stream: 1.0.0
     dev: true
 
   /commander/2.20.3:
@@ -3172,6 +3184,11 @@ packages:
     dependencies:
       has-property-descriptors: 1.0.0
       object-keys: 1.1.1
+    dev: true
+
+  /delayed-stream/1.0.0:
+    resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
+    engines: {node: '>=0.4.0'}
     dev: true
 
   /detect-newline/2.1.0:
@@ -3565,6 +3582,15 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
+    dev: true
+
+  /form-data/4.0.0:
+    resolution: {integrity: sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==}
+    engines: {node: '>= 6'}
+    dependencies:
+      asynckit: 0.4.0
+      combined-stream: 1.0.8
+      mime-types: 2.1.35
     dev: true
 
   /framer-motion/6.5.1_biqbaboplfbrettd7655fr4n2y:
@@ -4202,6 +4228,18 @@ packages:
       picomatch: 2.3.1
     dev: true
 
+  /mime-db/1.52.0:
+    resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
+    engines: {node: '>= 0.6'}
+    dev: true
+
+  /mime-types/2.1.35:
+    resolution: {integrity: sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==}
+    engines: {node: '>= 0.6'}
+    dependencies:
+      mime-db: 1.52.0
+    dev: true
+
   /minimatch/3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
     dependencies:
@@ -4240,6 +4278,12 @@ packages:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
 
   /node-releases/2.0.6:
     resolution: {integrity: sha512-PiVXnNuFm5+iYkLBNeq5211hvO38y63T0i2KKh2KnUs3RpzJ+JtODFjkD8yjLwnDkTYF1eKXheUwdssR+NRZdg==}
@@ -4401,6 +4445,11 @@ packages:
   /pretty-bytes/5.6.0:
     resolution: {integrity: sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==}
     engines: {node: '>=6'}
+    dev: true
+
+  /pretty-bytes/6.0.0:
+    resolution: {integrity: sha512-6UqkYefdogmzqAZWzJ7laYeJnaXDy2/J+ZqiiMtS7t7OfpXWTlaeGMwX8U6EFvPV/YWWEKRkS8hKS4k60WHTOg==}
+    engines: {node: ^14.13.1 || >=16.0.0}
     dev: true
 
   /prop-types/15.8.1:
@@ -5419,14 +5468,14 @@ packages:
       vscode-uri: 3.0.3
     dev: true
 
-  /vite-plugin-pwa/0.11.13_vite@3.0.2:
-    resolution: {integrity: sha512-Ssj14m3TRVLfkFEAWSMcFE2d1cSdEZyrVTzfY2lSL+umHYvcIFHVDAY143sygtBCb44OPczsAOmWwBTxwOvh7g==}
+  /vite-plugin-pwa/0.12.3_vite@3.0.2:
+    resolution: {integrity: sha512-gmYdIVXpmBuNjzbJFPZFzxWYrX4lHqwMAlOtjmXBbxApiHjx9QPXKQPJjSpeTeosLKvVbNcKSAAhfxMda0QVNQ==}
     peerDependencies:
-      vite: ^2.0.0
+      vite: ^2.0.0 || ^3.0.0-0
     dependencies:
       debug: 4.3.4
       fast-glob: 3.2.11
-      pretty-bytes: 5.6.0
+      pretty-bytes: 6.0.0
       rollup: 2.77.0
       vite: 3.0.2
       workbox-build: 6.5.3
