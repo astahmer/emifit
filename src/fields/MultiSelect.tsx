@@ -281,7 +281,12 @@ function ListComponent<IsMulti extends boolean, Item = any>({
                             })}
                         >
                             {isMulti ? (
-                                <Checkbox isChecked={values.includes(value)} value={value} pointerEvents="none" />
+                                <Checkbox
+                                    isChecked={values.includes(value)}
+                                    value={value}
+                                    pointerEvents="none"
+                                    colorScheme="pink"
+                                />
                             ) : null}
                             <Text>{label}</Text>
                             {renderAfterOptionText ? renderAfterOptionText(value) : null}
