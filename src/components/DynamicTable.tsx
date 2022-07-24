@@ -69,7 +69,9 @@ export function DynamicTable<RowData>({
                             <Th
                                 key={header.id}
                                 colSpan={header.colSpan}
-                                {...{ onClick: header.column.getToggleSortingHandler() }}
+                                {...mergeProps((getHeaderProps?.(header.column, header.index) as any) || {}, {
+                                    onClick: header.column.getToggleSortingHandler(),
+                                })}
                                 isNumeric={(header.column.columnDef.meta as any)?.isNumeric}
                                 css={
                                     isHeaderSticky
@@ -78,13 +80,7 @@ export function DynamicTable<RowData>({
                                 }
                             >
                                 <Box display="flex" alignItems="flex-end">
-                                    {flexRender(
-                                        header.column.columnDef.header,
-                                        mergeProps(
-                                            (getHeaderProps?.(header.column, header.index) as any) || {},
-                                            header.getContext()
-                                        )
-                                    )}
+                                    {flexRender(header.column.columnDef.header, header.getContext())}
                                     {header.column.getCanSort() !== false && (
                                         <chakra.span pl="2" transform="translateY(-1px)">
                                             {header.column.getIsSorted() !== false ? (
@@ -108,14 +104,12 @@ export function DynamicTable<RowData>({
                         <Fragment key={row.id}>
                             <Tr {...getRowProps?.(row, rowIndex)}>
                                 {row.getVisibleCells().map((cell, cellIndex) => (
-                                    <Td key={cell.id} isNumeric={(cell.column.columnDef.meta as any)?.isNumeric}>
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            mergeProps(
-                                                (getCellProps?.(cell, rowIndex, cellIndex) as any) || {},
-                                                cell.getContext()
-                                            )
-                                        )}
+                                    <Td
+                                        key={cell.id}
+                                        isNumeric={(cell.column.columnDef.meta as any)?.isNumeric}
+                                        {...((getCellProps?.(cell, rowIndex, cellIndex) as any) || {})}
+                                    >
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </Td>
                                 ))}
                             </Tr>
