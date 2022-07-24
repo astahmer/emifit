@@ -60,7 +60,7 @@ export const InspectExerciseTab = () => {
                         </VFlex>
                     </CalendarValuesProvider>
                     <Divider my="2" />
-                    <Tabs variant="soft-rounded">
+                    <Tabs variant="soft-rounded" colorScheme="pink">
                         <TabPanels>
                             <TabPanel p="0">
                                 <ExerciseTopSetsTable
@@ -75,7 +75,7 @@ export const InspectExerciseTab = () => {
                                 />
                             </TabPanel>
                         </TabPanels>
-                        <TabList mt="4">
+                        <TabList mt="4" display="inline-flex" borderRadius="full" bgColor="gray.100">
                             <Tab>kgs</Tab>
                             <Tab>reps</Tab>
                         </TabList>
