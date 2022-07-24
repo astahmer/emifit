@@ -86,6 +86,8 @@ export function DynamicTable<
                                         ? { position: "sticky", top: 0, backgroundColor: "white" }
                                         : undefined
                                 }
+                                bgColor="white"
+                                zIndex={1}
                             >
                                 <Box display="flex" alignItems="flex-end">
                                     {flexRender(header.column.columnDef.header, header.getContext())}
