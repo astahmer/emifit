@@ -63,7 +63,9 @@ export const ExerciseLibraryItem = ({
                 borderTopRightRadius={0}
                 sx={{ th: { whiteSpace: "nowrap" } }}
             >
-                {isFocused && <ExerciseTopSetsTable exerciseList={exerciseList} />}
+                {isFocused && (
+                    <ExerciseTopSetsTable exerciseList={exerciseList} hiddenColumns={["topReps", "kgWithTopReps"]} />
+                )}
             </AccordionPanel>
         </AccordionItem>
     );

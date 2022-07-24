@@ -1,14 +1,16 @@
-import { DynamicTable } from "@/components/DynamicTable";
+import { DynamicTable, DynamicTableProps, makeColumns } from "@/components/DynamicTable";
 import { Show } from "@/components/Show";
 import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Badge, Stack, Text } from "@chakra-ui/react";
-import { ColumnDef } from "@tanstack/react-table";
 import { findBy } from "pastable";
 import { Link as ReactLink } from "react-router-dom";
 
-export const ExerciseTopSetsTable = ({ exerciseList }: { exerciseList: Exercise[] }) => {
+export const ExerciseTopSetsTable = ({
+    exerciseList,
+    hiddenColumns,
+}: { exerciseList: Exercise[] } & Pick<DynamicTableProps<ExerciseWithTops, typeof columns>, "hiddenColumns">) => {
     const { listWithTops, topKg, topReps } = getExerciseListWithTops(exerciseList);
 
     const data = listWithTops.map((exo) => ({
@@ -18,15 +20,21 @@ export const ExerciseTopSetsTable = ({ exerciseList }: { exerciseList: Exercise[
     }));
 
     return (
-        <DynamicTable columns={columns} data={data} isHeaderSticky initialSortBy={[{ id: "createdAt", desc: true }]} />
+        <DynamicTable
+            columns={columns}
+            data={data}
+            isHeaderSticky
+            initialSortBy={[{ id: "createdAt", desc: true }]}
+            hiddenColumns={hiddenColumns}
+        />
     );
 };
 
-const columns = [
+const columns = makeColumns<ExerciseWithTops>()([
     {
         header: "Date",
         accessorKey: "createdAt",
-        sortType: "datetime",
+        sortingFn: "datetime",
         cell: (props) => (
             <Stack
                 direction="row"
@@ -73,6 +81,7 @@ const columns = [
             );
         },
     },
+    { header: "reps", accessorKey: "repsWithTopKg" },
     {
         header: "top reps",
         accessorKey: "topReps",
@@ -103,22 +112,31 @@ const columns = [
             );
         },
     },
-] as Array<ColumnDef<ExerciseWithTops>>;
+    { header: "kg", accessorKey: "kgWithTopReps" },
+]);
 
 export interface ExerciseWithTops extends Exercise {
     isTopKg: boolean;
     isTopReps: boolean;
     topKg: number;
+    repsWithTopKg: number;
     topReps: number;
+    kgWithTopReps: number;
 }
 
 export function getExerciseListWithTops(exerciseList: Exercise[]) {
-    const listWithTops = exerciseList.map((exo) => ({
-        ...exo,
-        createdAt: new Date(exo.createdAt),
-        topKg: Math.max(...exo.series.map((set) => set.kg)),
-        topReps: Math.max(...exo.series.map((set) => set.reps)),
-    }));
+    const listWithTops = exerciseList.map((exo) => {
+        const topKg = Math.max(...exo.series.map((set) => set.kg));
+        const topReps = Math.max(...exo.series.map((set) => set.reps));
+        return {
+            ...exo,
+            createdAt: new Date(exo.createdAt),
+            topKg,
+            repsWithTopKg: exo.series.find((set) => set.kg === topKg).reps,
+            topReps,
+            kgWithTopReps: exo.series.find((set) => set.reps === topReps).kg,
+        };
+    });
 
     const topKg = Math.max(...listWithTops.map((exo) => exo.topKg));
     const topReps = Math.max(...listWithTops.map((exo) => exo.topReps));

@@ -16,6 +16,11 @@ import {
 import {
     Cell,
     ColumnDef,
+    CoreColumnDefAccessorFn,
+    CoreColumnDefAccessorKey,
+    CoreColumnDefBase,
+    CoreColumnDefDisplay,
+    CoreColumnDefDisplayWithStringHeader,
     flexRender,
     getCoreRowModel,
     getExpandedRowModel,
@@ -25,10 +30,13 @@ import {
     TableOptions,
     useReactTable,
 } from "@tanstack/react-table";
-import { isDefined, mergeProps, ObjectLiteral } from "pastable";
+import { mergeProps, ObjectLiteral } from "pastable";
 import { Fragment, ReactNode, useEffect } from "react";
 
-export function DynamicTable<RowData>({
+export function DynamicTable<
+    RowData extends ObjectLiteral,
+    Columns extends TableOptions<RowData>["columns"] = TableOptions<RowData>["columns"]
+>({
     columns,
     data,
     getHeaderProps,
@@ -39,7 +47,7 @@ export function DynamicTable<RowData>({
     getRowProps,
     initialSortBy,
     hiddenColumns = [],
-}: DynamicTableProps<RowData>) {
+}: DynamicTableProps<RowData, Columns>) {
     const table = useReactTable<RowData>({
         columns,
         data,
@@ -49,14 +57,14 @@ export function DynamicTable<RowData>({
         getSortedRowModel: getSortedRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
         initialState: {
-            columnVisibility: Object.fromEntries(hiddenColumns.map((id) => [id, true])),
+            columnVisibility: Object.fromEntries(hiddenColumns.map((id) => [id, false])),
             sorting: initialSortBy as SortingState,
         },
     });
 
     useEffect(() => {
         if (hiddenColumns?.length) {
-            table.setColumnVisibility(Object.fromEntries(hiddenColumns.map((id) => [id, true])));
+            table.setColumnVisibility(Object.fromEntries(hiddenColumns.map((id) => [id, false])));
         }
     }, [hiddenColumns]);
 
@@ -126,21 +134,45 @@ export function DynamicTable<RowData>({
     );
 }
 
-export interface DynamicTableProps<RowData extends ObjectLiteral = any> extends Pick<TableProps, "size"> {
-    columns: TableOptions<RowData>["columns"];
+export interface DynamicTableProps<
+    RowData extends ObjectLiteral = any,
+    Columns extends TableOptions<RowData>["columns"] = TableOptions<RowData>["columns"]
+> extends Pick<TableProps, "size"> {
+    columns: Columns;
     data: TableOptions<RowData>["data"];
     getHeaderProps?: (column: ColumnDef<RowData>, colIndex: number) => TableColumnHeaderProps;
     getRowProps?: (row: Row<RowData>, rowIndex: number) => TableRowProps;
     getCellProps?: (cell: Cell<RowData, any>, rowIndex: number, cellIndex: number) => TableCellProps;
     renderSubRow?: ({ row }: { row: Row<RowData> }) => ReactNode;
     isHeaderSticky?: boolean;
-    hiddenColumns?: string[];
+    hiddenColumns?: Array<ColumnId<Columns[number]>>;
     initialSortBy?: ReactTableSortBy<RowData>[];
 }
 
+export type ColumnId<ColumnD extends CoreColumnDefBase<any, any>> = ColumnD extends CoreColumnDefAccessorKey<
+    any,
+    any
+> & {
+    accessorKey: infer KeyId;
+}
+    ? KeyId
+    : ColumnD extends CoreColumnDefAccessorFn<any, any> & {
+          accessorFn: infer FnId;
+      }
+    ? FnId
+    : ColumnD extends CoreColumnDefDisplayWithStringHeader<any, any> & {
+          header: infer HeaderId;
+      }
+    ? HeaderId
+    : ColumnD extends CoreColumnDefDisplay<any, any> & {
+          id: infer Id;
+      }
+    ? Id
+    : never;
+
 type ReactTableSortBy<RowData extends ObjectLiteral = any> = { id: keyof RowData & {}; desc?: boolean };
 
-const defaultColumn = { cell: ({ cell }) => (isDefined(cell.getValue()) ? String(cell.getValue()) : "--") } as Partial<
-    ColumnDef<any>
-    // defaultColumn: defaultColumn as Partial<ColumnDef<RowData>>,
->;
+export const makeColumns =
+    <RowData extends ObjectLiteral = unknown>() =>
+    <Column extends ColumnDef<RowData> = ColumnDef<RowData>>(columns: Array<Column>) =>
+        columns;

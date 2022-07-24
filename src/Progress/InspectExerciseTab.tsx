@@ -60,9 +60,22 @@ export const InspectExerciseTab = () => {
                         </VFlex>
                     </CalendarValuesProvider>
                     <Divider my="2" />
-                    <ExerciseTopSetsTable exerciseList={exerciseList} />
-                    <Tabs mt="4">
-                        <TabList>
+                    <Tabs variant="soft-rounded">
+                        <TabPanels>
+                            <TabPanel p="0">
+                                <ExerciseTopSetsTable
+                                    exerciseList={exerciseList}
+                                    hiddenColumns={["topReps", "kgWithTopReps"]}
+                                />
+                            </TabPanel>
+                            <TabPanel p="0">
+                                <ExerciseTopSetsTable
+                                    exerciseList={exerciseList}
+                                    hiddenColumns={["topKg", "repsWithTopKg"]}
+                                />
+                            </TabPanel>
+                        </TabPanels>
+                        <TabList mt="4">
                             <Tab>kgs</Tab>
                             <Tab>reps</Tab>
                         </TabList>
