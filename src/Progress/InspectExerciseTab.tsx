@@ -44,11 +44,11 @@ export const InspectExerciseTab = () => {
     const data = sortBy(listWithComputeds, "createdAt");
 
     return (
-        <Box pos="relative" h="100%" minH={0} p="4">
+        <VFlex pos="relative" h="100%" minH={0} p="4">
             <Header exerciseList={exerciseList} data={data} />
             <Divider my="4" />
             <Show when={Boolean(exerciseList.length)} fallback={<CenteredSpinner h="100%" />}>
-                <Box h="100%" minH={0} overflowX="hidden" overflowY="auto">
+                <VFlex h="100%" minH={0} overflowX="hidden" overflowY="auto">
                     <CalendarValuesProvider value={{ ...dates, setDates }}>
                         <VFlex bgColor="white" pb="4" px="4">
                             <Flex alignItems="center" mb="4">
@@ -80,9 +80,9 @@ export const InspectExerciseTab = () => {
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
-                </Box>
+                </VFlex>
             </Show>
-        </Box>
+        </VFlex>
     );
 };
 
