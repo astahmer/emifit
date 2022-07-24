@@ -64,7 +64,7 @@ export const InspectTab = () => {
                                 <Divider my="1" />
                             </Box>
                         )}
-                        <Flex as={ReactLink} to={exo.slug} py="1" px="4" alignItems="center">
+                        <Flex as={ReactLink} to={"/inspect/" + exo.slug} py="1" px="4" alignItems="center">
                             <ExerciseListItem
                                 exo={{
                                     ...exo,

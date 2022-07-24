@@ -68,10 +68,7 @@ function App() {
                                         <Route path="inspect" element={<InspectTab />} />
                                         <Route path="compare" element={<CompareTab />} />
                                     </Route>
-                                    <Route
-                                        path={routeMap.progress + "/inspect/:exoSlug"}
-                                        element={<InspectExerciseTab />}
-                                    />
+                                    <Route path="/inspect/:exoSlug" element={<InspectExerciseTab />} />
                                     <Route path={routeMap.settings} element={<SettingsPage />} />
                                     <Route path={routeMap.programs} element={<ProgramsPage />} />
                                     <Route path={routeMap.exerciseLibrary} element={<ExerciseLibraryPage />} />

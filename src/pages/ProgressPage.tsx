@@ -1,5 +1,5 @@
 import { VFlex } from "@/components/VFlex";
-import { Box, Tab, TabList, Tabs } from "@chakra-ui/react";
+import { Tab, TabList, Tabs } from "@chakra-ui/react";
 import { Outlet, Link as ReactLink, useLocation } from "react-router-dom";
 import { match } from "ts-pattern";
 
