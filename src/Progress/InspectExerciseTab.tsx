@@ -60,7 +60,7 @@ export const InspectExerciseTab = () => {
                         </VFlex>
                     </CalendarValuesProvider>
                     <Divider my="2" />
-                    <Tabs variant="soft-rounded" colorScheme="pink">
+                    <Tabs variant="soft-rounded" colorScheme="pink" display="flex" flexDirection="column">
                         <TabPanels>
                             <TabPanel p="0">
                                 <ExerciseTopSetsTable
@@ -75,21 +75,18 @@ export const InspectExerciseTab = () => {
                                 />
                             </TabPanel>
                         </TabPanels>
-                        <TabList mt="4" display="inline-flex" borderRadius="full" bgColor="gray.100">
+
+                        <TabList mt="5" alignSelf="center" display="inline-flex" borderRadius="full" bgColor="gray.100">
                             <Tab>kgs</Tab>
                             <Tab>reps</Tab>
                         </TabList>
 
                         <TabPanels>
-                            <TabPanel>
-                                <Box w="100%" h="250px" my="4">
-                                    <LineGraph data={data} prefix="kgs" />
-                                </Box>
+                            <TabPanel py="0" w="100%" h="250px" my="4">
+                                <LineGraph data={data} prefix="kgs" />
                             </TabPanel>
-                            <TabPanel>
-                                <Box w="100%" h="250px" my="4">
-                                    <LineGraph data={data} prefix="reps" />
-                                </Box>
+                            <TabPanel py="0" w="100%" h="250px" my="4">
+                                <LineGraph data={data} prefix="reps" />
                             </TabPanel>
                         </TabPanels>
                     </Tabs>
@@ -175,7 +172,7 @@ interface ExerciseTopValues {
 const LineGraph = ({ data, prefix }: Pick<ComponentPropsWithoutRef<typeof LineChart>, "data"> & { prefix: string }) => {
     return (
         <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 5, bottom: 5 }}>
+            <LineChart data={data}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
