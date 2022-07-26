@@ -29,5 +29,47 @@ export const appTheme = extendTheme(CalendarDefaultTheme, { config: { initialCol
                 },
             },
         },
+        Table: {
+            sizes: {
+                xs: {
+                    th: {
+                        px: "3",
+                        py: "0.5",
+                        lineHeight: "2",
+                        fontSize: "x-small",
+                    },
+                    td: {
+                        px: "3",
+                        py: "1",
+                        fontSize: "xs",
+                        lineHeight: "2",
+                    },
+                    caption: {
+                        px: "3",
+                        py: "1",
+                        fontSize: "x-small",
+                    },
+                },
+                "x-small": {
+                    th: {
+                        px: "2",
+                        py: "1",
+                        lineHeight: "1",
+                        fontSize: "xx-small",
+                    },
+                    td: {
+                        px: "2",
+                        py: "1",
+                        fontSize: "xs",
+                        lineHeight: "1",
+                    },
+                    caption: {
+                        px: "2",
+                        py: "1",
+                        fontSize: "xx-small",
+                    },
+                },
+            },
+        },
     },
 });
