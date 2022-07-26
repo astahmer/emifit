@@ -3,7 +3,6 @@ import { DotsIconButton } from "@/components/DotsIconButton";
 import { DynamicTable } from "@/components/DynamicTable";
 import { VFlex } from "@/components/VFlex";
 import { onError, toasts } from "@/functions/toasts";
-import { printDate } from "@/functions/utils";
 import { orm, StoreQueryParams } from "@/orm";
 import { useCategoryList } from "@/orm-hooks";
 import { Category, Daily, Exercise, Group, Program, Tag } from "@/orm-types";
@@ -123,7 +122,7 @@ export const DataAccordions = ({
                                 data={dailyList}
                                 isHeaderSticky
                                 hiddenColumns={(!showIdColumn ? ["id"] : []).concat(withActions ? [] : ["__actions"])}
-                                getRowProps={(row) => ({ onClick: (row as any).getToggleExpandedHandler() })}
+                                getRowProps={(row) => ({ onClick: row.getToggleExpandedHandler() })}
                                 renderSubRow={({ row }) => (
                                     <VFlex pb="4">
                                         <Box>Exercise list:</Box>

@@ -53,6 +53,7 @@ export function DynamicTable<
         data,
         autoResetExpanded: false,
         renderFallbackValue: "--",
+        getRowCanExpand: () => Boolean(renderSubRow),
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
