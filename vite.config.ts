@@ -73,7 +73,7 @@ export default defineConfig({
         react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } }),
         VitePWA(pwaOptions),
         replace(replaceOptions) as PluginOption,
-        checker({ typescript: true }),
+        checker({ typescript: true, overlay: { initialIsOpen: false } }),
         qrcode(),
     ],
     resolve: {
