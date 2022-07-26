@@ -50,8 +50,9 @@ export const Layout = () => {
     const setDebugMode = useSetAtom(debugModeAtom);
     useHotkeys("cmd+k", () => setDebugMode((current) => !current));
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
     const btnRef = useRef();
+    useHotkeys("cmd+i", onToggle);
 
     const isScrollingRef = useRef(false);
     const service = useInterpret(scrollMachine, undefined, (state) => {
