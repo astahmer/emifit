@@ -92,10 +92,10 @@ export const InspectExerciseTab = () => {
                         gap="6"
                         p="4"
                         rounded="lg"
-                        gridAutoRows="minmax(150px, 1fr)"
+                        gridAutoRows="minmax(80px, 1fr)"
                         gridTemplateColumns="1fr 1fr"
                     >
-                        <Card colSpan={2} rowSpan={3}>
+                        <Card colSpan={2} rowSpan={5}>
                             <Text fontSize="md" fontWeight="bold" mb="1">
                                 Top kg/reps
                             </Text>
@@ -103,13 +103,13 @@ export const InspectExerciseTab = () => {
                                 <ExerciseWithTopKgAndRepsTableAndCharts exerciseListWithTops={exerciseListWithTops} />
                             </Box>
                         </Card>
-                        <Card colSpan={2} rowSpan={2}>
+                        <Card colSpan={2} rowSpan={4}>
                             <Text fontSize="md" fontWeight="bold" whiteSpace="nowrap">
                                 Usage by tag
                             </Text>
                             <ByTagPieGraph exerciseList={exerciseList} />
                         </Card>
-                        <Card colSpan={2} rowSpan={2}>
+                        <Card colSpan={2} rowSpan={4}>
                             <Stack direction="row" fontSize="md" fontWeight="bold" alignItems="flex-start" spacing={1}>
                                 <div>Total volume</div>
                                 <Text as="span" fontStyle="italic" fontSize="xs">
@@ -125,21 +125,8 @@ export const InspectExerciseTab = () => {
                             <Text fontSize="md" fontWeight="bold">
                                 Summary
                             </Text>
-                            <Box w="100%" h="100%" mt="2">
-                                <DynamicTable
-                                    columns={[
-                                        { accessorKey: "type", header: null },
-                                        { accessorKey: "sum", header: "Sum" },
-                                        { accessorKey: "min", header: "Min" },
-                                        { accessorKey: "average", header: "Average" },
-                                        { accessorKey: "max", header: "Max" },
-                                    ]}
-                                    data={[
-                                        { type: "Sets", sum: 120, min: 13, average: 42, max: 50 },
-                                        { type: "Kgs", sum: 120, min: 13, average: 42, max: 50 },
-                                        { type: "Reps", sum: 120, min: 13, average: 42, max: 50 },
-                                    ]}
-                                />
+                            <Box w="100%" h="100%" mt="2" maxH="100%" overflow="auto">
+                                <SummaryTable exerciseList={exerciseList} />
                             </Box>
                         </Card>
                         {/* TODO +x kgs / -y reps, en mode <Stats> */}
@@ -152,7 +139,7 @@ export const InspectExerciseTab = () => {
                         {/* TODO History page:
                         vue comme Google Agenda où on a une liste avec :
                         1 ligne (ou card) = 1 jour et on voit la catégorie + le nom des exos, liste scrollable */}
-                        <Card rowSpan={2}>
+                        <Card rowSpan={4}>
                             <Text fontSize="md" fontWeight="bold">
                                 History
                             </Text>
@@ -378,4 +365,32 @@ const TotalKgVolumeLineGraph = ({ exerciseList }: WithExerciseList) => {
             <Tooltip />
         </LineGraph>
     );
+};
+
+const SummaryTable = ({ exerciseList }: WithExerciseList) => {
+    const setsCount = exerciseList.map((exo) => exo.series.length);
+    const kgsCount = exerciseList.flatMap((exo) => exo.series.map((set) => set.kg));
+    const repsCount = exerciseList.flatMap((exo) => exo.series.map((set) => set.reps));
+    const data = [getStats("sets", setsCount), getStats("kgs", kgsCount), getStats("reps", repsCount)];
+
+    return <DynamicTable size="xs" columns={summaryColumns} data={data} />;
+};
+const summaryColumns = [
+    { accessorKey: "type", header: null },
+    { accessorKey: "min", header: "Min" },
+    { accessorKey: "average", header: "Average" },
+    // { accessorKey: "median", header: "Med." },
+    { accessorKey: "max", header: "Max" },
+    { accessorKey: "sum", header: "Sum" },
+];
+
+const getStats = (type: string, list: number[]) => ({ ...getMinAverageMaxSum(list), type });
+const getMinAverageMaxSum = (list: number[]) => {
+    return {
+        min: Math.min(...list),
+        average: roundTo(getSum(list) / list.length, 2),
+        median: list[Math.floor(list.length / 2)],
+        max: Math.max(...list),
+        sum: getSum(list),
+    };
 };
