@@ -217,7 +217,7 @@ const PieGraph = ({ data }: { data: Array<{ name: string; color: string; value: 
 
     return (
         <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
+            <PieChart margin={{ left: 0, right: 0, top: 5, bottom: 5 }}>
                 <Pie
                     animationDuration={400}
                     data={data}

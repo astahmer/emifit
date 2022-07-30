@@ -103,13 +103,13 @@ export const InspectExerciseTab = () => {
                                 <ExerciseWithTopKgAndRepsTableAndCharts exerciseListWithTops={exerciseListWithTops} />
                             </Box>
                         </Card>
-                        <Card colSpan={2} rowSpan={4}>
+                        <Card colSpan={2} rowSpan={3}>
                             <Text fontSize="md" fontWeight="bold" whiteSpace="nowrap">
                                 Usage by tag
                             </Text>
                             <ByTagPieGraph exerciseList={exerciseList} />
                         </Card>
-                        <Card colSpan={2} rowSpan={4}>
+                        <Card colSpan={2} rowSpan={3}>
                             <Stack direction="row" fontSize="md" fontWeight="bold" alignItems="flex-start" spacing={1}>
                                 <div>Total volume</div>
                                 <Text as="span" fontStyle="italic" fontSize="xs">
@@ -304,7 +304,7 @@ const LineGraph = ({
 }: Pick<ComponentPropsWithoutRef<typeof LineChart>, "data"> & PropsWithChildren) => {
     return (
         <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <LineChart data={data} margin={{ left: 0, right: 0, top: 5, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 {children}
             </LineChart>
@@ -338,7 +338,7 @@ const ByTagPieGraph = ({ exerciseList }: { exerciseList: Exercise[] }) => {
 
     return (
         <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ top: 10 }}>
+            <PieChart margin={{ left: 0, right: 0, top: 5, bottom: 5 }}>
                 <Pie data={data} dataKey="count" label innerRadius={30}>
                     {data.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
