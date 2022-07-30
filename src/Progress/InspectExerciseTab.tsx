@@ -1,6 +1,6 @@
 import { baseRangePresets, DateRangePresetPicker, getRangeStart } from "@/Calendar/DateRangePresetPicker";
 import { CalendarValuesProvider } from "@/Calendar/useCalendarValues";
-import { AppExternalLinkIcon } from "@/components/AppExternalLinkIcon";
+import { DynamicTable } from "@/components/DynamicTable";
 import { Show } from "@/components/Show";
 import { VFlex } from "@/components/VFlex";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
@@ -8,7 +8,7 @@ import { ExerciseTopSetsTable } from "@/Exercises/ExerciseTopSetsTable";
 import { displayDate } from "@/functions/utils";
 import { useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
-import { ArrowBackIcon, TriangleDownIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
     Badge,
     Box,
@@ -21,23 +21,15 @@ import {
     IconButton,
     Stack,
     Tab,
-    Table,
     TabList,
-    TabPanel,
-    TabPanels,
     Tabs,
     Tag,
-    Tbody,
-    Td,
     Text,
-    Th,
-    Thead,
-    Tr,
     useTabsContext,
     useTheme,
 } from "@chakra-ui/react";
 import { CalendarValues } from "@uselessdev/datepicker";
-import { get, getSum, groupBy, roundTo, sortBy, uniques } from "pastable";
+import { get, getSum, roundTo, sortBy } from "pastable";
 import { ComponentPropsWithoutRef, PropsWithChildren, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -104,35 +96,57 @@ export const InspectExerciseTab = () => {
                         gridTemplateColumns="1fr 1fr"
                     >
                         <Card colSpan={2} rowSpan={3}>
-                            <Text fontSize="md" fontWeight="bold">
+                            <Text fontSize="md" fontWeight="bold" mb="1">
                                 Top kg/reps
                             </Text>
                             <Box my="auto">
                                 <ExerciseWithTopKgAndRepsTableAndCharts exerciseListWithTops={exerciseListWithTops} />
                             </Box>
                         </Card>
-                        {/* TODO radial graph */}
                         <Card colSpan={2} rowSpan={2}>
                             <Text fontSize="md" fontWeight="bold" whiteSpace="nowrap">
                                 Usage by tag
                             </Text>
                             <ByTagPieGraph exerciseList={exerciseList} />
                         </Card>
-                        <Card colSpan={1}>
+                        <Card colSpan={2} rowSpan={2}>
+                            <Stack direction="row" fontSize="md" fontWeight="bold" alignItems="flex-start" spacing={1}>
+                                <div>Total volume</div>
+                                <Text as="span" fontStyle="italic" fontSize="xs">
+                                    (kg * reps)
+                                </Text>
+                                <div>by day</div>
+                            </Stack>
+                            <Box w="100%" h="100%" mt="2">
+                                <TotalKgVolumeLineGraph exerciseList={exerciseList} />
+                            </Box>
+                        </Card>
+                        <Card colSpan={2} rowSpan={2}>
                             <Text fontSize="md" fontWeight="bold">
-                                Totals
+                                Summary
                             </Text>
+                            <Box w="100%" h="100%" mt="2">
+                                <DynamicTable
+                                    columns={[
+                                        { accessorKey: "type", header: null },
+                                        { accessorKey: "sum", header: "Sum" },
+                                        { accessorKey: "min", header: "Min" },
+                                        { accessorKey: "average", header: "Average" },
+                                        { accessorKey: "max", header: "Max" },
+                                    ]}
+                                    data={[
+                                        { type: "Sets", sum: 120, min: 13, average: 42, max: 50 },
+                                        { type: "Kgs", sum: 120, min: 13, average: 42, max: 50 },
+                                        { type: "Reps", sum: 120, min: 13, average: 42, max: 50 },
+                                    ]}
+                                />
+                            </Box>
                         </Card>
                         {/* TODO +x kgs / -y reps, en mode <Stats> */}
+                        {/* Le même à faire dans Progress (pas spécifique à un exo mais tous) */}
                         <Card colSpan={2}>
                             <Text fontSize="md" fontWeight="bold">
                                 Progress avec last week/last month
-                            </Text>
-                        </Card>
-                        {/* graph Total volume (kg) by day en graphiques avec des points reliés ou courbe remplie */}
-                        <Card colSpan={1}>
-                            <Text fontSize="md" fontWeight="bold">
-                                Total volume (kg)
                             </Text>
                         </Card>
                         {/* TODO History page:
@@ -154,12 +168,6 @@ export const InspectExerciseTab = () => {
                         • Nom | Somme | Min | Max | Moyenne | Tendance (+ ou - ou =)
                         et en lignes: Set | Poids | Reps
                         */}
-                        {/* TODO podium ? */}
-                        <Card colSpan={2}>
-                            <Text fontSize="md" fontWeight="bold">
-                                Records
-                            </Text>
-                        </Card>
                     </Grid>
                 </VFlex>
             </Show>
@@ -236,6 +244,7 @@ const Header = ({ exerciseListWithTops }: { exerciseListWithTops: ExerciseWithTo
 interface ExerciseWithTops extends Exercise {
     kgs: ExerciseTopValues;
     reps: ExerciseTopValues;
+    date: string;
 }
 
 interface ExerciseTopValues {
@@ -258,7 +267,7 @@ const ExerciseWithTopKgAndRepsTableAndCharts = ({
                 <Tab>reps</Tab>
             </TabList>
 
-            <LineGraphInTabs exerciseListWithTops={exerciseListWithTops} />
+            <ExerciseTopsLineGraphInTabs exerciseListWithTops={exerciseListWithTops} />
         </Tabs>
     );
 };
@@ -280,14 +289,19 @@ const ExerciseTopSetsTableInTabs = ({ exerciseList }: WithExerciseList) => {
     );
 };
 
-const LineGraphInTabs = ({
+const ExerciseTopsLineGraphInTabs = ({
     exerciseListWithTops,
 }: Pick<ComponentPropsWithoutRef<typeof ExerciseWithTopKgAndRepsTableAndCharts>, "exerciseListWithTops">) => {
     const ctx = useTabsContext();
+    const prefix = ctx.selectedIndex ? "kgs" : "reps";
+    const data = exerciseListWithTops.map((exo) => ({ date: exo.date, ...exo[prefix] }));
 
     return (
         <Box w="100%" h="200px" my="4">
-            <LineGraph data={exerciseListWithTops} prefix={ctx.selectedIndex ? "kgs" : "reps"}>
+            <LineGraph data={data}>
+                <Line type="monotone" dataKey="bot" name="lowest" stroke="red" />
+                <Line type="monotone" dataKey="medium" name="average" stroke="#8884d8" />
+                <Line type="monotone" dataKey="top" name="best" stroke="#82ca9d" />
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
@@ -299,16 +313,12 @@ const LineGraphInTabs = ({
 
 const LineGraph = ({
     data,
-    prefix,
     children,
-}: Pick<ComponentPropsWithoutRef<typeof LineChart>, "data"> & { prefix: string } & PropsWithChildren) => {
+}: Pick<ComponentPropsWithoutRef<typeof LineChart>, "data"> & PropsWithChildren) => {
     return (
         <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <Line type="monotone" dataKey={prefix + ".bot"} name="lowest" stroke="red" />
-                <Line type="monotone" dataKey={prefix + ".medium"} name="average" stroke="#8884d8" />
-                <Line type="monotone" dataKey={prefix + ".top"} name="best" stroke="#82ca9d" />
                 {children}
             </LineChart>
         </ResponsiveContainer>
@@ -351,5 +361,21 @@ const ByTagPieGraph = ({ exerciseList }: { exerciseList: Exercise[] }) => {
                 <Tooltip />
             </PieChart>
         </ResponsiveContainer>
+    );
+};
+
+const TotalKgVolumeLineGraph = ({ exerciseList }: WithExerciseList) => {
+    const data = exerciseList.map((exo) => ({
+        date: displayDate(exo.createdAt),
+        volume: getSum(exo.series.map((set) => set.kg * set.reps)),
+    }));
+
+    return (
+        <LineGraph data={data}>
+            <Line type="monotone" dataKey="volume" name="daily kg" stroke="#8884d8" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+        </LineGraph>
     );
 };
