@@ -6,6 +6,7 @@ import { useCompactContext } from "@/store";
 import { Box, Divider, Flex, Grid, Heading, Stack } from "@chakra-ui/react";
 import { chunk, WithChildren } from "pastable";
 import { Fragment } from "react";
+import { ExerciseNote } from "./ExerciseNote";
 import { ExerciseSetList, ExerciseSetListOverview } from "./ExerciseSetList";
 
 export const ExerciseGridView = ({ exerciseList, children }: WithExerciseList & Partial<WithChildren>) => {
@@ -57,7 +58,12 @@ function ExerciseGridItem({ exo }: { exo: Exercise }) {
             </Flex>
             <ExerciseSetListOverview setList={exo.series} />
             <ExerciseTagList mt="2" tagList={exo.tags} isPreview={toggle.isHidden} />
-            {toggle.isHidden ? null : <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />}
+            {toggle.isHidden ? null : (
+                <>
+                    <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />
+                    <ExerciseNote exo={exo} />
+                </>
+            )}
         </Flex>
     );
 }
