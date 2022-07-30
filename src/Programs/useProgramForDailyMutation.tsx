@@ -4,7 +4,7 @@ import { toasts } from "@/functions/toasts";
 import { makeId } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCurrentDaily } from "@/orm-hooks";
-import { Program } from "@/orm-types";
+import { Exercise, ExerciseWithReferences, Program } from "@/orm-types";
 import { currentDailyIdAtom } from "@/store";
 import { useAtomValue } from "jotai";
 import { useMutation } from "@tanstack/react-query";
@@ -21,7 +21,13 @@ export function useProgramForDailyMutation() {
 
             const exerciseCloneList = program.exerciseList
                 .map((id) => exerciseListById[id])
-                .map((exo) => ({ ...exo, id: makeId(), madeFromExerciseId: exo.id, programId: selectedProgram.id }));
+                .map((exo) => ({
+                    ...exo,
+                    id: makeId(),
+                    madeFromExerciseId: exo.id,
+                    programId: selectedProgram.id,
+                    from: "program",
+                })) as ExerciseWithReferences[];
 
             const tx = orm.exercise.tx("readwrite");
             const insertMany = exerciseCloneList.map((exo) => tx.store.add(exo));

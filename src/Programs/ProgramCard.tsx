@@ -113,7 +113,8 @@ const EditableProgramCardHeader = ({ program, onEdit }: EditableProgramCardHeade
                 id: makeId(),
                 madeFromExerciseId: exo.id,
                 programId: programId,
-            }));
+                from: "program",
+            })) as Exercise[];
             const insertMany = newExos.map((exo) => tx.store.add(serializeExercise(exo)));
 
             const now = new Date();

@@ -18,6 +18,7 @@ export const saveAsJSON = async (serialized: string, fileHandle?: any) => {
 
 export const loadFromJSON = async <T>() => {
     const blob = await fileOpen({
+        id: "EmiFit",
         description: "EmiFIT files",
         extensions: [".json"],
         mimeTypes: ["application/json"],

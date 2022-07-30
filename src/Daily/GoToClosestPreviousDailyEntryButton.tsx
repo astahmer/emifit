@@ -12,7 +12,7 @@ export const GoToClosestPreviousDailyEntryButton = (props: ButtonProps) => {
     const mutation = useMutation(() => void setCurrentDate(lastFilledDaily));
 
     return (
-        <RadioCardButton {...props} onClick={mutation.mutate.bind(undefined)}>
+        <RadioCardButton {...props} onClick={() => mutation.mutate()}>
             <ChevronLeftIcon />
             Go to the closest previous daily entry
         </RadioCardButton>

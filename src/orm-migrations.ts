@@ -204,7 +204,7 @@ export const runMigrations: (
                     exoCursor.update({
                         ...exoCursor.value,
                         programId: programCursor.value.id,
-                        from: programCursor.value.madeFromProgramId ? "program-clone" : "program",
+                        from: programCursor.value.madeFromProgramId ? "program" : "program",
                     });
                 }
                 exoCursor = await exoCursor.continue();
@@ -296,6 +296,35 @@ export const runMigrations: (
 
             console.log("migrated to version", migrationVersion, `Add exercise.superset index`);
         }
+        migrationVersion++;
+    }
+
+    // nothing changed between v51 -> v59
+    if (migrationVersion >= 51 && migrationVersion <= 58) migrationVersion = 59;
+
+    // Add exercise.from = daily / exercise.dailyId when missing
+    if (migrationVersion === 59) {
+        let dailyCursor = await tx.objectStore("daily").openCursor();
+
+        while (dailyCursor) {
+            let exoCursor = await tx.objectStore("exercise").openCursor();
+            while (exoCursor) {
+                if (dailyCursor.value.exerciseList.includes(exoCursor.value.id)) {
+                    if (!exoCursor.value.from || !exoCursor.value.dailyId) {
+                        exoCursor.update({ ...exoCursor.value, dailyId: dailyCursor.value.id, from: "daily" });
+                    }
+                }
+                exoCursor = await exoCursor.continue();
+            }
+
+            dailyCursor = await dailyCursor.continue();
+        }
+
+        console.log(
+            "migrated to version",
+            migrationVersion,
+            `Add exercise.from = daily / exercise.dailyId when missing`
+        );
         migrationVersion++;
     }
 

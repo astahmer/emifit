@@ -19,6 +19,7 @@ import { InitialState } from "../Programs/InitialState";
 import { ProgramForm } from "../Programs/ProgramForm";
 import { programFormMachine } from "../Programs/programFormMachine";
 import { VFlex } from "@/components/VFlex";
+import { Exercise } from "@/orm-types";
 
 export const ProgramsPage = () => {
     const navigate = useNavigate();
@@ -38,7 +39,8 @@ export const ProgramsPage = () => {
                 id: makeId(),
                 madeFromExerciseId: exo.id,
                 programId,
-            }));
+                from: "program",
+            })) as Exercise[];
             const insertMany = newExos.map((exo) => tx.store.add(serializeExercise(exo)));
 
             const params = {

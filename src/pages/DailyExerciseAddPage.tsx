@@ -6,7 +6,7 @@ import { toasts } from "@/functions/toasts";
 import { makeId, printDate, slugify } from "@/functions/utils";
 import { orm } from "@/orm";
 import { useCurrentDailyInvalidate, useDailyQuery } from "@/orm-hooks";
-import { Exercise } from "@/orm-types";
+import { Exercise, ExerciseWithReferences } from "@/orm-types";
 import { makeExercise } from "@/orm-utils";
 import { routeMap } from "@/routes";
 import { Box } from "@chakra-ui/react";
@@ -35,7 +35,14 @@ export const DailyExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
     const addExerciseToDaily = useMutation(
         async (exo: Exercise) => {
             const name = exo.name.trim();
-            await orm.exercise.add({ ...serializeExercise(exo), name, slug: slugify(name) });
+            await orm.exercise.add({
+                ...serializeExercise(exo),
+                name,
+                slug: slugify(name),
+                from: "daily",
+                dailyId: daily.id,
+                madeFromExerciseId: exercise?.id,
+            });
             return orm.daily.upsert(daily.id, (current) => ({
                 ...current,
                 exerciseList: (current.exerciseList || []).concat(exo.id),
@@ -61,8 +68,8 @@ export const DailyExerciseAddPage = ({ exercise }: { exercise?: Exercise }) => {
             const forms = Object.values(service.state.context.supersetForms);
             const newExerciseList = forms.map((exo) => {
                 const exercise = makeExercise({ ...exo, category: daily.category });
-                return serializeExercise({ ...exercise, supersetId });
-            });
+                return serializeExercise({ ...exercise, supersetId, from: "daily", dailyId: daily.id });
+            }) as ExerciseWithReferences[];
             await Promise.all(newExerciseList.map((exo) => exoStore.add(exo)));
 
             await dailyStore.put({

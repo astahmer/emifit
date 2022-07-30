@@ -42,6 +42,7 @@ export const ExportImportData = () => {
         {
             onSuccess: () => void toasts.success("Data loaded successfully"),
             onError: (err) => {
+                console.log(err);
                 // @ts-ignore
                 if (err.message === "The user aborted a request.") return;
                 void toasts.error("Something unexpected happened while loading data");
@@ -93,18 +94,14 @@ export const ExportImportData = () => {
     return (
         <Stack>
             <Stack direction="row" ml="auto">
-                <Button
-                    leftIcon={<Icon as={BiImport} />}
-                    colorScheme="pink"
-                    onClick={exportMutation.mutate.bind(undefined)}
-                >
+                <Button leftIcon={<Icon as={BiImport} />} colorScheme="pink" onClick={() => exportMutation.mutate()}>
                     Export
                 </Button>
                 <Button
                     leftIcon={<Icon as={BiExport} />}
                     colorScheme="pink"
                     variant="outline"
-                    onClick={loadMutation.mutate.bind(undefined)}
+                    onClick={() => loadMutation.mutate()}
                 >
                     Import
                 </Button>
@@ -124,7 +121,7 @@ export const ExportImportData = () => {
                         showIdColumn={isDebugMode}
                     />
                     <ConfirmationButton
-                        onConfirm={importMutation.mutate.bind(undefined)}
+                        onConfirm={() => importMutation.mutate()}
                         colorScheme="twitter"
                         renderTrigger={(onOpen) => (
                             <Button
