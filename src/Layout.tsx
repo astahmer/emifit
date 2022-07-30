@@ -41,10 +41,11 @@ import { GoBackToTodayEntryButton } from "./Daily/GoBackToTodayEntryButton";
 import { GoToClosestPreviousDailyEntryButton } from "./Daily/GoToClosestPreviousDailyEntryButton";
 import { useLastFilledDailyDate } from "./Daily/useLastFilledDailyDate";
 import { createContextWithHook } from "./functions/createContextWithHook";
-import { useCurrentDailyCategory } from "./orm-hooks";
+import { useCurrentDailyCategory, useDailyQuery } from "./orm-hooks";
 import { on } from "pastable";
 import { createMachine } from "xstate";
 import { useInterpret } from "@xstate/react";
+import { printDate } from "./functions/utils";
 
 export const Layout = () => {
     const setDebugMode = useSetAtom(debugModeAtom);
@@ -84,6 +85,7 @@ export const Layout = () => {
     const drawerDragProps = useSwipeable({ delta: 30, onSwipedLeft: onClose });
 
     const [isCompact, setIsCompact] = useState(true);
+    useDailyQuery(printDate(new Date()), { staleTime: 60 * 1000 });
 
     return (
         <Flex as="main" direction="column" boxSize="100%" {...mainDragProps} style={{ touchAction: "none" }}>

@@ -1,6 +1,6 @@
 import { ConfirmationButton } from "@/fields/ConfirmationButton";
 import { orm } from "@/orm";
-import { useCurrentDaily } from "@/orm-hooks";
+import { useCurrentDaily, useDailyQuery } from "@/orm-hooks";
 import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
@@ -8,6 +8,7 @@ import { Box, HStack, IconButton } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import { Link as ReactLink } from "react-router-dom";
 import { FaRegCopy } from "react-icons/fa";
+import { printDate } from "@/functions/utils";
 
 export function ExerciseMenu({ exo }: { exo: Exercise }) {
     const daily = useCurrentDaily();
@@ -57,6 +58,10 @@ export function ExerciseMenu({ exo }: { exo: Exercise }) {
 }
 
 export function PastDailyExerciseMenu({ exo }: { exo: Exercise }) {
+    const todaysDaily = useDailyQuery(printDate(new Date()));
+    if (!todaysDaily.data) return null;
+    if (todaysDaily.data.category !== exo.category) return null;
+
     return (
         <Box ml="auto" mt="2" aria-label="menu">
             <IconButton

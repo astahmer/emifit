@@ -1,6 +1,6 @@
 import { sortArrayOfObjectByPropFromArray } from "pastable";
 import { useAtomValue } from "jotai";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { groupIn } from "./functions/groupBy";
 import {
     computeCategoryFromReferences,
@@ -8,22 +8,29 @@ import {
     computeExerciseFromReferences,
 } from "./functions/snapshot";
 import { orm, StoreIndex, StoreQueryParams } from "./orm";
-import { Category, Daily, DailyWithReferences, Exercise, Program, ProgramWithReferences } from "./orm-types";
+import { Category, Daily, DailyWithReferences, Exercise, Program } from "./orm-types";
 import { getMostRecentsExerciseById } from "./orm-utils";
 import { currentDailyIdAtom } from "./store";
 
-export const useDailyQuery = (id: DailyWithReferences["id"]) => {
-    const query = useQuery(["daily", "single", id], async () => {
-        const daily = await orm.daily.find(id);
-        if (!daily) return null;
+export const useDailyQuery = (
+    id: DailyWithReferences["id"],
+    options?: Omit<UseQueryOptions<Daily>, "queryKey" | "queryFn">
+) => {
+    const query = useQuery(
+        ["daily", "single", id],
+        async () => {
+            const daily = await orm.daily.find(id);
+            if (!daily) return null;
 
-        const [exerciseList, tagList] = await Promise.all([orm.exercise.get(), orm.tag.get()]);
-        const [exerciseListById, tagListById] = [groupIn(exerciseList, "id"), groupIn(tagList, "id")];
-        return {
-            ...daily,
-            exerciseList: daily.exerciseList.map(computeExerciseFromExoId(exerciseListById, tagListById)),
-        } as Daily;
-    });
+            const [exerciseList, tagList] = await Promise.all([orm.exercise.get(), orm.tag.get()]);
+            const [exerciseListById, tagListById] = [groupIn(exerciseList, "id"), groupIn(tagList, "id")];
+            return {
+                ...daily,
+                exerciseList: daily.exerciseList.map(computeExerciseFromExoId(exerciseListById, tagListById)),
+            } as Daily;
+        },
+        options
+    );
 
     return query;
 };
