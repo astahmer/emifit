@@ -2,6 +2,7 @@ import { useCompactState } from "@/Daily/ExpandButton";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { Exercise } from "@/orm-types";
 import { Flex, Heading, UseDisclosureProps } from "@chakra-ui/react";
+import { ExerciseNote } from "./ExerciseNote";
 import { ExerciseSetList, ExerciseSetListOverview } from "./ExerciseSetList";
 
 export function ExerciseListItem({
@@ -33,7 +34,12 @@ export function ExerciseListItem({
             </Flex>
             {withSetListOverview && <ExerciseSetListOverview setList={exo.series} />}
             <ExerciseTagList mt="2" tagList={exo.tags} isPreview={shouldShowAllTags ? false : toggle.isHidden} />
-            {toggle.isHidden ? null : <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />}
+            {toggle.isHidden ? null : (
+                <>
+                    <ExerciseSetList mt="2" fontSize="xs" setList={exo.series} />
+                    <ExerciseNote exo={exo} />
+                </>
+            )}
         </Flex>
     );
 }
