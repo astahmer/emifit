@@ -1,16 +1,19 @@
+import { AppExternalLinkIcon } from "@/components/AppExternalLinkIcon";
 import { DynamicTable, DynamicTableProps, makeColumns } from "@/components/DynamicTable";
 import { Show } from "@/components/Show";
 import { Exercise } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { Badge, Stack, Text } from "@chakra-ui/react";
 import { findBy } from "pastable";
 import { Link as ReactLink } from "react-router-dom";
 
 export const ExerciseTopSetsTable = ({
     exerciseList,
-    hiddenColumns,
-}: { exerciseList: Exercise[] } & Pick<DynamicTableProps<ExerciseWithTops, typeof columns>, "hiddenColumns">) => {
+    tableProps,
+}: {
+    exerciseList: Exercise[];
+    tableProps: Omit<DynamicTableProps<ExerciseWithTops, typeof columns>, "data" | "columns">;
+}) => {
     const { listWithTops, topKg, topReps } = getExerciseListWithTops(exerciseList);
 
     const data = listWithTops.map((exo) => ({
@@ -21,11 +24,11 @@ export const ExerciseTopSetsTable = ({
 
     return (
         <DynamicTable
-            columns={columns}
-            data={data}
             isHeaderSticky
             initialSortBy={[{ id: "createdAt", desc: true }]}
-            hiddenColumns={hiddenColumns}
+            {...tableProps}
+            columns={columns}
+            data={data}
         />
     );
 };
@@ -44,7 +47,7 @@ const columns = makeColumns<ExerciseWithTops>()([
                 alignItems="center"
                 spacing="1.5"
             >
-                <ExternalLinkIcon color="pink.700" opacity="0.6" boxSize="3" />
+                <AppExternalLinkIcon />
                 <Text color="pink.300" fontWeight="bold">
                     {new Date(props.getValue<string | Date>()).toLocaleDateString()}
                 </Text>

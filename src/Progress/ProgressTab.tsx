@@ -1,3 +1,4 @@
+import { AppExternalLinkIcon } from "@/components/AppExternalLinkIcon";
 import { DynamicTable } from "@/components/DynamicTable";
 import { Show } from "@/components/Show";
 import { VFlex } from "@/components/VFlex";
@@ -9,13 +10,24 @@ import { orm } from "@/orm";
 import { useCategoryList } from "@/orm-hooks";
 import { DailyWithReferences, ExerciseWithReferences } from "@/orm-types";
 import { printDailyDate } from "@/orm-utils";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { Box, Divider, Flex, Heading, Stack, Stat, StatGroup, StatLabel, StatNumber, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Divider,
+    Flex,
+    Heading,
+    Stack,
+    Stat,
+    StatGroup,
+    StatLabel,
+    StatNumber,
+    Text,
+    useTheme,
+} from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { CalendarValues } from "@uselessdev/datepicker";
-import { getSum } from "pastable";
-import { ComponentPropsWithoutRef, useState } from "react";
+import { get, getSum } from "pastable";
+import { useState } from "react";
 import { Link as ReactLink } from "react-router-dom";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from "recharts";
 import { DateRangePresetPicker, getRangeStart } from "../Calendar/DateRangePresetPicker";
@@ -52,10 +64,11 @@ export const ProgressTab = () => {
     const categoryList = useCategoryList();
     const byCategory = groupBy(dailyList, (daily) => daily.category);
 
-    const data = Object.entries(byCategory).map(([category, dailyList]) => ({
-        name: categoryList.find((cat) => cat.id === category)?.name,
-        value: dailyList.length,
-    }));
+    const theme = useTheme();
+    const data = Object.entries(byCategory).map(([catId, dailyList]) => {
+        const category = categoryList.find((cat) => cat.id === catId);
+        return { name: category.name, color: get(theme.colors, category.color || "pink.300"), value: dailyList.length };
+    });
 
     const [unitMode, setUnitMode] = useState<UnitMode>("count");
     const totals: StatsTotalByKind = {
@@ -168,25 +181,43 @@ const columns = [
                 alignItems="center"
                 spacing="1.5"
             >
-                <ExternalLinkIcon color="pink.700" opacity="0.6" boxSize="3" />
+                <AppExternalLinkIcon />
                 <Text color="pink.300" fontWeight="bold">
                     {new Date(props.row.original.dailyId).toLocaleDateString()}
                 </Text>
             </Stack>
         ),
     }),
-    { header: "Exo", accessorKey: "name" },
+    {
+        header: "Exo",
+        accessorKey: "name",
+        cell: (props) => (
+            <Stack
+                direction="row"
+                as={ReactLink}
+                to={`/inspect/${props.row.original.slug}`}
+                color="pink.300"
+                alignItems="center"
+                spacing="1.5"
+            >
+                <AppExternalLinkIcon />
+                <Text color="pink.300" fontWeight="bold">
+                    {props.renderValue<string>()}
+                </Text>
+            </Stack>
+        ),
+    },
     { header: "Kg", accessorKey: "topKg" },
     { header: "Reps", accessorKey: "topReps" },
 ] as Array<ColumnDef<ExerciseWithTopKgAndReps>>;
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
 const RADIAN = Math.PI / 180;
-const PieGraph = ({ data }: Pick<ComponentPropsWithoutRef<typeof Pie>, "data">) => {
+const PieGraph = ({ data }: { data: Array<{ name: string; color: string; value: number }> }) => {
     const unitMode = useUnitMode();
 
     return (
         <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+            <PieChart>
                 <Pie
                     animationDuration={400}
                     data={data}
@@ -215,8 +246,8 @@ const PieGraph = ({ data }: Pick<ComponentPropsWithoutRef<typeof Pie>, "data">) 
                         );
                     }}
                 >
-                    {data.map((_entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                 </Pie>
                 <Legend />
@@ -224,6 +255,7 @@ const PieGraph = ({ data }: Pick<ComponentPropsWithoutRef<typeof Pie>, "data">) 
         </ResponsiveContainer>
     );
 };
+
 type StatsTotalByKind = { daily: number; exercise: number; cardio: number | string };
 const StatTotals = ({ totals }: { totals: StatsTotalByKind }) => {
     return (
