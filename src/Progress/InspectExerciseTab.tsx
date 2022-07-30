@@ -92,10 +92,10 @@ export const InspectExerciseTab = () => {
                         gap="6"
                         p="4"
                         rounded="lg"
-                        gridAutoRows="minmax(80px, 1fr)"
+                        gridAutoRows="minmax(55px, 1fr)"
                         gridTemplateColumns="1fr 1fr"
                     >
-                        <Card colSpan={2} rowSpan={5}>
+                        <Card colSpan={2} rowSpan={7}>
                             <Text fontSize="md" fontWeight="bold" mb="1">
                                 Top kg/reps
                             </Text>
@@ -103,13 +103,13 @@ export const InspectExerciseTab = () => {
                                 <ExerciseWithTopKgAndRepsTableAndCharts exerciseListWithTops={exerciseListWithTops} />
                             </Box>
                         </Card>
-                        <Card colSpan={2} rowSpan={3}>
+                        <Card colSpan={2} rowSpan={4}>
                             <Text fontSize="md" fontWeight="bold" whiteSpace="nowrap">
                                 Usage by tag
                             </Text>
                             <ByTagPieGraph exerciseList={exerciseList} />
                         </Card>
-                        <Card colSpan={2} rowSpan={3}>
+                        <Card colSpan={2} rowSpan={4}>
                             <Stack direction="row" fontSize="md" fontWeight="bold" alignItems="flex-start" spacing={1}>
                                 <div>Total volume</div>
                                 <Text as="span" fontStyle="italic" fontSize="xs">
@@ -121,12 +121,12 @@ export const InspectExerciseTab = () => {
                                 <TotalKgVolumeLineGraph exerciseList={exerciseList} />
                             </Box>
                         </Card>
-                        <Card colSpan={2} rowSpan={2}>
+                        <Card colSpan={2} rowSpan={3}>
                             <Text fontSize="md" fontWeight="bold">
-                                Summary
+                                Stats (by day)
                             </Text>
                             <Box w="100%" h="100%" mt="2" maxH="100%" overflow="auto">
-                                <SummaryTable exerciseList={exerciseList} />
+                                <StatsTable exerciseList={exerciseList} />
                             </Box>
                         </Card>
                         {/* TODO +x kgs / -y reps, en mode <Stats> */}
@@ -367,15 +367,22 @@ const TotalKgVolumeLineGraph = ({ exerciseList }: WithExerciseList) => {
     );
 };
 
-const SummaryTable = ({ exerciseList }: WithExerciseList) => {
+const StatsTable = ({ exerciseList }: WithExerciseList) => {
     const setsCount = exerciseList.map((exo) => exo.series.length);
-    const kgsCount = exerciseList.flatMap((exo) => exo.series.map((set) => set.kg));
-    const repsCount = exerciseList.flatMap((exo) => exo.series.map((set) => set.reps));
-    const data = [getStats("sets", setsCount), getStats("kgs", kgsCount), getStats("reps", repsCount)];
+    const kgs = exerciseList.flatMap((exo) => exo.series.map((set) => set.kg));
+    const reps = exerciseList.flatMap((exo) => exo.series.map((set) => set.reps));
+    const volume = exerciseList.flatMap((exo) => getSum(exo.series.map((set) => set.kg * set.reps)));
 
-    return <DynamicTable size="xs" columns={summaryColumns} data={data} />;
+    const data = [
+        getStats("sets", setsCount),
+        getStats("kgs", kgs),
+        getStats("reps", reps),
+        getStats("volume", volume),
+    ];
+
+    return <DynamicTable size="xs" columns={statsColumns} data={data} />;
 };
-const summaryColumns = [
+const statsColumns = [
     { accessorKey: "type", header: null },
     { accessorKey: "min", header: "Min" },
     { accessorKey: "average", header: "Average" },
