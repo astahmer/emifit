@@ -212,22 +212,22 @@ const getExerciseTops = (exo: Exercise) =>
         createdAt: new Date(exo.createdAt),
         date: displayDate(new Date(exo.createdAt)),
         kgs: {
-            bot: Math.min(...exo.series.map((set) => set.kg)),
-            medium: roundTo(getSum(exo.series.map((set) => set.kg)) / exo.series.length, 2),
-            top: Math.max(...exo.series.map((set) => set.kg)),
+            min: Math.min(...exo.series.map((set) => set.kg)),
+            median: roundTo(getSum(exo.series.map((set) => set.kg)) / exo.series.length, 2),
+            max: Math.max(...exo.series.map((set) => set.kg)),
         },
         reps: {
-            bot: Math.min(...exo.series.map((set) => set.reps)),
-            medium: roundTo(getSum(exo.series.map((set) => set.reps)) / exo.series.length, 2),
-            top: Math.max(...exo.series.map((set) => set.reps)),
+            min: Math.min(...exo.series.map((set) => set.reps)),
+            median: roundTo(getSum(exo.series.map((set) => set.reps)) / exo.series.length, 2),
+            max: Math.max(...exo.series.map((set) => set.reps)),
         },
     } as ExerciseWithTops);
 
 const InspectExerciseHeader = ({ exerciseListWithTops }: { exerciseListWithTops: ExerciseWithTops[] }) => {
     const exercise = useLastExerciseCtx();
 
-    const topKg = Math.max(...exerciseListWithTops.map((exo) => exo.kgs.top));
-    const topReps = Math.max(...exerciseListWithTops.map((exo) => exo.reps.top));
+    const topKg = Math.max(...exerciseListWithTops.map((exo) => exo.kgs.max));
+    const topReps = Math.max(...exerciseListWithTops.map((exo) => exo.reps.max));
 
     const navigate = useNavigate();
 
@@ -275,9 +275,9 @@ interface ExerciseWithTops extends Exercise {
 }
 
 interface ExerciseTopValues {
-    bot: number;
-    medium: number;
-    top: number;
+    min: number;
+    median: number;
+    max: number;
 }
 
 const ExerciseWithTopKgAndRepsTableAndCharts = ({
@@ -326,9 +326,9 @@ const ExerciseTopsLineGraphInTabs = ({
     return (
         <Box w="100%" h="200px" my="4">
             <LineGraph data={data}>
-                <Line type="monotone" dataKey="bot" name="lowest" stroke="red" />
-                <Line type="monotone" dataKey="medium" name="average" stroke="#8884d8" />
-                <Line type="monotone" dataKey="top" name="best" stroke="#82ca9d" />
+                <Line type="monotone" dataKey="min" name="min" stroke="red" />
+                <Line type="monotone" dataKey="median" name="median" stroke="#8884d8" />
+                <Line type="monotone" dataKey="max" name="max" stroke="#82ca9d" />
                 <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
@@ -425,14 +425,14 @@ const StatsTable = ({ exerciseList }: WithExerciseList) => {
 const statsColumns = [
     { accessorKey: "type", header: null },
     { accessorKey: "min", header: "Min" },
-    { accessorKey: "average", header: "Average" },
-    // { accessorKey: "median", header: "Med." },
+    // { accessorKey: "average", header: "Average" },
+    { accessorKey: "median", header: "Med." },
     { accessorKey: "max", header: "Max" },
     { accessorKey: "sum", header: "Sum" },
 ];
 
-const getStats = (type: string, list: number[]) => ({ ...getMinAverageMaxSum(list), type });
-const getMinAverageMaxSum = (list: number[]) => {
+const getStats = (type: string, list: number[]) => ({ ...getMinAverageMedianMaxSum(list), type });
+const getMinAverageMedianMaxSum = (list: number[]) => {
     return {
         min: Math.min(...list),
         average: roundTo(getSum(list) / list.length, 2),
