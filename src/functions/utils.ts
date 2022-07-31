@@ -1,5 +1,6 @@
 import { format, parse } from "date-fns";
 import { nanoid } from "nanoid";
+import { getSum, roundTo } from "pastable";
 
 export const rmTrailingSlash = (path: string) => (path.endsWith("/") ? path.slice(0, path.length - 1) : path);
 export const makeId = () => nanoid(10);
@@ -31,3 +32,21 @@ export function slugify(text: string) {
 }
 
 export const requiredRule = { value: true, message: "This field is required" };
+export const median = (arr: number[]) => {
+    const mid = Math.floor(arr.length / 2),
+        nums = [...arr].sort((a, b) => a - b);
+    return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+};
+export const average = (array: number[]): number => {
+    return array.reduce((acc, curr) => acc + curr, 0) / array.length;
+};
+
+export const getListStats = (list: number[]) => {
+    return {
+        min: Math.min(...list),
+        average: roundTo(getSum(list) / list.length, 2),
+        median: median(list),
+        max: Math.max(...list),
+        sum: getSum(list),
+    };
+};

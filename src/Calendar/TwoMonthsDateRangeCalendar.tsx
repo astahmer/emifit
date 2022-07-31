@@ -14,6 +14,7 @@ import {
     CalendarValues,
     CalendarWeek,
 } from "@uselessdev/datepicker";
+import { createContextWithHook } from "pastable";
 import { ReactNode } from "react";
 import { useCalendarValues } from "./useCalendarValues";
 
@@ -27,12 +28,14 @@ export const TwoMonthsDateRangeCalendar = ({
     const { setDates, ...dates } = useCalendarValues();
 
     const categoryList = useCategoryList();
+    const override = useCalendarCtx();
 
     return (
         <Calendar
             value={dates}
             onSelectDate={(dates) => setDates(dates as CalendarValues)}
             months={MONTHS}
+            {...override}
             disableFutureDates
         >
             <VFlex>
@@ -61,3 +64,6 @@ export const TwoMonthsDateRangeCalendar = ({
         </Calendar>
     );
 };
+
+export const [CalendarPropsProvider, useCalendarCtx] =
+    createContextWithHook<Partial<Calendar>>("CalendarPropsProvider");

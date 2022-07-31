@@ -1,24 +1,27 @@
 import { CustomDateRangeCalendarButton } from "@/Calendar/CustomDateRangeCalendarButton";
 import {
-    baseRangePresets,
     DateRangePresetPicker,
+    defaultDateRangePresets,
     FallbackDatesProvider,
     getFallbackDates,
+    getInferedDateRangePreset,
     getRangeStart,
 } from "@/Calendar/DateRangePresetPicker";
+import { CalendarPropsProvider } from "@/Calendar/TwoMonthsDateRangeCalendar";
 import { CalendarValuesProvider, useCalendarValues } from "@/Calendar/useCalendarValues";
 import { DynamicTable } from "@/components/DynamicTable";
-import { MotionBox } from "@/components/MotionBox";
 import { Show } from "@/components/Show";
 import { VFlex } from "@/components/VFlex";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { ExerciseTopSetsTable } from "@/Exercises/ExerciseTopSetsTable";
-import { displayDate } from "@/functions/utils";
+import { displayDate, getListStats, median } from "@/functions/utils";
 import { ViewLayout } from "@/Layout";
 import { useExerciseUnsortedList } from "@/orm-hooks";
-import { Exercise, WithExerciseList } from "@/orm-types";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import { Exercise } from "@/orm-types";
+import { ArrowBackIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
+    Alert,
+    AlertIcon,
     Badge,
     Box,
     Divider,
@@ -26,8 +29,15 @@ import {
     Grid,
     GridItem,
     GridItemProps,
+    Heading,
     IconButton,
     Stack,
+    Stat,
+    StatArrow,
+    StatGroup,
+    StatHelpText,
+    StatLabel,
+    StatNumber,
     Tab,
     TabList,
     Tabs,
@@ -39,8 +49,9 @@ import {
     useTheme,
 } from "@chakra-ui/react";
 import { CalendarValues } from "@uselessdev/datepicker";
+import { differenceInDays, formatDistance, subDays } from "date-fns";
 import { createContextWithHook, get, getSum, roundTo, sortBy } from "pastable";
-import { ComponentPropsWithoutRef, PropsWithChildren, useRef, useState } from "react";
+import { ComponentPropsWithoutRef, PropsWithChildren, ReactNode, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     CartesianGrid,
@@ -55,45 +66,50 @@ import {
     XAxis,
     YAxis,
 } from "recharts";
+import { match } from "ts-pattern";
 import { CenteredSpinner } from "./CenteredSpinner";
 
 export const InspectExerciseTab = () => {
     const { exoSlug } = useParams();
     const query = useExerciseUnsortedList({ index: "by-slug", query: exoSlug });
 
-    const [dates, setDates] = useState<CalendarValues>({ start: getRangeStart("1y"), end: new Date() });
+    const [dates, setDates] = useState<CalendarValues>({ start: getRangeStart("1m"), end: new Date() });
     const exerciseList = sortBy(
-        (query.data || []).filter(
-            (exo) => exo.from === "daily" && exo.createdAt >= dates.start && exo.createdAt <= dates.end
-        ),
+        (query.data || []).filter((exo) => exo.from === "daily"),
         "createdAt"
+    );
+    const exerciseListInDateRange = exerciseList.filter(
+        (exo) => exo.createdAt >= dates.start && exo.createdAt <= dates.end
     );
 
     return (
         <Show when={Boolean(query.data?.length)} fallback={<CenteredSpinner h="100%" />}>
-            <LastExerciseProvider value={(query.data || []).at(-1)}>
-                <CalendarValuesProvider value={{ ...dates, setDates }}>
-                    <ExerciseListProvider value={exerciseList}>
-                        <ViewLayout>
-                            <InspectExerciseTabContent />
-                        </ViewLayout>
-                    </ExerciseListProvider>
-                </CalendarValuesProvider>
-            </LastExerciseProvider>
+            <DailyExerciseListProvider value={exerciseList}>
+                <LastExerciseProvider value={(query.data || []).at(-1)}>
+                    <CalendarValuesProvider value={{ ...dates, setDates }}>
+                        <ExerciseListInDateRangeProvider value={exerciseListInDateRange}>
+                            <ViewLayout>
+                                <InspectExerciseTabContent />
+                            </ViewLayout>
+                        </ExerciseListInDateRangeProvider>
+                    </CalendarValuesProvider>
+                </LastExerciseProvider>
+            </DailyExerciseListProvider>
         </Show>
     );
 };
 
-const [ExerciseListProvider, useExerciseListCtx] = createContextWithHook<Exercise[]>("ExerciseListCtx");
+const [ExerciseListInDateRangeProvider, useExerciseListInDateRangeCtx] =
+    createContextWithHook<Exercise[]>("ExerciseListCtx");
+
+const [DailyExerciseListProvider, useDailyExericseListCtx] = createContextWithHook<Exercise[]>("DailyExerciseListCtx");
+
 const [LastExerciseProvider, useLastExerciseCtx] = createContextWithHook<Exercise>("LastExerciseCtx");
 
 const InspectExerciseTabContent = () => {
-    const { setDates, ...dates } = useCalendarValues();
-    const exerciseList = useExerciseListCtx();
-    const exerciseListWithTops = exerciseList.map(getExerciseTops);
-
-    const rangeContainerRef = useRef();
-    const fallbackDates = useConst(getFallbackDates(dates).fallbackDates);
+    const dates = useCalendarValues();
+    const exerciseListInDateRange = useExerciseListInDateRangeCtx();
+    const exerciseListWithTops = exerciseListInDateRange.map(getExerciseTops);
 
     return (
         <>
@@ -103,7 +119,7 @@ const InspectExerciseTabContent = () => {
             </VFlex>
             <VFlex h="100%" minH={0} bgColor="gray.100">
                 <VFlex px="4" pos="relative" overflow="hidden">
-                    <MotionBox
+                    <Box
                         pos="absolute"
                         left="50%"
                         transform="translateX(-50%)"
@@ -114,23 +130,8 @@ const InspectExerciseTabContent = () => {
                         h="100%"
                     />
                     {/* TODO Dropdown avec les presets quand on clique plutôt que tout dispo via Flex ? */}
-                    <VFlex px="4" pos="relative" pt="4" pb="60px" alignItems="center">
-                        <Flex alignItems="center" mb="4">
-                            <FallbackDatesProvider value={fallbackDates}>
-                                <CustomDateRangeCalendarButton
-                                    calendarRef={rangeContainerRef}
-                                    renderTrigger={({ onOpen }) => (
-                                        <Tag colorScheme="pink" variant="solid" onClick={onOpen}>
-                                            <TagLabel>
-                                                {displayDate(dates.start)} - {displayDate(dates.end)}
-                                            </TagLabel>
-                                        </Tag>
-                                    )}
-                                />
-                            </FallbackDatesProvider>
-                        </Flex>
-                        <DateRangePresetPicker rangePresets={baseRangePresets.slice(1)} />
-                    </VFlex>
+
+                    <InspectExerciseDateRange />
                     <Divider mt="2" />
                 </VFlex>
                 <ViewLayout pb="60px">
@@ -145,9 +146,24 @@ const InspectExerciseTabContent = () => {
                         gridAutoRows="minmax(55px, 1fr)"
                         gridTemplateColumns="1fr 1fr"
                     >
+                        {/* Le même à faire dans Progress (pas spécifique à un exo mais tous) */}
+                        <Card colSpan={2} rowSpan={3}>
+                            <ProgressSinceDate
+                                renderTitle={(since) => (
+                                    <Stack spacing={1} mb="2">
+                                        <Text fontSize="md" fontWeight="bold">
+                                            Progress compared to the last period:
+                                        </Text>
+                                        <Text fontSize="sm" whiteSpace="nowrap">
+                                            {displayDate(since)} - {displayDate(dates.start)}
+                                        </Text>
+                                    </Stack>
+                                )}
+                            />
+                        </Card>
                         <Card colSpan={2} rowSpan={7}>
                             <Text fontSize="md" fontWeight="bold" mb="1">
-                                Top kg/reps
+                                Top kg/reps (by day)
                             </Text>
                             <Box my="auto">
                                 <ExerciseWithTopKgAndRepsTableAndCharts exerciseListWithTops={exerciseListWithTops} />
@@ -157,7 +173,7 @@ const InspectExerciseTabContent = () => {
                             <Text fontSize="md" fontWeight="bold" whiteSpace="nowrap">
                                 Usage by tag
                             </Text>
-                            <ByTagPieGraph exerciseList={exerciseList} />
+                            <ByTagPieGraph />
                         </Card>
                         <Card colSpan={2} rowSpan={4}>
                             <Stack direction="row" fontSize="md" fontWeight="bold" alignItems="flex-start" spacing={1}>
@@ -168,7 +184,7 @@ const InspectExerciseTabContent = () => {
                                 <div>by day</div>
                             </Stack>
                             <Box w="100%" h="100%" mt="2">
-                                <TotalKgVolumeLineGraph exerciseList={exerciseList} />
+                                <TotalKgVolumeLineGraph />
                             </Box>
                         </Card>
                         <Card colSpan={2} rowSpan={3}>
@@ -176,16 +192,8 @@ const InspectExerciseTabContent = () => {
                                 Stats (by day)
                             </Text>
                             <Box w="100%" h="100%" mt="2" maxH="100%" overflow="auto">
-                                <StatsTable exerciseList={exerciseList} />
+                                <StatsTable />
                             </Box>
-                        </Card>
-                        {/* TODO +x kgs / -y reps, en mode <Stats> */}
-                        {/* Le même à faire dans Progress (pas spécifique à un exo mais tous) */}
-                        <Card colSpan={2}>
-                            <Text fontSize="md" fontWeight="bold">
-                                Progress avec last week/last month
-                            </Text>
-                            <ProgressSinceDate exerciseList={exerciseList} />
                         </Card>
                         {/* TODO History page:
                         vue comme Google Agenda où on a une liste avec :
@@ -206,25 +214,27 @@ const Card = (props: GridItemProps) => {
     return <GridItem display="flex" flexDirection="column" p="3" boxShadow="lg" rounded="md" bg="white" {...props} />;
 };
 
-const getExerciseTops = (exo: Exercise) =>
-    ({
+const getExerciseTops = (exo: Exercise) => {
+    return {
         ...exo,
         createdAt: new Date(exo.createdAt),
         date: displayDate(new Date(exo.createdAt)),
         kgs: {
             min: Math.min(...exo.series.map((set) => set.kg)),
-            median: roundTo(getSum(exo.series.map((set) => set.kg)) / exo.series.length, 2),
+            median: median(exo.series.map((set) => set.kg)),
             max: Math.max(...exo.series.map((set) => set.kg)),
         },
         reps: {
             min: Math.min(...exo.series.map((set) => set.reps)),
-            median: roundTo(getSum(exo.series.map((set) => set.reps)) / exo.series.length, 2),
+            median: median(exo.series.map((set) => set.reps)),
             max: Math.max(...exo.series.map((set) => set.reps)),
         },
-    } as ExerciseWithTops);
+    } as ExerciseWithTops;
+};
 
 const InspectExerciseHeader = ({ exerciseListWithTops }: { exerciseListWithTops: ExerciseWithTops[] }) => {
     const exercise = useLastExerciseCtx();
+    const exerciseList = useDailyExericseListCtx();
 
     const topKg = Math.max(...exerciseListWithTops.map((exo) => exo.kgs.max));
     const topReps = Math.max(...exerciseListWithTops.map((exo) => exo.reps.max));
@@ -246,16 +256,18 @@ const InspectExerciseHeader = ({ exerciseListWithTops }: { exerciseListWithTops:
                 <Stack alignItems="flex-start" w="100%">
                     <Flex alignItems="center">
                         <Text mr="1" fontWeight="bold">
-                            {exercise?.name}
+                            {exercise.name}
                         </Text>
-                        <Text fontSize="xs">({exerciseListWithTops.length})</Text>
+                        <Text fontSize="xs">
+                            ({exerciseListWithTops.length} / {exerciseList.length})
+                        </Text>
                     </Flex>
-                    {Boolean(exercise?.tags?.length) && <ExerciseTagList tagList={exercise.tags} />}
+                    {Boolean(exercise.tags?.length) && <ExerciseTagList tagList={exercise.tags} />}
                 </Stack>
             </Stack>
             <Stack ml="auto" mr="2">
                 <Tag size="sm" colorScheme="pink" borderRadius="full" variant="subtle" alignSelf="center">
-                    {exercise?.category}
+                    {exercise.category}
                 </Tag>
                 <Badge variant="outline" colorScheme="pink" fontSize="x-small">
                     Top kg {topKg}
@@ -265,6 +277,45 @@ const InspectExerciseHeader = ({ exerciseListWithTops }: { exerciseListWithTops:
                 </Badge>
             </Stack>
         </Flex>
+    );
+};
+
+const InspectExerciseDateRange = () => {
+    const dates = useCalendarValues();
+    const rangeContainerRef = useRef();
+    const fallbackDates = useConst(getFallbackDates(dates).fallbackDates);
+
+    const exerciseList = useDailyExericseListCtx();
+    const oldestExercise = exerciseList[0];
+
+    const ranges = defaultDateRangePresets
+        .slice(1)
+        // Always include the preset even if its start date is earlier than the oldest exercise
+        // (so that the user can see the oldest exercise in case the previous preset doesn't include it)
+        .filter((_preset, index, arr) =>
+            arr[index - 1] ? getRangeStart(arr[index - 1]) >= oldestExercise?.createdAt : true
+        );
+
+    return (
+        <VFlex px="4" pos="relative" pt="4" alignItems="center" pb={ranges.length > 1 ? "60px" : "10px"}>
+            <Flex alignItems="center" mb="4">
+                <CalendarPropsProvider value={{ disablePastDates: oldestExercise?.createdAt }}>
+                    <FallbackDatesProvider value={fallbackDates}>
+                        <CustomDateRangeCalendarButton
+                            calendarRef={rangeContainerRef}
+                            renderTrigger={({ onOpen }) => (
+                                <Tag colorScheme="pink" variant="solid" onClick={onOpen}>
+                                    <TagLabel>
+                                        {displayDate(dates.start)} - {displayDate(dates.end)}
+                                    </TagLabel>
+                                </Tag>
+                            )}
+                        />
+                    </FallbackDatesProvider>
+                </CalendarPropsProvider>
+            </Flex>
+            {ranges.length > 1 && <DateRangePresetPicker rangePresets={ranges} />}
+        </VFlex>
     );
 };
 
@@ -287,7 +338,7 @@ const ExerciseWithTopKgAndRepsTableAndCharts = ({
 }) => {
     return (
         <Tabs variant="soft-rounded" colorScheme="pink" display="flex" flexDirection="column">
-            <ExerciseTopSetsTableInTabs exerciseList={exerciseListWithTops} />
+            <ExerciseTopSetsTableInTabs exerciseListWithTops={exerciseListWithTops} />
 
             <TabList mt="5" alignSelf="center" display="inline-flex" borderRadius="full" bgColor="gray.100">
                 <Tab>kgs</Tab>
@@ -299,17 +350,16 @@ const ExerciseWithTopKgAndRepsTableAndCharts = ({
     );
 };
 
-const ExerciseTopSetsTableInTabs = ({ exerciseList }: WithExerciseList) => {
+const ExerciseTopSetsTableInTabs = ({ exerciseListWithTops }: { exerciseListWithTops: ExerciseWithTops[] }) => {
     const ctx = useTabsContext();
 
     return (
         <Box maxH="170px" overflow="auto">
             <ExerciseTopSetsTable
-                exerciseList={exerciseList}
+                exerciseList={exerciseListWithTops}
                 tableProps={{
                     size: "xs",
                     hiddenColumns: ctx.selectedIndex === 0 ? ["topReps", "kgWithTopReps"] : ["topKg", "repsWithTopKg"],
-                    // isHeaderSticky: false,
                 }}
             />
         </Box>
@@ -363,10 +413,12 @@ const PieColorNames = [
     "purple.300",
     "gray.300",
 ];
-const ByTagPieGraph = ({ exerciseList }: { exerciseList: Exercise[] }) => {
+const ByTagPieGraph = () => {
     const exercise = useLastExerciseCtx();
+    const exerciseListInDateRange = useExerciseListInDateRangeCtx();
+
     const byTags = Object.fromEntries(
-        exercise.tags.map((tag) => [tag.id, exerciseList.filter((exo) => exo.tags.includes(tag)).length])
+        exercise.tags.map((tag) => [tag.id, exerciseListInDateRange.filter((exo) => exo.tags.includes(tag)).length])
     );
     const theme = useTheme();
     const colors = PieColorNames.map((name) => get(theme.colors, name));
@@ -391,8 +443,9 @@ const ByTagPieGraph = ({ exerciseList }: { exerciseList: Exercise[] }) => {
     );
 };
 
-const TotalKgVolumeLineGraph = ({ exerciseList }: WithExerciseList) => {
-    const data = exerciseList.map((exo) => ({
+const TotalKgVolumeLineGraph = () => {
+    const exerciseListInDateRange = useExerciseListInDateRangeCtx();
+    const data = exerciseListInDateRange.map((exo) => ({
         date: displayDate(exo.createdAt),
         volume: getSum(exo.series.map((set) => set.kg * set.reps)),
     }));
@@ -407,17 +460,15 @@ const TotalKgVolumeLineGraph = ({ exerciseList }: WithExerciseList) => {
     );
 };
 
-const StatsTable = ({ exerciseList }: WithExerciseList) => {
-    const setsCount = exerciseList.map((exo) => exo.series.length);
-    const kgs = exerciseList.flatMap((exo) => exo.series.map((set) => set.kg));
-    const reps = exerciseList.flatMap((exo) => exo.series.map((set) => set.reps));
-    const volume = exerciseList.flatMap((exo) => getSum(exo.series.map((set) => set.kg * set.reps)));
+const StatsTable = () => {
+    const exerciseListInDateRange = useExerciseListInDateRangeCtx();
+    const { setsCount, kgs, reps, volume } = getExerciseListStats(exerciseListInDateRange);
 
     const data = [
-        getStats("sets", setsCount),
-        getStats("kgs", kgs),
-        getStats("reps", reps),
-        getStats("volume", volume),
+        getStatsWithType("sets", setsCount),
+        getStatsWithType("kgs", kgs),
+        getStatsWithType("reps", reps),
+        getStatsWithType("volume", volume),
     ];
 
     return <DynamicTable size="xs" columns={statsColumns} data={data} />;
@@ -431,18 +482,178 @@ const statsColumns = [
     { accessorKey: "sum", header: "Sum" },
 ];
 
-const getStats = (type: string, list: number[]) => ({ ...getMinAverageMedianMaxSum(list), type });
-const getMinAverageMedianMaxSum = (list: number[]) => {
-    return {
-        min: Math.min(...list),
-        average: roundTo(getSum(list) / list.length, 2),
-        median: list[Math.floor(list.length / 2)],
-        max: Math.max(...list),
-        sum: getSum(list),
-    };
+const getStatsWithType = (type: string, list: number[]) => ({ ...getListStats(list), type });
+const getExerciseListStats = (exerciseList: Exercise[]) => {
+    const setsCount = exerciseList.map((exo) => exo.series.length);
+    const kgs = exerciseList.flatMap((exo) => exo.series.map((set) => set.kg));
+    const reps = exerciseList.flatMap((exo) => exo.series.map((set) => set.reps));
+    const volume = exerciseList.flatMap((exo) => getSum(exo.series.map((set) => set.kg * set.reps)));
+
+    return { setsCount, kgs, reps, volume };
 };
 
-const ProgressSinceDate = ({ exerciseList }: WithExerciseList) => {
-    console.log(exerciseList);
-    return null;
+const ProgressSinceDate = ({ renderTitle }: { renderTitle: (since: Date) => ReactNode }) => {
+    const { start, end } = useCalendarValues();
+
+    const diffInDays = differenceInDays(end, start);
+    const prevStartByDays = subDays(start, diffInDays);
+    const range = getInferedDateRangePreset(prevStartByDays, start);
+    const prevStart = range.date;
+
+    const exerciseListFromDaily = useDailyExericseListCtx();
+    const exerciseListInPrevDateRange = exerciseListFromDaily.filter(
+        (exo) => exo.createdAt >= prevStart && exo.createdAt <= start
+    );
+
+    return (
+        <>
+            {renderTitle(prevStart)}
+            <Show
+                when={Boolean(exerciseListInPrevDateRange.length)}
+                fallback={
+                    <Alert display="flex" flexDirection="column" my="auto" variant="subtle" status="warning">
+                        <AlertIcon />
+                        <span>No data between these dates ! 😢</span>
+                        <span>
+                            First occurence was the{" "}
+                            <Text as="span" fontWeight="bold">
+                                {displayDate(exerciseListFromDaily[0].createdAt)}
+                            </Text>
+                        </span>
+                    </Alert>
+                }
+            >
+                {Boolean(exerciseListInPrevDateRange.length) && (
+                    <Tabs variant="soft-rounded" colorScheme="pink" display="flex" flexDirection="column">
+                        <ProgressSinceDateStats exerciseListInPrevDateRange={exerciseListInPrevDateRange} />
+
+                        <TabList
+                            mt="1.5"
+                            alignSelf="center"
+                            display="inline-flex"
+                            borderRadius="full"
+                            bgColor="gray.100"
+                        >
+                            <Tab>min</Tab>
+                            <Tab>average</Tab>
+                            <Tab>median</Tab>
+                            <Tab>max</Tab>
+                        </TabList>
+                    </Tabs>
+                )}
+            </Show>
+        </>
+    );
+};
+
+const ProgressSinceDateStats = ({ exerciseListInPrevDateRange }: { exerciseListInPrevDateRange: Exercise[] }) => {
+    const prevStats = getExerciseListStats(exerciseListInPrevDateRange);
+
+    const exerciseListInDateRange = useExerciseListInDateRangeCtx();
+    const stats = getExerciseListStats(exerciseListInDateRange);
+
+    const ctx = useTabsContext();
+    const getStat = match(ctx.focusedIndex)
+        .with(0, () => (list: number[]) => Math.min(...list))
+        .with(1, () => (list: number[]) => roundTo(getSum(list) / list.length, 2))
+        .with(2, () => median)
+        .with(3, () => (list: number[]) => Math.max(...list))
+        .run();
+
+    const diffs = {
+        kg: roundTo(getStat(stats.kgs) - getStat(prevStats.kgs)),
+        reps: roundTo(getStat(stats.reps) - getStat(prevStats.reps)),
+        volume: roundTo(getStat(stats.volume) - getStat(prevStats.volume)),
+    };
+
+    return (
+        <StatGroup>
+            <Stat>
+                <StatLabel>Kgs</StatLabel>
+                <StatNumber>
+                    {match(diffs.kg)
+                        .when(
+                            (diff) => diff === 0,
+                            () => (
+                                <Box display="inline-flex">
+                                    <StatArrow type="increase" />
+                                    <StatArrow type="decrease" />
+                                </Box>
+                            )
+                        )
+                        .when(
+                            (diff) => diff > 0,
+                            () => <StatArrow type="increase" />
+                        )
+                        .when(
+                            (diff) => diff < 0,
+                            () => <StatArrow type="decrease" />
+                        )
+                        .run()}
+                    {diffs.kg}
+                </StatNumber>
+                <StatHelpText display="flex" alignItems="center">
+                    {getStat(prevStats.kgs)} <ChevronRightIcon /> {getStat(stats.kgs)}
+                </StatHelpText>
+            </Stat>
+
+            <Stat>
+                <StatLabel>Reps</StatLabel>
+                <StatNumber>
+                    {match(diffs.reps)
+                        .when(
+                            (diff) => diff === 0,
+                            () => (
+                                <Box display="inline-flex">
+                                    <StatArrow type="increase" />
+                                    <StatArrow type="decrease" />
+                                </Box>
+                            )
+                        )
+                        .when(
+                            (diff) => diff > 0,
+                            () => <StatArrow type="increase" />
+                        )
+                        .when(
+                            (diff) => diff < 0,
+                            () => <StatArrow type="decrease" />
+                        )
+                        .run()}
+                    {diffs.reps}
+                </StatNumber>
+                <StatHelpText display="flex" alignItems="center">
+                    {getStat(prevStats.reps)} <ChevronRightIcon /> {getStat(stats.reps)}
+                </StatHelpText>
+            </Stat>
+
+            <Stat>
+                <StatLabel>Volume</StatLabel>
+                <StatNumber>
+                    {match(diffs.volume)
+                        .when(
+                            (diff) => diff === 0,
+                            () => (
+                                <Box display="inline-flex">
+                                    <StatArrow type="increase" />
+                                    <StatArrow type="decrease" />
+                                </Box>
+                            )
+                        )
+                        .when(
+                            (diff) => diff > 0,
+                            () => <StatArrow type="increase" />
+                        )
+                        .when(
+                            (diff) => diff < 0,
+                            () => <StatArrow type="decrease" />
+                        )
+                        .run()}
+                    {diffs.volume}
+                </StatNumber>
+                <StatHelpText display="flex" alignItems="center">
+                    {getStat(prevStats.volume)} <ChevronRightIcon /> {getStat(stats.volume)}
+                </StatHelpText>
+            </Stat>
+        </StatGroup>
+    );
 };
