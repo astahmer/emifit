@@ -260,7 +260,7 @@ const tagsColumns = [
         accessorKey: "__actions",
         enableSorting: false,
         cell: ({ row }) => {
-            const tag = row.original as Tag;
+            const tag = row.original;
             const categoryList = useCategoryList().filter((category) =>
                 category.tagList.map((tag) => tag.id).includes(tag.id)
             );
@@ -375,7 +375,7 @@ const categoryColumns = [
         accessorKey: "__actions",
         enableSorting: false,
         cell: ({ row }) => {
-            const category = row.original as Category;
+            const category = row.original;
 
             const queryClient = useQueryClient();
             const deleteMutation = useMutation(async () => orm.category.delete(category.id), {
@@ -454,7 +454,7 @@ const groupColumns = [
         accessorKey: "__actions",
         enableSorting: false,
         cell: ({ row }) => {
-            const group = row.original as Group;
+            const group = row.original;
 
             const queryClient = useQueryClient();
             const deleteMutation = useMutation(async () => orm.group.delete(group.id), {
@@ -519,7 +519,7 @@ const exerciseColumns = [
         accessorKey: "__actions",
         enableSorting: false,
         cell: ({ row }) => {
-            const exercise = row.original as Exercise;
+            const exercise = row.original;
             const queryClient = useQueryClient();
 
             const editMutation = useMutation(

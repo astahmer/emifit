@@ -58,7 +58,7 @@ const columns = makeColumns<ExerciseWithTops>()([
         header: "top kg",
         accessorKey: "topKg",
         cell: (props) => {
-            const exo = props.row.original as ExerciseWithTops;
+            const exo = props.row.original;
             const list = props.table.getSortedRowModel().rows;
 
             const sortedIndex = findBy(list, "original.id", exo.id, true);
@@ -84,12 +84,11 @@ const columns = makeColumns<ExerciseWithTops>()([
             );
         },
     },
-    { header: "reps", accessorKey: "repsWithTopKg" },
     {
-        header: "top reps",
-        accessorKey: "topReps",
+        header: "reps",
+        accessorKey: "repsWithTopKg",
         cell: (props) => {
-            const exo = props.row.original as ExerciseWithTops;
+            const exo = props.row.original;
             const list = props.table.getSortedRowModel().rows;
 
             const sortedIndex = findBy(list, "original.id", exo.id, true);
@@ -115,7 +114,66 @@ const columns = makeColumns<ExerciseWithTops>()([
             );
         },
     },
-    { header: "kg", accessorKey: "kgWithTopReps" },
+    {
+        header: "top reps",
+        accessorKey: "topReps",
+        cell: (props) => {
+            const exo = props.row.original;
+            const list = props.table.getSortedRowModel().rows;
+
+            const sortedIndex = findBy(list, "original.id", exo.id, true);
+            const next = list[sortedIndex + 1];
+            const diff = sortedIndex < list.length - 1 ? exo.topReps - next?.original.topReps : 0;
+
+            return (
+                <Stack direction="row" alignItems="center">
+                    <Text {...(exo.isTopReps ? { color: "pink.300", fontWeight: "bold" } : undefined)}>
+                        {props.getValue<number>()}
+                    </Text>
+                    <Show when={diff !== 0}>
+                        <Badge
+                            variant="subtle"
+                            colorScheme={diff > 0 ? "whatsapp" : "red"}
+                            fontSize="x-small"
+                            fontStyle="italic"
+                        >
+                            {diff > 0 ? "+" + diff : diff}
+                        </Badge>
+                    </Show>
+                </Stack>
+            );
+        },
+    },
+    {
+        header: "kg",
+        accessorKey: "kgWithTopReps",
+        cell: (props) => {
+            const exo = props.row.original;
+            const list = props.table.getSortedRowModel().rows;
+
+            const sortedIndex = findBy(list, "original.id", exo.id, true);
+            const next = list[sortedIndex + 1];
+            const diff = sortedIndex < list.length - 1 ? exo.topKg - next?.original.topKg : 0;
+
+            return (
+                <Stack direction="row" alignItems="center">
+                    <Text {...(exo.isTopKg ? { color: "pink.300", fontWeight: "bold" } : undefined)}>
+                        {props.getValue<number>()}
+                    </Text>
+                    <Show when={diff !== 0}>
+                        <Badge
+                            variant="subtle"
+                            colorScheme={diff > 0 ? "whatsapp" : "red"}
+                            fontSize="x-small"
+                            fontStyle="italic"
+                        >
+                            {diff > 0 ? "+" + diff : diff}
+                        </Badge>
+                    </Show>
+                </Stack>
+            );
+        },
+    },
 ]);
 
 export interface ExerciseWithTops extends Exercise {
