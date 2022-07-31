@@ -20,7 +20,7 @@ export function DevTools() {
             w="100%"
             flexShrink={0}
             position={location.pathname.includes("/settings") ? "relative" : "fixed"}
-            bottom="0"
+            bottom="50px"
             left="0"
             right="0"
             bg="gray.400"
