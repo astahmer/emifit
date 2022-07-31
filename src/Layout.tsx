@@ -1,7 +1,9 @@
 import {
     Box,
+    BoxProps,
     Divider,
     Flex,
+    FlexProps,
     Icon,
     List,
     ListItem,
@@ -60,6 +62,7 @@ export const Layout = () => {
         isScrollingRef.current = state.matches("scrolling");
     });
 
+    // Keep track of when user is scrolling to disable swiping in the meantime
     useEffect(() => {
         return on(
             window,
@@ -88,16 +91,21 @@ export const Layout = () => {
     useDailyQuery(printDate(new Date()), { staleTime: 60 * 1000 });
 
     return (
-        <Flex as="main" direction="column" boxSize="100%" {...mainDragProps} style={{ touchAction: "none" }}>
-            <Flex as="section" id="View" direction="column" h="100%" overflow="hidden" pos="relative">
-                <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <CompactProvider value={[isCompact, setIsCompact]}>
-                        <Outlet />
-                    </CompactProvider>
-                </ErrorBoundary>
-            </Flex>
+        <Flex
+            id="Layout"
+            as="main"
+            direction="column"
+            boxSize="100%"
+            {...mainDragProps}
+            style={{ touchAction: "none" }}
+        >
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <CompactProvider value={[isCompact, setIsCompact]}>
+                    <Outlet />
+                </CompactProvider>
+            </ErrorBoundary>
             <DevTools />
-            <Box as="footer" mt="auto" w="100%" flexShrink={0}>
+            <Box as="footer" mt="auto" w="100%" flexShrink={0} pos="fixed" bottom="-20px">
                 <BottomTabs />
             </Box>
             <Box pos="fixed" bottom="70px">
@@ -126,6 +134,11 @@ export const Layout = () => {
         </Flex>
     );
 };
+
+export const ViewLayout = (props: FlexProps) => (
+    <Flex {...props} as="section" className="View" direction="column" h="100%" overflow="hidden" pos="relative" />
+);
+export const FooterSpacer = (props: BoxProps) => <Box h="75px" {...props} />;
 
 const scrollMachine = createMachine({
     id: "scrollMachine",

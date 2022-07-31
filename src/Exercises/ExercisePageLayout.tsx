@@ -1,6 +1,7 @@
 import { VFlex } from "@/components/VFlex";
 import { getRouteTypeFromPathname } from "@/Daily/DailyExercisePageLayout";
-import { Box, Heading } from "@chakra-ui/react";
+import { FooterSpacer, ViewLayout } from "@/Layout";
+import { Heading } from "@chakra-ui/react";
 import { Outlet, useLocation } from "react-router-dom";
 import { match } from "ts-pattern";
 
@@ -16,11 +17,14 @@ export function ExercisePageLayout() {
         .run();
 
     return (
-        <VFlex id="DailyExercisePageLayout" as="section" h="100%" p="4" w="100%">
-            <Heading as="h1">{title}</Heading>
-            <VFlex id="DailyExercisePageLayoutOutlet" mt="auto" minH="0">
-                <Outlet />
-            </VFlex>
-        </VFlex>
+        <ViewLayout>
+            <ViewLayout id="ExercisePageLayout" p="4">
+                <Heading as="h1">{title}</Heading>
+                <VFlex id="ExercisePageLayoutOutlet" mt="auto" minH="0">
+                    <Outlet />
+                </VFlex>
+            </ViewLayout>
+            <FooterSpacer />
+        </ViewLayout>
     );
 }

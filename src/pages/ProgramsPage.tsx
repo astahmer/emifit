@@ -18,8 +18,8 @@ import { useNavigate } from "react-router-dom";
 import { InitialState } from "../Programs/InitialState";
 import { ProgramForm } from "../Programs/ProgramForm";
 import { programFormMachine } from "../Programs/programFormMachine";
-import { VFlex } from "@/components/VFlex";
 import { Exercise } from "@/orm-types";
+import { FooterSpacer, ViewLayout } from "@/Layout";
 
 export const ProgramsPage = () => {
     const navigate = useNavigate();
@@ -108,31 +108,34 @@ export const ProgramsPage = () => {
     const [sortByDirection, setSortByDirection] = useState<SortByDirection>("asc");
 
     return (
-        <ProgramInterpretProvider value={interpret}>
-            <VFlex id="ProgramsPage" h="100%" p="4" w="100%">
-                <Flex alignItems="center">
-                    <Heading as="h1">Programs</Heading>
-                    {state.matches("initial") && (
-                        <SortByIconButton
-                            ml="auto"
-                            variant="outline"
-                            sortByDirection={sortByDirection}
-                            onSortByDirectionChange={setSortByDirection}
-                        />
+        <ViewLayout>
+            <ProgramInterpretProvider value={interpret}>
+                <ViewLayout id="ProgramsPage" h="100%" p="4" w="100%">
+                    <Flex alignItems="center">
+                        <Heading as="h1">Programs</Heading>
+                        {state.matches("initial") && (
+                            <SortByIconButton
+                                ml="auto"
+                                variant="outline"
+                                sortByDirection={sortByDirection}
+                                onSortByDirectionChange={setSortByDirection}
+                            />
+                        )}
+                    </Flex>
+                    {query.isFetched && (
+                        <>
+                            {state.matches("initial") && <InitialState sortByDirection={sortByDirection} />}
+                            {state.matches("creating") && <ProgramForm />}
+                        </>
                     )}
-                </Flex>
-                {query.isFetched && (
-                    <>
-                        {state.matches("initial") && <InitialState sortByDirection={sortByDirection} />}
-                        {state.matches("creating") && <ProgramForm />}
-                    </>
+                </ViewLayout>
+                {debugMode && (
+                    <Box position="fixed" top="10px" w="100%" textAlign="center">
+                        <Tag wordBreak="break-all">{printStatesPathValue(state)}</Tag>
+                    </Box>
                 )}
-            </VFlex>
-            {debugMode && (
-                <Box position="fixed" top="10px" w="100%" textAlign="center">
-                    <Tag wordBreak="break-all">{printStatesPathValue(state)}</Tag>
-                </Box>
-            )}
-        </ProgramInterpretProvider>
+            </ProgramInterpretProvider>
+            <FooterSpacer />
+        </ViewLayout>
     );
 };

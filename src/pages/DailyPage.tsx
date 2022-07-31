@@ -1,6 +1,7 @@
 import { CalendarButton } from "@/Calendar/CalendarButton";
 import { VFlex } from "@/components/VFlex";
 import { DailyEntry } from "@/Daily/DailyEntry";
+import { FooterSpacer, ViewLayout } from "@/Layout";
 import { currentDateAtom } from "@/store";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { Box, Flex, IconButton } from "@chakra-ui/react";
@@ -10,19 +11,25 @@ import { Outlet } from "react-router-dom";
 
 export const DailyPage = () => {
     return (
-        <>
-            <Header />
-            <DailyEntry />
-        </>
+        <ViewLayout>
+            <ViewLayout>
+                <Header />
+                <DailyEntry />
+            </ViewLayout>
+            <FooterSpacer />
+        </ViewLayout>
     );
 };
 
 export const DailyPageLayout = () => {
     return (
-        <>
-            <Header />
-            <Outlet />
-        </>
+        <ViewLayout>
+            <ViewLayout>
+                <Header />
+                <Outlet />
+            </ViewLayout>
+            <FooterSpacer />
+        </ViewLayout>
     );
 };
 

@@ -24,13 +24,14 @@ export const CustomDateRangeCalendarButton = ({
 
     const { setDates, ...dates } = useCalendarValues();
     const fallbackDates = useFallbackDates();
+
     const handleClose = () => {
         let { start, end } = dates;
         if (!dates.start) {
-            start = fallbackDates.start || getRangeStart("1m");
+            start = fallbackDates?.start || getRangeStart("1m");
         }
         if (!dates.end) {
-            end = fallbackDates.end || new Date();
+            end = fallbackDates?.end || new Date();
         }
         setDates({ start, end });
         onClose();
@@ -53,6 +54,17 @@ export const CustomDateRangeCalendarButton = ({
                     <TwoMonthsDateRangeCalendar
                         renderButton={(dates) => (
                             <Show when={Boolean(dates.start || dates.end)}>
+                                <Button
+                                    onClick={() =>
+                                        setDates(fallbackDates || { start: getRangeStart("1m"), end: new Date() })
+                                    }
+                                    colorScheme="pink"
+                                    size="md"
+                                    disabled={!Boolean(dates.start || dates.end)}
+                                    variant="outline"
+                                >
+                                    Reset range
+                                </Button>
                                 <Button
                                     onClick={handleClose}
                                     colorScheme="pink"

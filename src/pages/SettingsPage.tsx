@@ -1,5 +1,5 @@
-import { VFlex } from "@/components/VFlex";
 import { SwitchInput } from "@/fields/SwitchInput";
+import { FooterSpacer, ViewLayout } from "@/Layout";
 import { useCategoryList, useDailyList, useExerciseList, useGroupList, useProgramList, useTagList } from "@/orm-hooks";
 import { DataAccordions } from "@/Settings/DataAccordions";
 import { debugModeAtom } from "@/store";
@@ -11,37 +11,40 @@ export const SettingsPage = () => {
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
 
     return (
-        <VFlex id="SettingsPage" h="100%" p="4" w="100%">
-            <Flex>
-                <Heading as="h1">Settings</Heading>
-                <chakra.span ml="auto">
-                    EmiFIT v{import.meta.env.VITE_APP_VERSION} [{import.meta.env.DEV ? "dev" : "prod"}]
-                </chakra.span>
-            </Flex>
-            <Flex flexDirection="column" mt="8" h="100%" minH="0" overflow="auto">
-                {/* TODO theme colors */}
-                <EditableList />
-                <Box mt="auto">
-                    <Stack spacing="4" mt="8" pt="8">
-                        <ExportImportData />
-                        <Flex>
-                            <SwitchInput
-                                ml="auto"
-                                id="debugModeSwitch"
-                                label="Debug mode"
-                                onChange={(e) => setDebugMode(e.target.checked)}
-                                isChecked={debugMode}
-                            />
-                        </Flex>
-                    </Stack>
-                </Box>
-                {debugMode && (
-                    <Box mt="4">
-                        <DebugModeOnly />
+        <ViewLayout>
+            <ViewLayout id="SettingsPage" h="100%" p="4" w="100%">
+                <Flex>
+                    <Heading as="h1">Settings</Heading>
+                    <chakra.span ml="auto">
+                        EmiFIT v{import.meta.env.VITE_APP_VERSION} [{import.meta.env.DEV ? "dev" : "prod"}]
+                    </chakra.span>
+                </Flex>
+                <Flex flexDirection="column" mt="8" h="100%" minH="0" overflow="auto">
+                    {/* TODO theme colors */}
+                    <EditableList />
+                    <Box mt="auto">
+                        <Stack spacing="4" mt="8" pt="8">
+                            <ExportImportData />
+                            <Flex>
+                                <SwitchInput
+                                    ml="auto"
+                                    id="debugModeSwitch"
+                                    label="Debug mode"
+                                    onChange={(e) => setDebugMode(e.target.checked)}
+                                    isChecked={debugMode}
+                                />
+                            </Flex>
+                        </Stack>
                     </Box>
-                )}
-            </Flex>
-        </VFlex>
+                    {debugMode && (
+                        <Box mt="4">
+                            <DebugModeOnly />
+                        </Box>
+                    )}
+                </Flex>
+            </ViewLayout>
+            <FooterSpacer />
+        </ViewLayout>
     );
 };
 

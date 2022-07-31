@@ -9,16 +9,17 @@ import { useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { CustomDateRangeCalendarButton } from "./CustomDateRangeCalendarButton";
 
-export const DateRangePresetPicker = ({ rangePresets }: { rangePresets?: RangePresetOrCustom[] }) => {
+export const DateRangePresetPicker = ({
+    rangePresets,
+    withCustomBtn,
+}: {
+    rangePresets?: RangePresetOrCustom[];
+    withCustomBtn?: boolean;
+}) => {
     const { setDates, ...dates } = useCalendarValues();
 
     const presets = Array.from(rangePresets || baseRangePresets);
-    const { inferedRange, datesRange } = getInferedRange(presets, dates);
-    const defaultRange = inferedRange || presets[0];
-
-    const fallbackIndex = closestIndexTo(getRangeStart(defaultRange === "custom" ? "1m" : defaultRange), datesRange);
-    const fallbackDates = { start: datesRange[fallbackIndex], end: new Date() };
-
+    const { defaultRange, fallbackDates } = getFallbackDates(dates, presets);
     const [activeRange, setActiveRange] = useState<RangePresetOrCustom>(defaultRange);
 
     const rangeContainerRef = useRef<HTMLDivElement>();
@@ -40,35 +41,49 @@ export const DateRangePresetPicker = ({ rangePresets }: { rangePresets?: RangePr
                     </Tag>
                 </WrapItem>
             ))}
-            <WrapItem>
-                <FallbackDatesProvider value={fallbackDates}>
-                    <CustomDateRangeCalendarButton
-                        calendarRef={rangeContainerRef}
-                        renderTrigger={({ onOpen }) => (
-                            <Tag
-                                colorScheme="pink"
-                                variant={"custom" === activeRange ? "solid" : "subtle"}
-                                onClick={() => {
-                                    if (activeRange !== "custom") {
-                                        setActiveRange("custom");
-                                        setDates(fallbackDates);
-                                    }
+            {withCustomBtn && (
+                <WrapItem>
+                    <FallbackDatesProvider value={fallbackDates}>
+                        <CustomDateRangeCalendarButton
+                            calendarRef={rangeContainerRef}
+                            renderTrigger={({ onOpen }) => (
+                                <Tag
+                                    colorScheme="pink"
+                                    variant={"custom" === activeRange ? "solid" : "subtle"}
+                                    onClick={() => {
+                                        if (activeRange !== "custom") {
+                                            setActiveRange("custom");
+                                            setDates(fallbackDates);
+                                        }
 
-                                    return onOpen();
-                                }}
-                            >
-                                {"custom" === activeRange ? <TagLeftIcon boxSize="12px" as={CheckIcon} /> : null}
-                                <TagLabel>Custom</TagLabel>
-                            </Tag>
-                        )}
-                    />
-                </FallbackDatesProvider>
-            </WrapItem>
+                                        return onOpen();
+                                    }}
+                                >
+                                    {"custom" === activeRange ? <TagLeftIcon boxSize="12px" as={CheckIcon} /> : null}
+                                    <TagLabel>Custom</TagLabel>
+                                </Tag>
+                            )}
+                        />
+                    </FallbackDatesProvider>
+                </WrapItem>
+            )}
         </Wrap>
     );
 };
 
 export const [FallbackDatesProvider, useFallbackDates] = createContextWithHook<CalendarValues>("FallbackDates");
+export const getFallbackDates = (
+    dates: CalendarValues,
+    presets: RangePresetOrCustom[] = Array.from(baseRangePresets)
+) => {
+    const { inferedRange, datesRange } = getInferedRange(presets, dates);
+    const defaultRange = inferedRange || presets[0];
+
+    const fallbackIndex = closestIndexTo(getRangeStart(defaultRange === "custom" ? "1m" : defaultRange), datesRange);
+    const fallbackDates = { start: datesRange[fallbackIndex], end: new Date() };
+
+    return { fallbackDates, defaultRange };
+};
 
 export const getRangeStart = (preset: RangePreset) => {
     const today = new Date();

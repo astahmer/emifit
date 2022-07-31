@@ -1,11 +1,20 @@
-import { baseRangePresets, DateRangePresetPicker, getRangeStart } from "@/Calendar/DateRangePresetPicker";
-import { CalendarValuesProvider } from "@/Calendar/useCalendarValues";
+import { CustomDateRangeCalendarButton } from "@/Calendar/CustomDateRangeCalendarButton";
+import {
+    baseRangePresets,
+    DateRangePresetPicker,
+    FallbackDatesProvider,
+    getFallbackDates,
+    getRangeStart,
+} from "@/Calendar/DateRangePresetPicker";
+import { CalendarValuesProvider, useCalendarValues } from "@/Calendar/useCalendarValues";
 import { DynamicTable } from "@/components/DynamicTable";
+import { MotionBox } from "@/components/MotionBox";
 import { Show } from "@/components/Show";
 import { VFlex } from "@/components/VFlex";
 import { ExerciseTagList } from "@/Exercises/ExerciseTag";
 import { ExerciseTopSetsTable } from "@/Exercises/ExerciseTopSetsTable";
 import { displayDate } from "@/functions/utils";
+import { ViewLayout } from "@/Layout";
 import { useExerciseUnsortedList } from "@/orm-hooks";
 import { Exercise, WithExerciseList } from "@/orm-types";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -17,20 +26,21 @@ import {
     Grid,
     GridItem,
     GridItemProps,
-    Heading,
     IconButton,
     Stack,
     Tab,
     TabList,
     Tabs,
     Tag,
+    TagLabel,
     Text,
+    useConst,
     useTabsContext,
     useTheme,
 } from "@chakra-ui/react";
 import { CalendarValues } from "@uselessdev/datepicker";
-import { get, getSum, roundTo, sortBy } from "pastable";
-import { ComponentPropsWithoutRef, PropsWithChildren, useState } from "react";
+import { createContextWithHook, get, getSum, roundTo, sortBy } from "pastable";
+import { ComponentPropsWithoutRef, PropsWithChildren, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
     CartesianGrid,
@@ -59,36 +69,76 @@ export const InspectExerciseTab = () => {
         "createdAt"
     );
 
+    return (
+        <Show when={Boolean(query.data?.length)} fallback={<CenteredSpinner h="100%" />}>
+            <LastExerciseProvider value={(query.data || []).at(-1)}>
+                <CalendarValuesProvider value={{ ...dates, setDates }}>
+                    <ExerciseListProvider value={exerciseList}>
+                        <ViewLayout>
+                            <InspectExerciseTabContent />
+                        </ViewLayout>
+                    </ExerciseListProvider>
+                </CalendarValuesProvider>
+            </LastExerciseProvider>
+        </Show>
+    );
+};
+
+const [ExerciseListProvider, useExerciseListCtx] = createContextWithHook<Exercise[]>("ExerciseListCtx");
+const [LastExerciseProvider, useLastExerciseCtx] = createContextWithHook<Exercise>("LastExerciseCtx");
+
+const InspectExerciseTabContent = () => {
+    const { setDates, ...dates } = useCalendarValues();
+    const exerciseList = useExerciseListCtx();
     const exerciseListWithTops = exerciseList.map(getExerciseTops);
 
+    const rangeContainerRef = useRef();
+    const fallbackDates = useConst(getFallbackDates(dates).fallbackDates);
+
     return (
-        <VFlex pos="relative" h="100%" minH={0} pt="4">
-            <Show when={Boolean(exerciseList.length)} fallback={<CenteredSpinner h="100%" />}>
-                <VFlex px="4">
-                    <Header exerciseListWithTops={exerciseListWithTops} />
-                    <Divider my="4" />
-                </VFlex>
-                <VFlex h="100%" minH={0}>
-                    <VFlex px="4">
-                        {/* TODO Dropdown avec les presets quand on clique plutôt que tout dispo via Flex ? */}
-                        <CalendarValuesProvider value={{ ...dates, setDates }}>
-                            <VFlex bgColor="white" pb="4" px="4">
-                                <Flex alignItems="center" mb="4">
-                                    <Heading as="h3" fontSize="sm" whiteSpace="nowrap">
-                                        From {displayDate(dates.start)} to {displayDate(dates.end)}{" "}
-                                    </Heading>
-                                </Flex>
-                                <DateRangePresetPicker rangePresets={baseRangePresets.slice(1)} />
-                            </VFlex>
-                        </CalendarValuesProvider>
-                        <Divider mt="2" />
+        <>
+            <VFlex px="4" pt="4">
+                <InspectExerciseHeader exerciseListWithTops={exerciseListWithTops} />
+                <Divider mt="4" />
+            </VFlex>
+            <VFlex h="100%" minH={0} bgColor="gray.100">
+                <VFlex px="4" pos="relative" overflow="hidden">
+                    <MotionBox
+                        pos="absolute"
+                        left="50%"
+                        transform="translateX(-50%)"
+                        borderBottomRadius="50%"
+                        bgColor="white"
+                        bottom="10px"
+                        w="140%"
+                        h="100%"
+                    />
+                    {/* TODO Dropdown avec les presets quand on clique plutôt que tout dispo via Flex ? */}
+                    <VFlex px="4" pos="relative" pt="4" pb="60px" alignItems="center">
+                        <Flex alignItems="center" mb="4">
+                            <FallbackDatesProvider value={fallbackDates}>
+                                <CustomDateRangeCalendarButton
+                                    calendarRef={rangeContainerRef}
+                                    renderTrigger={({ onOpen }) => (
+                                        <Tag colorScheme="pink" variant="solid" onClick={onOpen}>
+                                            <TagLabel>
+                                                {displayDate(dates.start)} - {displayDate(dates.end)}
+                                            </TagLabel>
+                                        </Tag>
+                                    )}
+                                />
+                            </FallbackDatesProvider>
+                        </Flex>
+                        <DateRangePresetPicker rangePresets={baseRangePresets.slice(1)} />
                     </VFlex>
+                    <Divider mt="2" />
+                </VFlex>
+                <ViewLayout pb="60px">
                     <Grid
                         h="100%"
                         minH={0}
                         overflowX="hidden"
                         overflowY="auto"
-                        bg="gray.100"
                         gap="6"
                         p="4"
                         rounded="lg"
@@ -135,6 +185,7 @@ export const InspectExerciseTab = () => {
                             <Text fontSize="md" fontWeight="bold">
                                 Progress avec last week/last month
                             </Text>
+                            <ProgressSinceDate exerciseList={exerciseList} />
                         </Card>
                         {/* TODO History page:
                         vue comme Google Agenda où on a une liste avec :
@@ -144,21 +195,10 @@ export const InspectExerciseTab = () => {
                                 History
                             </Text>
                         </Card>
-                        {/*  */}
-                        <Card colSpan={1}>
-                            <Text fontSize="md" fontWeight="bold">
-                                Used in programs
-                            </Text>
-                        </Card>
-                        {/* TODO
-                        Tableau de totaux, avec comme colonnes:
-                        • Nom | Somme | Min | Max | Moyenne | Tendance (+ ou - ou =)
-                        et en lignes: Set | Poids | Reps
-                        */}
                     </Grid>
-                </VFlex>
-            </Show>
-        </VFlex>
+                </ViewLayout>
+            </VFlex>
+        </>
     );
 };
 
@@ -183,8 +223,8 @@ const getExerciseTops = (exo: Exercise) =>
         },
     } as ExerciseWithTops);
 
-const Header = ({ exerciseListWithTops }: { exerciseListWithTops: ExerciseWithTops[] }) => {
-    const exercise = exerciseListWithTops.at(-1);
+const InspectExerciseHeader = ({ exerciseListWithTops }: { exerciseListWithTops: ExerciseWithTops[] }) => {
+    const exercise = useLastExerciseCtx();
 
     const topKg = Math.max(...exerciseListWithTops.map((exo) => exo.kgs.top));
     const topReps = Math.max(...exerciseListWithTops.map((exo) => exo.reps.top));
@@ -324,7 +364,7 @@ const PieColorNames = [
     "gray.300",
 ];
 const ByTagPieGraph = ({ exerciseList }: { exerciseList: Exercise[] }) => {
-    const exercise = exerciseList.at(-1);
+    const exercise = useLastExerciseCtx();
     const byTags = Object.fromEntries(
         exercise.tags.map((tag) => [tag.id, exerciseList.filter((exo) => exo.tags.includes(tag)).length])
     );
@@ -400,4 +440,9 @@ const getMinAverageMaxSum = (list: number[]) => {
         max: Math.max(...list),
         sum: getSum(list),
     };
+};
+
+const ProgressSinceDate = ({ exerciseList }: WithExerciseList) => {
+    console.log(exerciseList);
+    return null;
 };

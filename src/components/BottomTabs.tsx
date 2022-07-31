@@ -29,12 +29,12 @@ export const BottomTabs = () => {
                 w="100%"
                 variant="enclosed"
                 isFitted
-                borderTop="1px solid"
-                borderTopColor="gray.300"
+                boxShadow="dark-lg"
                 bgColor="gray.50"
+                borderRadius="3xl"
                 index={index}
             >
-                <TabList>
+                <TabList borderRadius="3xl" pb="6">
                     <Tab as={ReactLink} to="/" w="100%" h="58px">
                         <VFlex alignItems="center">
                             <Icon as={AiFillHome} />

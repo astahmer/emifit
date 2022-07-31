@@ -1,13 +1,24 @@
 import { VFlex } from "@/components/VFlex";
 import { DailyExerciseTaskListSkeleton } from "@/Daily/DailyExerciseTaskListSkeleton";
+import { FooterSpacer, ViewLayout } from "@/Layout";
 import { useCurrentDailyQuery } from "@/orm-hooks";
 import { currentDailyIdAtom, showSkeletonsAtom } from "@/store";
-import { Box, Divider, Flex, Heading, Skeleton } from "@chakra-ui/react";
+import { Divider, Flex, Heading, Skeleton } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
+import { WithChildren } from "pastable";
 import { matchPath, Outlet, useLocation } from "react-router-dom";
 import { match } from "ts-pattern";
 
-export function DailyExercisePageLayout() {
+export const DailyExercisePageLayout = () => (
+    <ViewLayout id="DailyExercisePageLayout">
+        <DailyExercisePageLayoutContent>
+            <Outlet />
+        </DailyExercisePageLayoutContent>
+        <FooterSpacer />
+    </ViewLayout>
+);
+
+function DailyExercisePageLayoutContent({ children }: WithChildren) {
     const dailyId = useAtomValue(currentDailyIdAtom);
     const query = useCurrentDailyQuery();
     const daily = query.data;
@@ -20,7 +31,7 @@ export function DailyExercisePageLayout() {
         .with("add", () => "Add daily exercise")
         .with("copy", () => "Copy daily exercise")
         .with("edit", () => "Edit daily exercise")
-        .with("edit-superset", () => "Edit dailysuperset exercise")
+        .with("edit-superset", () => "Edit dailysuperset")
         .exhaustive();
 
     if (showSkeletons || query.isLoading) {
@@ -28,17 +39,17 @@ export function DailyExercisePageLayout() {
     }
 
     return (
-        <VFlex id="DailyExercisePageLayout" as="section" h="100%" p="4" w="100%">
+        <ViewLayout id="DailyExercisePageLayoutContent" p="4">
             <Heading as="h1">{title} </Heading>
             <Heading as="h2" size="md">
                 Daily {dailyId} - {daily?.category}
             </Heading>
             {daily && (
-                <VFlex id="DailyExercisePageLayoutOutlet" mt="auto" minH="0">
-                    <Outlet />
+                <VFlex id="DailyExercisePageLayoutOutlet" pt="4" mt="auto" minH="0">
+                    {children}
                 </VFlex>
             )}
-        </VFlex>
+        </ViewLayout>
     );
 }
 
