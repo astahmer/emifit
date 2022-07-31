@@ -280,7 +280,7 @@ const ExerciseTopsLineGraphInTabs = ({
     exerciseListWithTops,
 }: Pick<ComponentPropsWithoutRef<typeof ExerciseWithTopKgAndRepsTableAndCharts>, "exerciseListWithTops">) => {
     const ctx = useTabsContext();
-    const prefix = ctx.selectedIndex ? "kgs" : "reps";
+    const prefix = ctx.selectedIndex === 0 ? "kgs" : "reps";
     const data = exerciseListWithTops.map((exo) => ({ date: exo.date, ...exo[prefix] }));
 
     return (
