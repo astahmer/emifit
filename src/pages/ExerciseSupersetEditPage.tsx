@@ -20,7 +20,9 @@ export const ExerciseSupersetEditPage = () => {
         }
     }, [supersetId, navigate]);
 
-    return exerciseList.length ? <ExerciseSupersetEditForm exerciseList={exerciseList} /> : null;
+    if (!exerciseList.length) return null;
+
+    return <ExerciseSupersetEditForm exerciseList={exerciseList} />;
 };
 
 const ExerciseSupersetEditForm = ({ exerciseList }: { exerciseList: Exercise[] }) => {

@@ -28,7 +28,9 @@ export const ExerciseEditPage = () => {
         }
     }, [exerciseId, navigate, exercise?.supersetId]);
 
-    return exercise ? <ExerciseEditForm exercise={exercise} /> : null;
+    if (!exercise) return null;
+
+    return <ExerciseEditForm exercise={exercise} />;
 };
 
 const ExerciseEditForm = ({ exercise }: { exercise: Exercise }) => {
