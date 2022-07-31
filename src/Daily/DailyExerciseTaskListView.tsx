@@ -53,6 +53,7 @@ export const DailyExerciseTaskListView = ({ exerciseList }: WithExerciseList) =>
 
 const DailyExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) => {
     const isDailyToday = useAtomValue(isDailyTodayAtom);
+    const debugMode = useAtomValue(debugModeAtom);
 
     const taskList = [] as Array<Exercise | Exercise[]>;
     const addedSuperset = [] as Array<Exercise["supersetId"]>;
@@ -89,7 +90,9 @@ const DailyExerciseTaskList = ({ exerciseList }: { exerciseList: Exercise[] }) =
                                         Superset {supersetIndex}
                                     </Heading>
 
-                                    {isDailyToday && <SupersetExerciseMenu exerciseList={exoOrSuperset} />}
+                                    {(isDailyToday || debugMode) && (
+                                        <SupersetExerciseMenu exerciseList={exoOrSuperset} />
+                                    )}
                                 </Flex>
                                 <ExerciseGrid exerciseList={exoOrSuperset} />
                             </Box>
